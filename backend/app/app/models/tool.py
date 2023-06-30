@@ -8,7 +8,7 @@ from uuid import uuid4
 from app.db.base_class import Base
 
 if TYPE_CHECKING:
-    from . import Report
+    from .report import Report
 
 class Tool(Base):
     id:         Mapped[UUID]        = mapped_column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid4)
