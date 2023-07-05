@@ -1,0 +1,7 @@
+- git clone
+- docker-compose up
+- docker-compose exec backend bash
+	- cd alembic/versions --> remove all revisions
+	- cd ../..
+	- alembic revision --autogenerate -m <msg>
+	- alembic upgrade head
