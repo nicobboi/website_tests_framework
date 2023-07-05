@@ -1,4 +1,6 @@
+from __future__ import annotations
 from pydantic import BaseModel, Json
+from uuid import UUID
 from datetime import datetime
 from typing import Optional, Any, List
 
@@ -20,3 +22,10 @@ class ReportCreate(ReportBase):
 class ReportUpdate(ReportBase):
     tool: Optional[ToolBase] = None
     scores: Optional[ScoreBase] = None
+
+
+class Report(ReportBase):
+    tool: dict
+    scores: list
+    website: dict
+    

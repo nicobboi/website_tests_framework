@@ -5,7 +5,7 @@ from app.api.api_v1.endpoints import (
     users,
     proxy,
     services,
-    reports,
+    reports
 )
 
 api_router = APIRouter()

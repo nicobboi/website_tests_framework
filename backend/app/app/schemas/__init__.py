@@ -12,7 +12,7 @@ from .token import (
 from .user import User, UserCreate, UserInDB, UserUpdate, UserLogin
 from .emails import EmailContent, EmailValidation
 from .totp import NewTOTP, EnableTOTP
-from .report import ReportBase, ReportCreate
-from .website import WebsiteCreate, WebsiteBase
+from .website import WebsiteBase, WebsiteCreate, WebsiteUpdate
+from .report import ReportBase, ReportCreate, ReportUpdate, Report
 from .tool import ToolBase
 from .score import ScoreBase

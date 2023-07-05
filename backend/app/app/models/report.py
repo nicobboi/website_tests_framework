@@ -12,10 +12,10 @@ from .website import Website
 from .score import Score
 from .tool import Tool
 
-# if TYPE_CHECKING:
-#     from .website import Website
-#     from .score import Score
-#     from .tool import Tool
+if TYPE_CHECKING:
+    from . import Website
+    from . import Score
+    from . import Tool
     
 class Report(Base):
     id:             Mapped[UUID]            = mapped_column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid4)

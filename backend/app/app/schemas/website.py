@@ -3,6 +3,7 @@ from typing import List, Optional
 
 from .report import ReportCreate
 
+
 class WebsiteBase(BaseModel):
     url: str
 

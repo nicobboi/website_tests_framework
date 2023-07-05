@@ -18,7 +18,7 @@ class User(Base):
     id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid4)
     created: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     modified: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), server_onupdate=func.now(), nullable=False)
-    full_name: Mapped[str] = mapped_column(index=True)
+    full_name: Mapped[Optional[str]] = mapped_column(index=True, nullable=True)
     email: Mapped[str] = mapped_column(unique=True, index=True, nullable=False)
     hashed_password: Mapped[Optional[str]] = mapped_column(nullable=True)
     totp_secret: Mapped[Optional[str]] = mapped_column(nullable=True)
