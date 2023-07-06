@@ -10,22 +10,26 @@ from .score import ScoreBase
 
 class ReportBase(BaseModel):
     notes: Optional[str] = None
-    json_report: Optional[Json[Any]] = None
+    json_report: Optional[dict] = None
     timestamp: datetime
 
 
+# class to create a new Report and return via API
 class ReportCreate(ReportBase):
     tool: ToolBase
     scores: List[ScoreBase]
     url: str
 
+# ...
 class ReportUpdate(ReportBase):
     tool: Optional[ToolBase] = None
     scores: Optional[ScoreBase] = None
 
 
-class Report(ReportBase):
-    tool: dict
-    scores: list
-    website: dict
+# class to return all scores data from API
+class ReportScores(BaseModel):
+    tool: ToolBase
+    scores: List[ScoreBase]
+    timestamp: datetime
+
     

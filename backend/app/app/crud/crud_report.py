@@ -8,10 +8,12 @@ from app.models.report import Report
 from app.models.tool import Tool
 from app.models.score import Score
 from app.models.website import Website
-from app.schemas.report import ReportCreate, ReportUpdate
+from app.schemas.report import ReportCreate, ReportUpdate, ReportScores
+from app.schemas import ReportScores, ToolBase, ScoreBase
 
 
 class CRUDReport(CRUDBase[Report, ReportCreate, ReportUpdate]):
+    # insert a new report into the db
     def create(self, db: Session, *, obj_in: ReportCreate):
         db_obj = Report(
             notes=obj_in.notes,
@@ -56,6 +58,39 @@ class CRUDReport(CRUDBase[Report, ReportCreate, ReportUpdate]):
         db.commit()
         db.refresh(db_obj)
 
-        return db_obj
+        # return a refactored schema output
+        return ReportCreate(
+            url=db_obj.website.url,
+            tool=ToolBase(
+                name=db_obj.tool.name,
+                type=db_obj.tool.type
+            ),
+            scores=[ScoreBase(
+                name=score.name,
+                score=score.score
+            ) for score in db_obj.scores],
+            notes=db_obj.notes,
+            json_report=db_obj.json_report,
+            timestamp=db_obj.timestamp
+        )
+    
+    # return all reports scores from a given URL
+    def get_scores(self, db: Session, *, url: str):
+        website = crud.website.get_by_url(db=db, url=url)
+
+        # return a refactored schema output
+        return [ReportScores(
+            tool=ToolBase(
+                name=report.tool.name,
+                type=report.tool.type
+            ),
+            scores=[ScoreBase(
+                name=score.name,
+                score=score.score
+            ) for score in report.scores],
+            timestamp=report.timestamp
+        ) for report in website.reports]
+    
+
     
 report = CRUDReport(Report)
