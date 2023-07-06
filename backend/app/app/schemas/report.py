@@ -17,7 +17,7 @@ class ReportBase(BaseModel):
 # class to create a new Report and return via API
 class ReportCreate(ReportBase):
     tool: ToolBase
-    scores: List[ScoreBase]
+    scores: Optional[List[ScoreBase]] = None
     url: str
 
 # ...

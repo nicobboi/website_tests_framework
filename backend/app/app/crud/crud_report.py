@@ -23,13 +23,14 @@ class CRUDReport(CRUDBase[Report, ReportCreate, ReportUpdate]):
         db.add(db_obj)
 
         # Score relationship
-        for s in obj_in.scores:
-            score = Score(
-                name=s.name,
-                score=s.score
-            )
-            db.add(score)
-            db_obj.scores.append(score)
+        if obj_in.scores:
+            for s in obj_in.scores:
+                score = Score(
+                    name=s.name,
+                    score=s.score
+                )
+                db.add(score)
+                db_obj.scores.append(score)
 
         # Tool relationship
         tool_name = obj_in.tool.name
