@@ -14,3 +14,7 @@ class WebsiteCreate(WebsiteBase):
 class WebsiteUpdate(WebsiteBase):
     reports: List[ReportCreate]
 
+
+class WebsiteRun(BaseModel):
+    url: str
+    test_types: List[str]

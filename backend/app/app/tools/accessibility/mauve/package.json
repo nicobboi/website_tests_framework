@@ -1,0 +1,14 @@
+{
+  "name": "mauve-cli",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "puppeteer": "^20",
+    "puppeteer-utilz": "^4.0.8",
+    "regenerator-runtime": "^0.13.11"
+  }
+}

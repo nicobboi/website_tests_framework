@@ -22,17 +22,3 @@ def create_report(
     report = crud.report.create(db, obj_in=report_in)
 
     return report
-
-
-@router.get("/scores", response_model=List[schemas.ReportScores])
-def get_reports_score(
-    *,
-    db: Session = Depends(deps.get_db),
-    url: str
-) -> Any: 
-    """
-    Get all reports scores by URL
-    """
-    reports_score = crud.report.get_scores(db=db, url=url)
-
-    return reports_score
