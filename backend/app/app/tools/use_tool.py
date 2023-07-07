@@ -6,7 +6,7 @@ from typing import List
 run_reports = []
 
 def run_tests(uri: str, test_type: List[str]):
-    print("Testing \'" + uri + "\'.\nMode: " + test_type + ".\n")
+    #print("Testing \'" + uri + "\'.\n")
 
     tests = {
         "SECURITY":         securityTest,
@@ -14,6 +14,7 @@ def run_tests(uri: str, test_type: List[str]):
         "ACCESSIBILITY":    accessibilityTest,
         "SEO":              SEOTest,
         "VALIDATION":       validationTest,
+        "TEST":             Test,
     }
 
     # if is present 'ALL', then test on all test types
@@ -156,6 +157,8 @@ def pushToDB(url):
     import requests
     from datetime import datetime
     timestamp = str(datetime.now())
+    session = requests.Session()
+    session.trust_env = False
 
     for report in run_reports:
         payload = {
@@ -169,11 +172,12 @@ def pushToDB(url):
 
         try:
             # api request to send report's data into the database
-            res = requests.post("http://localhost/api/v1/report/set", json=payload)
+            api_url = "http://backend/api/v1/report/set"
+            res = session.post(api_url, json=payload)
             if res.status_code == 200:
-                print("Report \'" + report['tool'] +"\' sent.")
+                print("Report sent.")
             else:
-                print("Error sending report \'" + report['tool'] +"\'. Response: " + str(res.status_code) + ".")
+                print("Error sending report.")
         except requests.exceptions.ConnectionError:
             print("Connection error.\nShutting down...")
             exit(1)

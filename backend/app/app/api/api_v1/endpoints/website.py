@@ -28,7 +28,6 @@ def get_reports_score(
 @router.post("/run", response_model=str)
 def run_tests(
     *,
-    db: Session = Depends(deps.get_db),
     obj_in: schemas.WebsiteRun
 ) -> Any:
     worker.test_website.delay(uri=obj_in.url, test_type=obj_in.test_types)
