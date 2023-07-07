@@ -144,11 +144,14 @@ def addToReport(type, output):
                 'name': tool,
                 'type': type,
             },
-            'scores': [[{
+            'scores': None
+        }
+
+        if out['scores']:
+            report['scores'] = [{
                 'name': name,
                 'score': score
-            } for name, score in out['scores'].items()], None][out['scores'] == None]
-        }
+            } for name, score in out['scores'].items()]
 
         run_reports.append(report)
 

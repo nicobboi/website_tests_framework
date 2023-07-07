@@ -8,7 +8,6 @@ from app.tools import use_tool
 
 client_sentry = Client(settings.SENTRY_DSN)
 
-
 @celery_app.task(acks_late=True)
 async def test_celery(word: str) -> str:
     await asyncio.sleep(5)
