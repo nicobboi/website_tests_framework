@@ -6,6 +6,8 @@ from typing import List
 run_reports = []
 
 def run_tests(uri: str, test_type: List[str]):
+    print("Testing \'" + uri + "\'.\nMode: " + test_type + ".\n")
+
     tests = {
         "SECURITY":         securityTest,
         "PERFORMANCE":      performanceTest,
@@ -22,15 +24,18 @@ def run_tests(uri: str, test_type: List[str]):
     else:
         for test_name in test_type:
             if not test_name in tests.keys():
-                 continue
+                print("Test \'" + test_name + "\' not valid.") 
+                continue
             tests[test_name](uri)
 
     # if there are reports (call is valid), then push them into the db
     if run_reports:
+        print("All tests ended.\n")
         pushToDB(uri)
 
 
-# ALL TEST OUTPUT ARE DICT (use keys() to check the tools used for that output)
+# --- TESTS ----------------------------------------------------------------------------- #
+
 
 # Runs the security tests (ssllabs-scan and shcheck) and prints the desired output
 def securityTest(uri):
@@ -48,7 +53,7 @@ def securityTest(uri):
 
 # Runs the performance test (PageSpeed Insight) and prints the desired output
 # OUTPUT:
-#   PageSpeed Insight: performance score, number of audits, ... (TODO: add more)
+#   PageSpeed Insight: ...
 def performanceTest(uri):
     from .performance import performancetest
 
@@ -78,7 +83,7 @@ def accessibilityTest(uri):
 
 # Runs the validation test (pa-website-validator) and prints the desired output
 # OUTPUT:
-#   pa-website-validator: model compliace score, reccomandations tests score, ... (TODO: add more)
+#   pa-website-validator: ...
 def validationTest(uri):
     from .validation import validationtest
 
@@ -150,12 +155,13 @@ def addToReport(type, output):
 def pushToDB(url):
     import requests
     from datetime import datetime
+    timestamp = str(datetime.now())
 
     for report in run_reports:
         payload = {
             'notes': report['notes'],
             'json_report': report['json_report'],
-            'timestamp': str(datetime.now()),
+            'timestamp': timestamp,
             'tool': report['tool'],
             'scores': report['scores'],
             'url': url
@@ -172,6 +178,6 @@ def pushToDB(url):
             print("Connection error.\nShutting down...")
             exit(1)
 
-    #print("\nAll report sent.\n")
+    print("\nAll report sent.\n")
     run_reports.clear()
 
