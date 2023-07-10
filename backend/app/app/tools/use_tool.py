@@ -5,7 +5,7 @@ from typing import List
 # global list to stores all reports which will be sent to db 
 run_reports = []
 
-def run_tests(uri: str, test_type: List[str]):
+def run_test(uri: str, test_type: str):
     #print("Testing \'" + uri + "\'.\n")
 
     tests = {
@@ -17,17 +17,20 @@ def run_tests(uri: str, test_type: List[str]):
         "TEST":             Test,
     }
 
-    # if is present 'ALL', then test on all test types
-    if "ALL" in test_type:
-        for test in tests.values():
-            test(uri)
-    # else, test on types given by client
-    else:
-        for test_name in test_type:
-            if not test_name in tests.keys():
-                print("Test \'" + test_name + "\' not valid.") 
-                continue
-            tests[test_name](uri)
+    # # if is present 'ALL', then test on all test types
+    # if "ALL" in test_type:
+    #     for test in tests.values():
+    #         test(uri)
+    # # else, test on types given by client
+    # else:
+    #     for test_name in test_type:
+    #         if not test_name in tests.keys():
+    #             print("Test \'" + test_name + "\' not valid.") 
+    #             continue
+    #         tests[test_name](uri)
+
+    if test_type in tests.keys():
+        tests[test_type](uri=uri)
 
     # if there are reports (call is valid), then push them into the db
     if run_reports:
@@ -159,7 +162,9 @@ def addToReport(type, output):
 def pushToDB(url):
     import requests
     from datetime import datetime
-    timestamp = str(datetime.now())
+    from zoneinfo import ZoneInfo
+
+    timestamp = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
     session = requests.Session()
     session.trust_env = False
 

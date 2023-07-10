@@ -5,3 +5,4 @@
 	- cd ../..
 	- alembic revision --autogenerate -m <msg>
 	- alembic upgrade head
+<!-- If needed, launche npm install into the celeryworker container for mauve and pa-website-validator -->

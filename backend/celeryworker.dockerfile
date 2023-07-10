@@ -34,6 +34,9 @@ ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
 RUN node --version
 RUN npm --version
 
+# TODO: add download pa-website-validator
+# TODO: add npm install fro mauve and pa-website-validator
+
 WORKDIR /app/
 # /end Project-specific dependencies	
 

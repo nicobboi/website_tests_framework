@@ -23,7 +23,7 @@ class Report(Base):
     notes:          Mapped[Optional[TEXT]]  = mapped_column(TEXT, nullable=True)
     json_report:    Mapped[Optional[JSON]]  = mapped_column(JSON, nullable=True)
     site_id:        Mapped[UUID]            = mapped_column(UUID(as_uuid=True), ForeignKey("website.id", ondelete="CASCADE"))
-    timestamp:      Mapped[datetime]        = mapped_column(DateTime, nullable=False)
+    timestamp:      Mapped[datetime]        = mapped_column(DateTime(timezone=True), nullable=False)
     
     tool:           Mapped["Tool"]          = relationship(back_populates="reports")
     scores:         Mapped[list["Score"]]   = relationship(back_populates="report", cascade="all, delete, delete-orphan")

@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
+from celery import group
 from typing import List
 from app.api import deps
 from app import worker
@@ -30,5 +31,10 @@ def run_tests(
     *,
     obj_in: schemas.WebsiteRun
 ) -> Any:
-    worker.test_website.delay(uri=obj_in.url, test_type=obj_in.test_types)
+    try:
+        job = group(worker.test_website.s(uri=obj_in.url, test_type=test) for test in obj_in.test_types)
+
+        job.apply_async()
+    except worker.test_website.OperationalError as e:
+        print("Sending task raised: " + str(e) + "\n")
     return "Run avviata!"

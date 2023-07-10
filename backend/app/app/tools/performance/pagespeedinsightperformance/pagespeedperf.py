@@ -1,5 +1,4 @@
-import requests, os, json
-from datetime import datetime
+import requests
 
 def test(uri):
     # API's url for the GET request

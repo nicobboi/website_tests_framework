@@ -1,6 +1,5 @@
 from raven import Client
 import asyncio
-from typing import List
 
 from app.core.celery_app import celery_app
 from app.core.config import settings
@@ -15,7 +14,7 @@ async def test_celery(word: str) -> str:
 
 
 @celery_app.task
-def test_website(uri: str, test_type: List[str]) -> str:
-    use_tool.run_tests(uri=uri, test_type=test_type)
+def test_website(uri: str, test_type: str) -> str:
+    use_tool.run_test(uri=uri, test_type=test_type)
     return "Tests ended."
 
