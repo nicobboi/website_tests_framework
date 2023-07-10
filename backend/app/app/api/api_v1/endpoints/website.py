@@ -38,3 +38,33 @@ def run_tests(
     except worker.test_website.OperationalError as e:
         print("Sending task raised: " + str(e) + "\n")
     return "Run avviata!"
+
+
+@router.post("/schedule", response_model=str)
+def set_schedule(
+    *,
+    db: Session = Depends(deps.get_db),
+    obj_in: schemas.WebsiteSchedule
+) -> Any:
+    crud.crontab.create(db=db, obj_in=schemas.CrontabCreate(
+        info=obj_in.crontab,
+        url=obj_in.url,
+        test_types=obj_in.test_types
+    ))
+
+    # TODO: avviare un nuovo scheduler col crontab specificato
+
+    return "Scheduler started!"
+
+
+@router.post("/scheduler/setstatus")
+def set_scheduler_status(
+    *,
+    scheduler,
+    status: bool
+) -> Any:
+    # trovare lo scheduler in questione
+
+    # modificare lo stato (attivo/disattivo)
+
+    return "Scheduler status modified!"

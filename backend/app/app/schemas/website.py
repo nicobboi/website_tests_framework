@@ -17,3 +17,7 @@ class WebsiteUpdate(WebsiteBase):
 
 class WebsiteRun(WebsiteBase):
     test_types: List[str]
+
+
+class WebsiteSchedule(WebsiteRun):
+    crontab: str

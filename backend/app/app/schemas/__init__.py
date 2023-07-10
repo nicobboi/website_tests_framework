@@ -14,7 +14,9 @@ from .emails import EmailContent, EmailValidation
 from .totp import NewTOTP, EnableTOTP
 
 # Add here import custom schemas
-from .website import WebsiteBase, WebsiteCreate, WebsiteUpdate, WebsiteRun
+from .website import WebsiteBase, WebsiteCreate, WebsiteUpdate, WebsiteRun, WebsiteSchedule
 from .report import ReportBase, ReportCreate, ReportUpdate, ReportScores
 from .tool import ToolBase
 from .score import ScoreBase
+from .type import TypeBase
+from .crontab import CrontabBase, CrontabCreate

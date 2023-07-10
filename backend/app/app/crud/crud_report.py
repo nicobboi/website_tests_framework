@@ -4,10 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.crud.base import CRUDBase
 from app import crud
-from app.models.report import Report
-from app.models.tool import Tool
-from app.models.score import Score
-from app.models.website import Website
+from app.models import Report, Tool, Score, Website, Type
 from app.schemas.report import ReportCreate, ReportUpdate, ReportScores
 from app.schemas import ReportScores, ToolBase, ScoreBase
 
@@ -36,9 +33,15 @@ class CRUDReport(CRUDBase[Report, ReportCreate, ReportUpdate]):
         tool_name = obj_in.tool.name
         tool = crud.tool.get_by_name(db=db, name=tool_name)
         if not tool:
+            type_name = obj_in.tool.type
+            type = crud.type.get_by_name(db=db, name=type_name)
+            if not type:
+                type = Type(name=type_name)
+            db.add(type)
+
             tool = Tool(
                 name=tool_name,
-                type=obj_in.tool.type
+                type=type
             )
             db.add(tool)
         db_obj.tool = tool
@@ -64,7 +67,7 @@ class CRUDReport(CRUDBase[Report, ReportCreate, ReportUpdate]):
             url=db_obj.website.url,
             tool=ToolBase(
                 name=db_obj.tool.name,
-                type=db_obj.tool.type
+                type=db_obj.tool.type.name
             ),
             scores=[ScoreBase(
                 name=score.name,
