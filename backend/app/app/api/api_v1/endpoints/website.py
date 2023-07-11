@@ -8,6 +8,7 @@ from celery import group
 from typing import List
 from app.api import deps
 from app import worker
+#from app import scheduler
 
 
 router = APIRouter()
@@ -46,25 +47,31 @@ def set_schedule(
     db: Session = Depends(deps.get_db),
     obj_in: schemas.WebsiteSchedule
 ) -> Any:
-    crud.crontab.create(db=db, obj_in=schemas.CrontabCreate(
+    crontab_model = crud.crontab.create(db=db, obj_in=schemas.CrontabCreate(
         info=obj_in.crontab,
         url=obj_in.url,
         test_types=obj_in.test_types
     ))
 
-    # TODO: avviare un nuovo scheduler col crontab specificato
+    # TODO start new scheduled tasks with crontab info
+    # try:
+    #     scheduler.setup_periodic_tasks(crontab_conf=obj_in.crontab, url=obj_in.url, test_types=obj_in.test_types, id=crontab_model.id)
+    #     return "Scheduler started!"
+    # except Exception as e:
+    #     return "An exception occurred: " + str(e)
 
-    return "Scheduler started!"
+
 
 
 @router.post("/scheduler/setstatus")
-def set_scheduler_status(
+def change_scheduler_status(
     *,
-    scheduler,
-    status: bool
+    db: Session = Depends(deps.get_db),
+    scheduler_name, # id crontab in the db
 ) -> Any:
-    # trovare lo scheduler in questione
+    # TODO: attivare/disattivare scheduler
 
-    # modificare lo stato (attivo/disattivo)
+    # change the status of a crontab task
+    crud.crontab.change_status(db=db, id=scheduler_name)
 
     return "Scheduler status modified!"

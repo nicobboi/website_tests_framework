@@ -8,7 +8,7 @@ from app.schemas.crontab import CrontabBase, CrontabCreate
 
 class CRUDCrontab(CRUDBase[Crontab, CrontabBase, CrontabBase]):
     # insert a new crontab into the db
-    def create(self, db: Session, *, obj_in: CrontabCreate):
+    def create(self, db: Session, *, obj_in: CrontabCreate) -> Crontab:
         # crontab
         crontab = Crontab(
             active=True,
@@ -36,6 +36,20 @@ class CRUDCrontab(CRUDBase[Crontab, CrontabBase, CrontabBase]):
                 db.add(type)
             type.crontabs.append(crontab)
 
+        db.commit()
+
+        return Crontab
+    
+    # get a crontab instance by its ID
+    def get_by_id(self, db: Session, *, id) -> Crontab:
+        return db.query(Crontab).filter(Crontab.id == id).first()
+    
+    # change status of a crontab task
+    def change_status(self, db: Session, *, id) -> bool:
+        crontab = self.get_by_id(db=db, id=id)
+
+        crontab.active = not crontab.active
+        
         db.commit()
     
 crontab = CRUDCrontab(Crontab)
