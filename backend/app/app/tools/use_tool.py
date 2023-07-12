@@ -176,8 +176,6 @@ def pushToDB(url):
             "url": url
         }
 
-        print(payload)
-
         try:
             # api request to send report's data into the database
             api_url = "http://backend/api/v1/report/set"

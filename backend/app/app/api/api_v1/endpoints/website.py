@@ -1,6 +1,6 @@
 from typing import Any
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Body
 from sqlalchemy.orm import Session
 from typing import Union
 
@@ -18,12 +18,16 @@ router = APIRouter()
 def get_reports_score(
     *,
     db: Session = Depends(deps.get_db),
-    url: str
+    url: str = Body(
+        example={
+            "url": "http://websiteurl"
+        }
+    )
 ) -> Any: 
     """
     Get all reports scores by URL
     """
-    reports_score = crud.report.get_scores(db=db, url=url)
+    reports_score = crud.website.get_scores(db=db, url=url)
 
     return reports_score
 
@@ -31,8 +35,25 @@ def get_reports_score(
 @router.post("/run", response_model=str)
 def run_tests(
     *,
-    obj_in: schemas.WebsiteRun
+    obj_in: schemas.WebsiteRun = Body(
+        example={
+            "url": "https://www.comune.novellara.re.it/",
+            "test_types": [
+                "performance",
+                "security"
+            ]
+        }
+    )
 ) -> Any:
+    """
+    Launch a different Celery task for all the test types given to test the website. <br />
+    <strong>Test types<strong />:
+        <br/>accessibility,
+        <br/>performance,
+        <br/>security,
+        <br/>seo,
+        <br/>validation.
+    """
     try:
         job = group(worker.test_website.s(uri=obj_in.url, test_type=test) for test in obj_in.test_types)
 

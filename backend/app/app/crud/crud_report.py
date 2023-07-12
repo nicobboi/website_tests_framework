@@ -80,27 +80,6 @@ class CRUDReport(CRUDBase[Report, ReportCreate, ReportUpdate]):
             end_test_timestamp=db_obj.end_test_timestamp
         )
     
-    # return all reports scores from a given URL
-    def get_scores(self, db: Session, *, url: str):
-        website = crud.website.get_by_url(db=db, url=url)
-        if not website:
-            return []
-
-        # return a refactored schema output
-        if website:
-            return [ReportScores(
-                tool=ToolBase(
-                    name=report.tool.name,
-                    type=report.tool.type.name
-                ),
-                scores=[ScoreBase(
-                    name=score.name,
-                    score=score.score
-                ) for score in report.scores],
-                timestamp=report.timestamp
-            ) for report in website.reports]
-        else: return
-    
 
     
 report = CRUDReport(Report)
