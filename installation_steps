@@ -1,8 +1,20 @@
+PREREQUISITI:
+docker: v24.0.4
+docker compose: v2.20.0
+
 - git clone
+- copy .env file
 - docker-compose up
-- docker-compose exec backend bash
-	- cd alembic/versions --> remove all revisions
-	- cd ../..
-	- alembic revision --autogenerate -m <msg>
-	- alembic upgrade head
-<!-- If needed, launche npm install into the celeryworker container for mauve and pa-website-validator -->
+
+If needed, launch npm install into the celeryworker container for mauve and pa-website-validator
+
+localhost:5050/
+pgadmin db setup:
+	- add new server
+	- in "General" set the db name
+	- in "Connection":
+		- "Host name/address" = "db"
+		- "Username" and "Password" are in the .env file
+
+localhost/docs
+API
