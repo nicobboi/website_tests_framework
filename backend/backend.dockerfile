@@ -25,6 +25,8 @@ RUN pip install --upgrade setuptools
 ARG INSTALL_JUPYTER=false
 RUN bash -c "if [ $INSTALL_JUPYTER == 'true' ] ; then pip install jupyterlab ; fi"
 
+COPY ./app/alembic/versions/* ./app/alembic/versions/
+
 ARG BACKEND_APP_MODULE=app.main:app
 ARG BACKEND_PRE_START_PATH=/app/prestart.sh
 ARG BACKEND_PROCESS_MANAGER=gunicorn
