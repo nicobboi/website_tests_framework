@@ -81,6 +81,8 @@ class CRUDReport(CRUDBase[Report, ReportCreate, ReportUpdate]):
     # return all reports scores from a given URL
     def get_scores(self, db: Session, *, url: str):
         website = crud.website.get_by_url(db=db, url=url)
+        if not website:
+            return []
 
         # return a refactored schema output
         return [ReportScores(
