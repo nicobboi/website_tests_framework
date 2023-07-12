@@ -2,6 +2,7 @@ from typing import Any
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from typing import Union
 
 from app import crud, models, schemas
 from celery import group
@@ -13,7 +14,7 @@ from app import worker
 
 router = APIRouter()
 
-@router.get("/scores", response_model=List[schemas.ReportScores])
+@router.get("/scores", response_model=Union[List[schemas.ReportScores],None])
 def get_reports_score(
     *,
     db: Session = Depends(deps.get_db),

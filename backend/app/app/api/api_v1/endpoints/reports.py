@@ -17,7 +17,7 @@ def create_report(
     report_in: schemas.ReportCreate,
 ) -> Any:
     """
-    Create new report
+    Insert a report into the database
     """
     report = crud.report.create(db, obj_in=report_in)
 

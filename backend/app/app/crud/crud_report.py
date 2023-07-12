@@ -83,17 +83,19 @@ class CRUDReport(CRUDBase[Report, ReportCreate, ReportUpdate]):
         website = crud.website.get_by_url(db=db, url=url)
 
         # return a refactored schema output
-        return [ReportScores(
-            tool=ToolBase(
-                name=report.tool.name,
-                type=report.tool.type
-            ),
-            scores=[ScoreBase(
-                name=score.name,
-                score=score.score
-            ) for score in report.scores],
-            timestamp=report.timestamp
-        ) for report in website.reports]
+        if website:
+            return [ReportScores(
+                tool=ToolBase(
+                    name=report.tool.name,
+                    type=report.tool.type.name
+                ),
+                scores=[ScoreBase(
+                    name=score.name,
+                    score=score.score
+                ) for score in report.scores],
+                timestamp=report.timestamp
+            ) for report in website.reports]
+        else: return
     
 
     
