@@ -1,4 +1,6 @@
 from subprocess import Popen
+from datetime import datetime
+from zoneinfo import ZoneInfo
 import json
 import os
 
@@ -18,8 +20,12 @@ def run_test(uri):
 
     print("\'Mauve++\' test started.")
 
+    start_test_timestamp = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
+
     with Popen(["node", mauve_path, uri, output_path]) as proc:
         proc.wait()
+
+    end_test_timestamp = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
 
     # if the url has '/' as last char, it will be removed
     if uri[-1] == '/':
@@ -46,6 +52,8 @@ def run_test(uri):
                 "overall": int(audits_passed / audits_total * 100),
             },
             "notes": str(audits_passed) + " audits passed on a total of " + str(audits_total),
+            "start_test_timestamp": start_test_timestamp,
+            "end_test_timestamp": end_test_timestamp,
             "json_report": mauve_out
         }
 

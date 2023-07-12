@@ -15,7 +15,8 @@ class CRUDReport(CRUDBase[Report, ReportCreate, ReportUpdate]):
         db_obj = Report(
             notes=obj_in.notes,
             json_report=obj_in.json_report,
-            timestamp=datetime.now(),
+            start_test_timestamp=obj_in.start_test_timestamp,
+            end_test_timestamp=obj_in.end_test_timestamp
         )
         db.add(db_obj)
 
@@ -75,7 +76,8 @@ class CRUDReport(CRUDBase[Report, ReportCreate, ReportUpdate]):
             ) for score in db_obj.scores],
             notes=db_obj.notes,
             json_report=db_obj.json_report,
-            timestamp=db_obj.timestamp
+            start_test_timestamp=db_obj.start_test_timestamp,
+            end_test_timestamp=db_obj.end_test_timestamp
         )
     
     # return all reports scores from a given URL

@@ -1,5 +1,3 @@
-from typing import List
-
 # Script to test tools's outputs and to print them
 
 # global list to stores all reports which will be sent to db 
@@ -9,12 +7,12 @@ def run_test(uri: str, test_type: str):
     #print("Testing \'" + uri + "\'.\n")
 
     tests = {
-        "SECURITY":         securityTest,
-        "PERFORMANCE":      performanceTest,
-        "ACCESSIBILITY":    accessibilityTest,
-        "SEO":              SEOTest,
-        "VALIDATION":       validationTest,
-        "TEST":             Test,
+        "security":         securityTest,
+        "performance":      performanceTest,
+        "accessibility":    accessibilityTest,
+        "seo":              SEOTest,
+        "validation":       validationTest,
+        "test":             Test,
     }
 
     # # if is present 'ALL', then test on all test types
@@ -131,7 +129,7 @@ def Test(uri):
         } 
     }
 
-    addToReport("test_type", output)
+    # addToReport("test_type", output)
 
 
 
@@ -141,13 +139,15 @@ def addToReport(type, output):
         out = output[tool]
 
         report = {
-            'notes': out['notes'],
-            'json_report': out['json_report'],
             'tool': {
                 'name': tool,
                 'type': type,
             },
-            'scores': None
+            'scores': None,
+            'notes': out['notes'],
+            'start_test_timestamp': out['start_test_timestamp'],
+            'end_test_timestamp': out['end_test_timestamp'],
+            'json_report': out['json_report'],
         }
 
         if out['scores']:
@@ -161,22 +161,22 @@ def addToReport(type, output):
 # Push a test result into the databa se using the custom API
 def pushToDB(url):
     import requests
-    from datetime import datetime
-    from zoneinfo import ZoneInfo
 
-    timestamp = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
     session = requests.Session()
     session.trust_env = False
 
     for report in run_reports:
         payload = {
-            'notes': report['notes'],
-            'json_report': report['json_report'],
-            'timestamp': timestamp,
-            'tool': report['tool'],
-            'scores': report['scores'],
-            'url': url
+            "notes": report['notes'],
+            "json_report": report['json_report'],
+            "start_test_timestamp": report['start_test_timestamp'],
+            "end_test_timestamp": report['end_test_timestamp'],
+            "tool": report['tool'],
+            "scores": report['scores'],
+            "url": url
         }
+
+        print(payload)
 
         try:
             # api request to send report's data into the database
@@ -186,6 +186,7 @@ def pushToDB(url):
                 print("Report sent.")
             else:
                 print("Error sending report.")
+            session.close()
         except requests.exceptions.ConnectionError:
             print("Connection error.\nShutting down...")
             exit(1)

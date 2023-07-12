@@ -1,4 +1,6 @@
 from .pagespeedinsightperformance import pagespeedperf as psp
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 def run_test(uri):
     output = {
@@ -9,8 +11,12 @@ def run_test(uri):
 
     print("\'PageSpeed Insight PERFORMANCE\' test started.")
 
+    start_test_timestamp = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
+
     # run script for pagespeed insight test
     psp_out = psp.test(uri)
+
+    end_test_timestamp = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
 
     try:
         # organize the output
@@ -19,6 +25,8 @@ def run_test(uri):
                 "performance_score":  int(psp_out['lighthouseResult']['categories']['performance']['score'] * 100),
             },
             "notes": "Loading speed: " + psp_out['loadingExperience']['overall_category'],
+            "start_test_timestamp": start_test_timestamp,
+            "end_test_timestamp": end_test_timestamp,
             "json_report": psp_out
         }
         
@@ -29,7 +37,9 @@ def run_test(uri):
             "notes": {
                 "info": "An error occured while testing this tool..."
             },
-            "documents": None
+            "start_test_timestamp": None,
+            "end_test_timestamp": None,
+            "json_report": None
         }
             
     print("Test ended.\n")

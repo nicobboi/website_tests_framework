@@ -1,5 +1,7 @@
 from .pagespeedinsightseo import pagespeedseo as pss
 from .robotparser import robotparser as rp 
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 # Runs all SEO tool tests and return a dict with all the desired output
 def run_test(uri):
@@ -13,8 +15,12 @@ def run_test(uri):
 
     print("\'PageSpeed Insight SEO\' test started.")
 
+    start_test_timestamp = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
+
     # runs pagespeed insight seo test
     pss_out = pss.test(uri)
+
+    end_test_timestamp = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
     
     try:
         # organizing pss output 
@@ -22,27 +28,14 @@ def run_test(uri):
         # n_audits = len(pss_out["lighthouseResult"]["categories"]["seo"]["auditRefs"])
         robot_valid = bool(pss_out["lighthouseResult"]["audits"]["robots-txt"]["score"])
 
-        ''' OLD OUTPUT (TinyDB)
-        output["pagespeed_seo"] = {
-            "stats": {
-                "score": seo_score,
-                "n_audits": n_audits
-            },
-            "notes": {
-                "is_robots_txt_valid": robot_valid
-            },
-            "documents": {
-                "json_report": pss_report_path
-            }
-        }
-        '''
-
         # NEW OUTPUT (SQLite)
         output['pagespeed_seo'] = {
             "scores": {
                 "seo_score": seo_score,
             },
             "notes": None,
+            "start_test_timestamp": start_test_timestamp,
+            "end_test_timestamp": end_test_timestamp,
             "json_report": pss_out
         }
 
@@ -65,13 +58,17 @@ def run_test(uri):
     output["robot_parser"] = {
         "scores": None,
         "notes": None,
+        "start_test_timestamp": None,
+        "end_test_timestamp": None,
         "json_report": None
     }
 
     print("\'Robot parser\' test started.")
     if robot_valid:
         output["robot_parser"]["notes"] = "Robots.txt is valid!\n\n"
+        output["robot_parser"]["start_test_timestamp"] = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
         output["robot_parser"]["notes"] += rp.test(uri)
+        output["robot_parser"]["end_test_timestamp"] = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
     else:
         output["robot_parser"]["notes"] = "Test not started because robots.txt is not valid!"
     print("Test ended\n")

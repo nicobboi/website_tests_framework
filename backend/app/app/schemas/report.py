@@ -1,5 +1,5 @@
 from __future__ import annotations
-from pydantic import BaseModel, Json
+from pydantic import BaseModel, Field
 from uuid import UUID
 from datetime import datetime
 from typing import Optional, Any, List
@@ -9,16 +9,18 @@ from .score import ScoreBase
 
 
 class ReportBase(BaseModel):
-    notes: Optional[str] = None
-    json_report: Optional[dict] = None
-    timestamp: datetime
+    notes: Optional[str] = Field(description="Notes write by report.")
+    json_report: Optional[dict] = Field(default=None, description="Full report in JSON format.")
+    start_test_timestamp: datetime = Field(description="Start test time.")
+    end_test_timestamp: datetime = Field(description="End test time.")
 
 
 # class to create a new Report and return via API
 class ReportCreate(ReportBase):
-    tool: ToolBase
-    scores: Optional[List[ScoreBase]] = None
-    url: str
+    tool: ToolBase = Field(description="Info about report's tool.")
+    scores: Optional[List[ScoreBase]] = Field(default=None, description="All scores of the report.")
+    url: str = Field(description="Website which was tested on.")
+
 
 # ...
 class ReportUpdate(ReportBase):

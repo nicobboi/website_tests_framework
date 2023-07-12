@@ -1,7 +1,8 @@
 from subprocess import Popen, PIPE
 import json
+from datetime import datetime
+from zoneinfo import ZoneInfo
 import os
-import inspect
 
 def run_test(uri):
     output = {
@@ -17,9 +18,13 @@ def run_test(uri):
 
     print("\'pa-website-validator\' test started.")
 
+    start_test_timestamp = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
+
     with Popen(["node", pwv_path + "dist", "--type", "municipality", "--destination", out_fold, "--report", "report", \
                           "--accuracy", "min", "--website", uri], stdout=PIPE, stderr=PIPE) as proc:
         proc.wait()
+
+    end_test_timestamp = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
 
     with open(out_fold + "report.json", "r") as f:
         pwt_out = json.load(f)
@@ -33,6 +38,8 @@ def run_test(uri):
                 "reccomandationstests_score": rt_score
             },
             "notes": None,
+            "start_test_timestamp": start_test_timestamp,
+            "end_test_timestamp": end_test_timestamp,
             "json_report": pwt_out
         }
 

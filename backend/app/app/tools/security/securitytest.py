@@ -1,4 +1,6 @@
 from subprocess import Popen, PIPE
+from datetime import datetime
+from zoneinfo import ZoneInfo
 import json
 import os
 import inspect
@@ -17,7 +19,13 @@ def run_test(uri):
     shcheck_path = script_dir + "/shcheck/shcheck.py"
 
     print("\'Security headers check\' test started.")
+
+    start_test_timestamp = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
+
     with Popen([shcheck_path, "-j", uri], stdout=PIPE) as proc:
+
+        end_test_timestamp = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
+
         shcheck_out = json.loads(proc.stdout.read())
 
         h_pres = list(shcheck_out[uri]['present'].keys())
@@ -26,6 +34,8 @@ def run_test(uri):
         output['sh-check'] = {
             "scores": None,
             "notes": "Security headers present: " + str(len(h_pres)) + ". Missing: " + str(len(h_miss)),
+            "start_test_timestamp": start_test_timestamp,
+            "end_test_timestamp": end_test_timestamp,
             "json_report": shcheck_out
         }
 
@@ -38,8 +48,13 @@ def run_test(uri):
     ssllabs_path = script_dir + "/ssllabsscan/ssllabs-scan"
 
     print("\'SSLlabs-scan\' test started.")
+
+    start_test_timestamp = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
+
     with Popen([ssllabs_path, "--verbosity", "error", uri], stdout=PIPE) as proc:
         ssllabs_scan_out = json.loads(proc.stdout.read())
+
+        end_test_timestamp = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
 
         grade = ssllabs_scan_out[0]['endpoints'][0]['grade'][0] # to get the grade (without the "+" for the "A") 
 
@@ -48,6 +63,8 @@ def run_test(uri):
                 "score_from_grade": score_from_grade(grade)
             },
             "notes": "SSL certificate's grade: " + grade,
+            "start_test_timestamp": start_test_timestamp,
+            "end_test_timestamp": end_test_timestamp,
             "json_report": ssllabs_scan_out[0]
         }
 
