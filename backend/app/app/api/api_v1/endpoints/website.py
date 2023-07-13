@@ -9,7 +9,6 @@ from celery import group
 from typing import List
 from app.api import deps
 from app import worker
-#from app import scheduler
 
 
 router = APIRouter()
@@ -75,12 +74,16 @@ def set_schedule(
         test_types=obj_in.test_types
     ))
 
+    worker.schedule_tasks()
+
     # TODO start new scheduled tasks with crontab info
     # try:
     #     scheduler.setup_periodic_tasks(crontab_conf=obj_in.crontab, url=obj_in.url, test_types=obj_in.test_types, id=crontab_model.id)
     #     return "Scheduler started!"
     # except Exception as e:
     #     return "An exception occurred: " + str(e)
+
+    return "Fatto"
 
 
 

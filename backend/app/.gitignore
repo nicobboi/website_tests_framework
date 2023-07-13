@@ -21,4 +21,4 @@ pip-log.txt
 .tox
 *.mo
 .s3cfg
-celerybeat-schedule
+schedule.db

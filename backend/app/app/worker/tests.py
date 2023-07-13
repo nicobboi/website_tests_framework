@@ -9,7 +9,7 @@ client_sentry = Client(settings.SENTRY_DSN)
 
 @celery_app.task(acks_late=True)
 async def test_celery(word: str) -> str:
-    await asyncio.sleep(5)
+    await asyncio.sleep(2)
     return f"test task return {word}"
 
 
