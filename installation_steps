@@ -1,7 +1,12 @@
-PREREQUISITI:
-docker: v24.0.4
-docker compose: v2.20.0
+PREREQUISITES:
+	docker: v24.0.4
+	docker compose: v2.20.0
+Versions used inside the containers:
+	poetry: v1.5.1
+	node: 19.6.0
+	npm: v9.7.2
 
+GUIDE:
 - git clone
 - copy .env file
 - docker-compose up

@@ -8,6 +8,14 @@ WORKDIR /app/
 # Neomodel has shapely and libgeos as dependencies
 RUN apt-get update && apt-get install -y libgeos-dev
 
+# Update poetry to 1.5.1 (uninstall and re-install)
+RUN rm -rf "${POETRY_HOME:-~/.poetry}"
+RUN curl -sSL https://install.python-poetry.org | python3 - --version 1.5.1
+ENV PATH /root/.local/bin:$PATH
+RUN cd /usr/local/bin && \
+    ln -s /opt/poetry/bin/poetry && \
+    poetry config virtualenvs.create false
+
 # Allow installing dev dependencies to run tests
 ARG INSTALL_DEV=false
 RUN bash -c "if [ $INSTALL_DEV == 'true' ] ; then poetry install --no-interaction --no-root ; else poetry install --no-interaction --no-root --no-dev ; fi"
