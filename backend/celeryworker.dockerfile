@@ -35,6 +35,9 @@ RUN apt-get update && apt-get install -y libgeos-dev
 # RUN bash -c "if [ $INSTALL_DEV == 'true' ] ; then poetry install --no-root ; else poetry install --no-root --no-dev ; fi"
 RUN poetry install --no-interaction --no-ansi
 
+# Environment variables for Celery
+ENV CELERY_BROKER_URL redis://queue:6379/0
+ENV CELERY_RESULT_BACKEND redis://queue:6379/0
 
 # /start Project-specific dependencies
 # RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -49,15 +52,16 @@ RUN . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION}
 RUN . "$NVM_DIR/nvm.sh" && nvm use v${NODE_VERSION}
 RUN . "$NVM_DIR/nvm.sh" && nvm alias default v${NODE_VERSION}
 ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
-# RUN node --version
-# RUN npm --version
 
 
 # DA SISTEMARE
+COPY ./app /app
+
 # install mauve dependencies
 WORKDIR /app/app/tools/accessibility/mauve/
-COPY ./app/app/tools/accessibility/mauve/package.json ./app/app/tools/accessibility/mauve/package-lock.json ./
+# COPY ./app/app/tools/accessibility/mauve/package.json ./app/app/tools/accessibility/mauve/package-lock.json ./
 RUN npm install
+
 # install pa-website-validator and its dependencies
 WORKDIR /app/app/tools/validation/pa-website-validator/
 RUN curl -sSL https://github.com/italia/pa-website-validator/archive/refs/tags/v2.5.1.tar.gz -o project.tar.gz \
@@ -76,7 +80,7 @@ ARG INSTALL_JUPYTER=false
 RUN bash -c "if [ $INSTALL_JUPYTER == 'true' ] ; then pip install jupyterlab ; fi"
 
 ENV C_FORCE_ROOT=1
-COPY ./app /app
+# COPY ./app /app
 WORKDIR /app
 ENV PYTHONPATH=/app
 COPY ./app/worker-start.sh /worker-start.sh

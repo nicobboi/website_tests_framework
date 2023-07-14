@@ -25,7 +25,8 @@ neomodel = "^4.0.8"
 psycopg2-binary = "^2.9.5"
 setuptools = "^65.6.3"
 argon2-cffi = "^21.3.0"
-celery-sqlalchemy-scheduler = "^0.3.0"
+redis = "^4.6.0"
+redisbeat = "^1.2.4"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.991"

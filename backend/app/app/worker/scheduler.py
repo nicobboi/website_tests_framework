@@ -1,8 +1,6 @@
-from app.core.celery_app import get_scheduler_db
-from . import test_website, test_celery
-from celery_sqlalchemy_scheduler.models import PeriodicTask, CrontabSchedule
-from sqlalchemy.orm import Session
-import json
+# from app.core.celery_app import get_scheduler_db
+# from . import test_website, test_celery
+from redisbeat.scheduler import RedisScheduler
 from datetime import datetime, timedelta
 
 
