@@ -103,8 +103,9 @@ services:
         - traefik.http.routers.${STACK_NAME?Variable not set}-pgadmin-https.tls.certresolver=le
         - traefik.http.services.${STACK_NAME?Variable not set}-pgadmin.loadbalancer.server.port=5050
 
-  queue:
+  redis:
     image: 'redis:alpine'
+    hostname: redis
     ports:
       - "6379:6379"
 
@@ -116,7 +117,7 @@ services:
     env_file:
       - .env
     command:
-      - "--broker=redis://guest@queue:6379//"
+      - "--broker=redis://guest@redis:6379//"
       # For the "Broker" tab to work in the flower UI, uncomment the following command argument,
       # and change the queue service's image as well
       # - "--broker_api=http://guest:guest@queue:15672/api//"
@@ -170,7 +171,7 @@ services:
     image: "${DOCKER_IMAGE_CELERYWORKER?Variable not set}:${TAG-latest}"
     depends_on:
       - db
-      - queue
+      - redis
     logging:
       driver: "json-file"
       options:
