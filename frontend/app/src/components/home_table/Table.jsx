@@ -1,10 +1,12 @@
 import Row from './Row'
 
 const Table = (props) => {
+    var row_id = 0;
+
     return (
       <>
         <div className="container">
-          <table class="table table-bordered border-black">
+          <table className="table table-bordered border-black">
             <thead>
               <tr>
                 <th scope="col">Site</th>
@@ -17,7 +19,7 @@ const Table = (props) => {
             </thead>
             {   // iterate all the table's data 
                 props.table_data.map((row_data) => (
-                    <Row site={row_data.url} scores={row_data.scores} />
+                    <Row key={row_id+=1} site={row_data.url} scores={row_data.scores} />
                 ))
             }
           </table>

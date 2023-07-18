@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 
 const Row = (props) => {
+    var td_id = 0;
+
     return (
       <>
         <tbody>
@@ -9,7 +11,7 @@ const Row = (props) => {
             <th scope="row"><Link to={`/sitehistory/${formatUrl(props.site)}`}>{props.site}</Link></th> 
             {
                 Object.values(props.scores).map((score) => (
-                    <td style={{background: setColor(score)}}>{score}</td>
+                    <td key={td_id+=1} style={{background: setColor(score)}}>{score}</td>
                 ))
             }
           </tr>

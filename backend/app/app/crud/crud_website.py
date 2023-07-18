@@ -16,7 +16,6 @@ class CRUDWebsite(CRUDBase[Website, WebsiteCreate, WebsiteUpdate]):
             def average_scores(type):
                 import itertools
                 scores_list = list(itertools.chain.from_iterable([[score_obj.score for score_obj in report_score.scores] for report_score in report_scores if report_score.tool.type == type]))
-                print(scores_list)
                 try:
                     return sum(scores_list) / len(scores_list)
                 except ZeroDivisionError:
