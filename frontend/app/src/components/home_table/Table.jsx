@@ -17,7 +17,7 @@ const Table = (props) => {
             </thead>
             {   // iterate all the table's data 
                 props.table_data.map((row_data) => (
-                    <Row site={row_data.site} scores={row_data.scores} />
+                    <Row site={row_data.url} scores={row_data.scores} />
                 ))
             }
           </table>

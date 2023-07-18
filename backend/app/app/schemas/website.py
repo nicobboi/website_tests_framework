@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List, Optional, Dict, Union
 
 from .report import ReportCreate
 
@@ -21,3 +21,6 @@ class WebsiteRun(WebsiteBase):
 
 class WebsiteSchedule(WebsiteRun):
     crontab: str = Field(description="Crontab string for scheduling task.")
+
+class WebsiteAverageScores(WebsiteBase):
+    scores: Dict[str, Union[int, None]] = Field(description="Schema used for passed average scores of all website in the db.")

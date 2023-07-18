@@ -13,23 +13,28 @@ from app import worker
 
 router = APIRouter()
 
-@router.get("/scores", response_model=Union[List[schemas.ReportScores],None])
-def get_reports_score(
+@router.get("/scores", response_model=Union[List[schemas.ReportScores],List])
+def get_website_scores(
     *,
     db: Session = Depends(deps.get_db),
-    url: str = Body(
-        example={
-            "url": "http://websiteurl"
-        }
-    )
+    url: str
 ) -> Any: 
     """
-    Get all reports scores by URL
+    Get all website's scores by URL
     """
-    reports_score = crud.website.get_scores(db=db, url=url)
+    website_scores = crud.website.get_scores(db=db, url=url)
 
-    return reports_score
+    return website_scores
 
+@router.get("/average-scores", response_model=Union[List[schemas.WebsiteAverageScores], List])
+def get_all_website_average_scores(
+    *,
+    db: Session = Depends(deps.get_db),
+) -> Any:
+    """
+    Get average scores of all websites
+    """
+    return crud.website.get_all_average_scores(db=db)
 
 @router.post("/run", response_model=str)
 def run_tests(
