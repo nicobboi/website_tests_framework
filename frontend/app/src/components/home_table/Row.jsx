@@ -27,7 +27,7 @@ export default Row;
 function setColor(score) {
     let color;
 
-    if (score == null | score == undefined) 
+    if (score === null | score === undefined) 
         color = 'white'
     else if (score >= 90) 
         color = '#7FFF00'; // green

@@ -26,7 +26,17 @@ def get_website_scores(
 
     return website_scores
 
-@router.get("/average-scores", response_model=Union[List[schemas.WebsiteAverageScores], List])
+@router.get("/latest-scores", response_model=Union[List[schemas.WebsiteScores], List])
+def get_latest_scores(
+    *,
+    db: Session = Depends(deps.get_db),
+) -> Any:
+    """
+    Get latest scores of all websites
+    """
+    return crud.website.get_all_latest_scores(db=db)
+
+@router.get("/average-scores", response_model=Union[List[schemas.WebsiteScores], List])
 def get_all_website_average_scores(
     *,
     db: Session = Depends(deps.get_db),

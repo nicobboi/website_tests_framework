@@ -1,12 +1,50 @@
 from sqlalchemy.orm import Session
 
 from app.crud.base import CRUDBase
+from app.crud.crud_tool import tool
 from app.models import Website, Report
-from app.schemas.website import WebsiteCreate, WebsiteUpdate, WebsiteAverageScores
+from app.schemas.website import WebsiteCreate, WebsiteUpdate, WebsiteScores
 from app.schemas import ReportScores, ToolBase, ScoreBase
 
 class CRUDWebsite(CRUDBase[Website, WebsiteCreate, WebsiteUpdate]):
-    # return all website with its average scores
+    # return all websites with their latest scores
+    def get_all_latest_scores(self, db: Session):
+        websites = db.query(Website).all()
+        output = []
+
+        for website in websites:
+            report_scores = self.get_scores(db=db, url=website.url)
+            def latest_score(type):
+                try:
+                    sorted_timestamps = [report_score.timestamp for report_score in report_scores if report_score.tool.type == type]
+                    sorted_timestamps.sort(reverse=True)
+                    latest_scores = []
+                    for report_score in report_scores:
+                        if report_score.timestamp in sorted_timestamps[0:tool.get_no_tool_by_type(db=db, type=type)]:
+                            [latest_scores.append(score.score) for score in report_score.scores if score.score != None]
+                    
+                    try:
+                        return sum(latest_scores) / len(latest_scores)
+                    except ZeroDivisionError:
+                        return None
+                    
+                except ValueError:
+                    return None
+
+            output.append(WebsiteScores(
+                url=website.url,
+                scores={
+                    'accessibility': latest_score("accessibility"),
+                    'performance': latest_score("performance"),
+                    'security': latest_score("security"),
+                    'seo': latest_score("seo"),
+                    'validation': latest_score("validation"),
+                }
+            ))
+
+        return output
+
+    # return all websites with their average scores
     def get_all_average_scores(self, db: Session):
         websites = db.query(Website).all()
         output = []
@@ -22,7 +60,7 @@ class CRUDWebsite(CRUDBase[Website, WebsiteCreate, WebsiteUpdate]):
                     return None
 
             
-            output.append(WebsiteAverageScores(
+            output.append(WebsiteScores(
                 url=website.url,
                 scores={
                     'accessibility': average_scores("accessibility"),
@@ -50,7 +88,7 @@ class CRUDWebsite(CRUDBase[Website, WebsiteCreate, WebsiteUpdate]):
             scores=[ScoreBase(
                 name=score.name,
                 score=score.score
-            ) for score in report.scores],
+            ) for score in report.scores if score.score != None],
             timestamp=report.end_test_timestamp
         ) for report in website.reports]
 

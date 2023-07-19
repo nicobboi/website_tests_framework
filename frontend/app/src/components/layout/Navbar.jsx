@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   return (
@@ -5,7 +6,7 @@ const Navbar = () => {
       <nav className="navbar navbar-light bg-light">
 
         <div className="container-fluid">
-          <a className="navbar-brand">Progetto</a>
+          <Link to="/" className="navbar-brand">Progetto</Link>
           <form className="d-flex">
             <input
               className="form-control me-2"
