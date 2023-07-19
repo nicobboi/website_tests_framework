@@ -1,7 +1,8 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, UUID4
 from typing import List, Optional, Dict, Union
+from datetime import datetime
 
-from .report import ReportCreate
+from .report import ReportCreate, ReportScores
 
 
 class WebsiteBase(BaseModel):
@@ -22,5 +23,11 @@ class WebsiteRun(WebsiteBase):
 class WebsiteSchedule(WebsiteRun):
     crontab: str = Field(description="Crontab string for scheduling task.")
 
-class WebsiteScores(WebsiteBase):
+
+
+class WebsiteReportsScores(WebsiteBase):
+    reports_scores: List[ReportScores] = Field(description="All reports scores of this website.")
+
+class AllWebsiteScores(WebsiteBase):
+    site_id: UUID4 = Field(description="Website's id in the database.")
     scores: Dict[str, Union[int, None]] = Field(description="Schema used for passing scores of all website in the db.")

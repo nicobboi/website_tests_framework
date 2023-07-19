@@ -6,28 +6,33 @@ from typing import Union
 
 from app import crud, models, schemas
 from celery import group
-from typing import List
+from typing import List, Optional
+from pydantic import UUID4
 from app.api import deps
 from app import worker
 
 
 router = APIRouter()
 
-@router.get("/scores", response_model=Union[List[schemas.ReportScores],List])
+@router.get("/scores", response_model=Union[schemas.WebsiteReportsScores,List])
 def get_website_scores(
     *,
     db: Session = Depends(deps.get_db),
-    url: str
+    website_url: Optional[str] = None,
+    website_id: Optional[UUID4] = None
 ) -> Any: 
     """
-    Get all website's scores by URL
+    Get all website's scores by URL or ID
     """
-    website_scores = crud.website.get_scores(db=db, url=url)
+    if not website_url and not website_id:
+        return [] 
+
+    website_scores = crud.website.get_scores(db=db, url=website_url, id=website_id)
 
     return website_scores
 
-@router.get("/latest-scores", response_model=Union[List[schemas.WebsiteScores], List])
-def get_latest_scores(
+@router.get("/latest-scores", response_model=Union[List[schemas.AllWebsiteScores], List])
+def get_all_website_latest_scores(
     *,
     db: Session = Depends(deps.get_db),
 ) -> Any:
@@ -36,7 +41,7 @@ def get_latest_scores(
     """
     return crud.website.get_all_latest_scores(db=db)
 
-@router.get("/average-scores", response_model=Union[List[schemas.WebsiteScores], List])
+@router.get("/average-scores", response_model=Union[List[schemas.AllWebsiteScores], List])
 def get_all_website_average_scores(
     *,
     db: Session = Depends(deps.get_db),

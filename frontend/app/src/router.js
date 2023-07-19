@@ -10,7 +10,7 @@ const CustomRouter = () => {
             <Routes>
                 {/* Routing list */}
                 <Route path='/' element={<Home />} /> 
-                <Route path='/sitehistory/:site' element={<SiteHistory />} />
+                <Route path='/sitehistory/:id' element={<SiteHistory />} />
 
                 {/* No match found handler */}
                 <Route path='*' element={<Home />} />
