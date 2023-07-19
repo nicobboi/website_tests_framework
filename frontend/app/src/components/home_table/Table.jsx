@@ -1,8 +1,6 @@
 import Row from './Row'
 
 const Table = (props) => {
-    var row_id = 0;
-
     return (
       <>
         <div className="container">
