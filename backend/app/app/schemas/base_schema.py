@@ -40,7 +40,8 @@ class MetadataBaseSchema(BaseSchema):
     # https://www.dublincore.org/specifications/dublin-core/dcmi-terms/#section-3
     title: Optional[str] = Field(None, description="A human-readable title given to the resource.")
     description: Optional[str] = Field(
-        None, description="A short description of the resource.",
+        None,
+        description="A short description of the resource.",
     )
     isActive: Optional[bool] = Field(default=True, description="Whether the resource is still actively maintained.")
     isPrivate: Optional[bool] = Field(

@@ -33,6 +33,7 @@ class ReportScores(BaseModel):
     scores: List[ScoreBase]
     timestamp: datetime
 
+
 # schema to return all details about a report
 class ReportDetails(BaseModel):
     url: str
@@ -42,6 +43,3 @@ class ReportDetails(BaseModel):
     end_test_time: datetime
     test_duration_time: str
     json_report: Optional[dict]
-
-
-    

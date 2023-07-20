@@ -16,7 +16,7 @@ services:
       # Do not expose all Docker services, only the ones explicitly exposed
       - --providers.docker.exposedbydefault=false
       # Enable Docker Swarm mode
-      - --providers.docker.swarmmode
+      # - --providers.docker.swarmmode
       # Enable the access log, with HTTP requests
       - --accesslog
       # Enable the Traefik log, for configurations and errors
@@ -106,8 +106,8 @@ services:
   redis:
     image: 'redis:alpine'
     hostname: redis
-    ports:
-      - "6379:6379"
+    # ports:
+    #   - "6379:6379"
 
   flower:
     image: mher/flower:0.9.7
@@ -160,12 +160,11 @@ services:
         BACKEND_PROCESS_MANAGER: ${BACKEND_PROCESS_MANAGER-gunicorn}
         BACKEND_WITH_RELOAD: ${BACKEND_WITH_RELOAD-false}
         INSTALL_DEV: ${INSTALL_DEV-false}
-    deploy:
-      labels:
-        - traefik.enable=true
-        - traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}
-        - traefik.http.routers.${STACK_NAME?Variable not set}-backend-http.rule=PathPrefix(`/api`) || PathPrefix(`/docs`) || PathPrefix(`/redoc`)
-        - traefik.http.services.${STACK_NAME?Variable not set}-backend.loadbalancer.server.port=80
+    labels:
+       - traefik.enable=true
+       - traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}
+       - traefik.http.routers.${STACK_NAME?Variable not set}-backend-http.rule=PathPrefix(`/api`) || PathPrefix(`/docs`) || PathPrefix(`/redoc`)
+       - traefik.http.services.${STACK_NAME?Variable not set}-backend.loadbalancer.server.port=80
 
   celeryworker:
     image: "${DOCKER_IMAGE_CELERYWORKER?Variable not set}:${TAG-latest}"
@@ -181,7 +180,7 @@ services:
       - .env
     environment:
       - SERVER_NAME=${DOMAIN?Variable not set}
-      - SERVER_HOST=https://${DOMAIN?Variable not set}
+      - SERVER_HOST=http://${DOMAIN?Variable not set}
       # Allow explicit env var override for tests
       - SMTP_HOST=${SMTP_HOST?Variable not set}
     build:
@@ -190,22 +189,21 @@ services:
       args:
         INSTALL_DEV: ${INSTALL_DEV-false}
 
-  # frontend:
-  #   image: "${DOCKER_IMAGE_FRONTEND?Variable not set}:${TAG-latest}"
-  #   env_file:
-  #     - .env
-  #   networks:
-  #     - ${TRAEFIK_PUBLIC_NETWORK?Variable not set}
-  #     - default
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: frontend.dockerfile
-  #   deploy:
-  #     labels:
-  #       - traefik.enable=true
-  #       - traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}
-  #       - traefik.http.routers.${STACK_NAME?Variable not set}-frontend-http.rule=PathPrefix(`/`)
-  #       - traefik.http.services.${STACK_NAME?Variable not set}-frontend.loadbalancer.server.port=80
+  frontend:
+    image: "${DOCKER_IMAGE_FRONTEND?Variable not set}:${TAG-latest}"
+    env_file:
+      - .env
+    # networks:
+    #   - ${TRAEFIK_PUBLIC_NETWORK?Variable not set}
+    #   - default
+    build:
+      context: ./frontend
+      dockerfile: frontend.dockerfile
+    labels:
+      - traefik.enable=true
+      - traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}
+      - traefik.http.routers.${STACK_NAME?Variable not set}-frontend-http.rule=PathPrefix(`/`)
+      - traefik.http.services.${STACK_NAME?Variable not set}-frontend.loadbalancer.server.port=3000
 
 volumes:
   app-db-data:
