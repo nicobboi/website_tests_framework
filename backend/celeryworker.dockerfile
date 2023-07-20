@@ -9,21 +9,6 @@ RUN cd /usr/local/bin && \
     ln -s /opt/poetry/bin/poetry && \
     poetry config virtualenvs.create false
 
-# RUN curl -sSL https://install.python-poetry.org | python3 - --version 1.5.1 | POETRY_HOME=/etc/poetry python3 && \
-# cd /usr/local/bin && \
-# ln -s /opt/poetry/bin/poetry && \
-# poetry config virtualenvs.create false
-# ENV POETRY_VERSION=1.5.1
-# ENV POETRY_HOME=/opt/poetry
-# ENV POETRY_VENV=/opt/poetry-venv
-# ENV POETRY_CACHE_DIR=/opt/.cache
-
-# RUN python3 -m venv $POETRY_VENV \
-#     && $POETRY_VENV/bin/pip install -U pip setuptools \
-#     && $POETRY_VENV/bin/pip install poetry==${POETRY_VERSION}
-
-# ENV PATH="${PATH}:${POETRY_VENV}/bin"
-
 # Copy poetry.lock* in case it doesn't exist in the repo
 COPY ./app/pyproject.toml ./app/poetry.lock /app/
 
@@ -35,13 +20,10 @@ RUN apt-get update && apt-get install -y libgeos-dev
 # RUN bash -c "if [ $INSTALL_DEV == 'true' ] ; then poetry install --no-root ; else poetry install --no-root --no-dev ; fi"
 RUN poetry install --no-interaction --no-ansi
 
-# Environment variables for Celery
-# ENV CELERY_BROKER_URL redis://queue:6379/0
-# ENV CELERY_RESULT_BACKEND redis://queue:6379/0
 
 # /start Project-specific dependencies
 # RUN apt-get update && apt-get install -y --no-install-recommends \
-# && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*	
+#     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*	
 
 # install node for tool testing
 ENV NODE_VERSION=19.6.0
@@ -76,8 +58,8 @@ WORKDIR /app/
 # For development, Jupyter remote kernel, Hydrogen
 # Using inside the container:
 # jupyter lab --ip=0.0.0.0 --allow-root --NotebookApp.custom_display_url=http://127.0.0.1:8888
-ARG INSTALL_JUPYTER=false
-RUN bash -c "if [ $INSTALL_JUPYTER == 'true' ] ; then pip install jupyterlab ; fi"
+# ARG INSTALL_JUPYTER=false
+# RUN bash -c "if [ $INSTALL_JUPYTER == 'true' ] ; then pip install jupyterlab ; fi"
 
 ENV C_FORCE_ROOT=1
 # COPY ./app /app

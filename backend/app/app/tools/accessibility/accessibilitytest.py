@@ -3,6 +3,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 import json
 import os
+from glob import glob
 
 def run_test(uri):
     output = {
@@ -31,8 +32,8 @@ def run_test(uri):
     if uri[-1] == '/':
         uri = uri[0:-1]
     # example: mauve-earl-reporthttps___www.comune.novellara.re.it
-    report_path = output_path + "/mauve-earl-report" + [uri, uri.replace("://", "___")]["://" in uri] + "_.json"
-    
+    report_path = output_path + "/mauve-earl-report" + uri.replace("/","_").replace(":","_") + ".json"
+
     # there's an error in the json (",]"), so I manually removed it
     replace_string = ""
     with open(report_path, "r") as f:
@@ -56,6 +57,8 @@ def run_test(uri):
             "end_test_timestamp": end_test_timestamp,
             "json_report": mauve_out
         }
+
+    os.remove(report_path)
 
     print("Test ended.\n")
 

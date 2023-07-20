@@ -1,3 +1,6 @@
 # Get rid of .venv when copying
 */.venv
 */*/.venv
+node_modules
+reports
+user_data
