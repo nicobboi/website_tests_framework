@@ -8,7 +8,7 @@ const Row = (props) => {
         <tbody>
           <tr>
             {/* must change the parameter with a slug */}
-            <th scope="row"><Link to={`/sitehistory/${props.slug}`}>{props.site}</Link></th> 
+            <th scope="row"><Link to={`/site-history/${props.slug}`}>{props.site}</Link></th> 
             {
                 Object.values(props.scores).map((score) => (
                     <td key={td_id+=1} style={{background: setColor(score)}}>{score}</td>
