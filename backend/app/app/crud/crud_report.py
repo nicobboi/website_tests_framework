@@ -1,4 +1,5 @@
 from datetime import datetime
+from pydantic import UUID4
 
 from sqlalchemy.orm import Session
 
@@ -79,6 +80,9 @@ class CRUDReport(CRUDBase[Report, ReportCreate, ReportUpdate]):
             start_test_timestamp=db_obj.start_test_timestamp,
             end_test_timestamp=db_obj.end_test_timestamp
         )
+    
+    def get_by_id(self, *, db: Session, id: UUID4) -> Report:
+        return db.query(Report).filter(Report.id == id).first()
     
 
     

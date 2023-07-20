@@ -1,6 +1,5 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field
-from uuid import UUID
 from datetime import datetime
 from typing import Optional, Any, List
 
@@ -33,5 +32,16 @@ class ReportScores(BaseModel):
     tool: ToolBase
     scores: List[ScoreBase]
     timestamp: datetime
+
+# schema to return all details about a report
+class ReportDetails(BaseModel):
+    url: str
+    tool: ToolBase
+    scores: List[ScoreBase]
+    notes: Optional[str] = None
+    end_test_time: datetime
+    test_duration_time: str
+    json_report: Optional[dict]
+
 
     

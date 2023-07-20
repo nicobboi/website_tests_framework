@@ -15,7 +15,7 @@ from .totp import NewTOTP, EnableTOTP
 
 # Add here import custom schemas
 from .website import WebsiteBase, WebsiteCreate, WebsiteUpdate, WebsiteRun, WebsiteSchedule, AllWebsiteScores, WebsiteReportsScores
-from .report import ReportBase, ReportCreate, ReportUpdate, ReportScores
+from .report import ReportBase, ReportCreate, ReportUpdate, ReportScores, ReportDetails
 from .tool import ToolBase
 from .score import ScoreBase
 from .type import TypeBase
