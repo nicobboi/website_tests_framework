@@ -1,24 +1,26 @@
 import {
     Chart as ChartJS,
+    TimeScale,
     LinearScale,
     PointElement,
     LineElement,
-    Title,
     Tooltip,
+    Title,
     Legend,
-    Colors,
-    TimeScale
+    Colors
 } from 'chart.js';
 import 'chartjs-adapter-date-fns';
-import { Line } from 'react-chartjs-2';
+import { useState } from 'react';
+import { Scatter } from 'react-chartjs-2';
 
 ChartJS.register(
+    TimeScale,
     LinearScale,
     PointElement,
     LineElement,
+    Tooltip,
     Colors,
     Title,
-    Tooltip,
     Legend,
     TimeScale
 );
@@ -26,50 +28,72 @@ ChartJS.register(
 
 const Chart = (props) => {
     // CHAT DATA
-    // All reports filtered by type for graph's y axis
-    const acc_reports = props.reports_scores.filter(report_score => report_score.tool.type === "accessibility");
-    const per_reports = props.reports_scores.filter(report_score => report_score.tool.type === "performance");
-    const sec_reports = props.reports_scores.filter(report_score => report_score.tool.type === "security");
-    const seo_reports = props.reports_scores.filter(report_score => report_score.tool.type === "seo");
-    const val_reports = props.reports_scores.filter(report_score => report_score.tool.type === "validation");
+    // return the dataset for the given type (timestamp - score)
+    const fetchChartData = (type) => {
+        // Reports filtered by type
+        const reports = props.reports_scores.filter(report_score => report_score.tool.type === type);
 
-    // Concatenate all timestamps for graph's x axis 
-    const timestamps_concatenated = [].concat(...acc_reports.map(report => report.timestamp))
-        .concat(...per_reports.map(report => report.timestamp))
-        .concat(...sec_reports.map(report => report.timestamp))
-        .concat(...seo_reports.map(report => report.timestamp))
-        .concat(...val_reports.map(report => report.timestamp))
+        // scores
+        const report_scores = reports.map(report => report.scores.map(score => score.score)).flat();
+        // timestamps
+        const report_timestamps = reports.map(report => report.timestamp);
 
+        var dataset = [];
+
+        if (report_scores.length === report_timestamps.length) {
+            report_scores.forEach((score, index) => {
+                dataset.push({
+                    x: report_timestamps[index],
+                    y: score
+                })
+            });
+        } else {
+            console.error('Axis data are not of the same length.');
+        }
+
+        return dataset;
+    }
+
+    // datasets of the chart
     const data = {
-        labels: timestamps_concatenated.map(timestamp => new Date(timestamp)),
         datasets: [
             {
                 label: 'Accessibility',
-                data: acc_reports.map(report => report.scores.map(score => score.score)).flat(),
+                data: fetchChartData("accessibility"),
+                showLine: true,
+                fill: false
                 // borderColor: 'rgb(255, 99, 132)',
                 // backgroundColor: 'rgba(255, 99, 132, 0.5)',
             },
             {
                 label: 'Performance',
-                data: per_reports.map(report => report.scores.map(score => score.score)).flat(),
+                data: fetchChartData("performance"),
+                showLine: true,
+                fill: false
                 // borderColor: 'rgb(255, 99, 132)',
                 // backgroundColor: 'rgba(255, 99, 132, 0.5)',
             },
             {
                 label: 'Security',
-                data: sec_reports.map(report => report.scores.map(score => score.score)).flat(),
+                data: fetchChartData("security"),
+                showLine: true,
+                fill: false
                 // borderColor: 'rgb(255, 99, 132)',
                 // backgroundColor: 'rgba(255, 99, 132, 0.5)',
             },
             {
                 label: 'SEO',
-                data: seo_reports.map(report => report.scores.map(score => score.score)).flat(),
+                data: fetchChartData("seo"),
+                showLine: true,
+                fill: false
                 // borderColor: 'rgb(255, 99, 132)',
                 // backgroundColor: 'rgba(255, 99, 132, 0.5)',
             },
             {
                 label: 'Validation',
-                data: val_reports.map(report => report.scores.map(score => score.score)).flat(),
+                data: fetchChartData("validation"),
+                showLine: true,
+                fill: false
                 // borderColor: 'rgb(255, 99, 132)',
                 // backgroundColor: 'rgba(255, 99, 132, 0.5)',
             },
@@ -78,7 +102,7 @@ const Chart = (props) => {
 
 
     // CHART CONFIGURATION
-    const options = {
+    const initialOptions = {
         responsive: true,
         plugins: {
             legend: {
@@ -93,10 +117,10 @@ const Chart = (props) => {
             x: {
                 type: 'time',
                 time: {
-                    unit: 'hour',
+                    unit: 'day',
                     unitStepSize: 1,
                     displayFormats: {
-                        hour: 'MMM dd hh:mm',
+                        hour: 'hh:mm',
                         day: 'MMM dd hh:mm',
                         week: 'MMM dd',
                         month: 'MMM dd',
@@ -115,9 +139,33 @@ const Chart = (props) => {
         }
     };
 
+    // to update the time render on x axis of the chart
+    const [options, setChartOptions] = useState(initialOptions);
+    const updateTimeRender = (time_format) => {
+        // Modify the chart option you want to change dynamically
+        const updatedOptions = {
+            ...options,
+            scales: {
+                ...options.scales,
+                x: {
+                    ...options.scales.x,
+                    time: {
+                        ...options.scales.x.time,
+                        unit: time_format
+                    }
+                }
+            },
+        }
+
+        setChartOptions(updatedOptions)
+    }
+
     return (
       <>
-        <Line options={options} data={data} />
+        <Scatter options={options} data={data} />
+        <button className='btn bg-primary text-white my-3 px-4 py-2' onClick={() => updateTimeRender('week')}>WEEK</button>
+        <button className='btn bg-primary text-white ms-4 my-3 px-4 py-2' onClick={() => updateTimeRender('day')}>DAY</button>
+        <button className='btn bg-primary text-white ms-4 my-3 px-4 py-2' onClick={() => updateTimeRender('hour')}>HOUR</button>
       </>
     );
 }

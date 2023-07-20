@@ -101,10 +101,10 @@ class CRUDWebsite(CRUDBase[Website, WebsiteCreate, WebsiteUpdate]):
             timestamp=report.end_test_timestamp
         ) for report in website.reports]
 
-        # remove all reports without a score
-        for report in reports_scores:
-            if all(score.score == [] for score in report.scores):
-                reports_scores.remove(report)
+        reports_score_null = [report for report in reports_scores if not report.scores]
+
+        for report in reports_score_null:
+            reports_scores.remove(report)
 
         # return a refactored schema output
         return WebsiteReportsScores(
