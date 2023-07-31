@@ -90,6 +90,7 @@ class CRUDWebsite(CRUDBase[Website, WebsiteCreate, WebsiteUpdate]):
             return []
         
         reports_scores = [ReportScores(
+            id=report.id,
             tool=ToolBase(
                 name=report.tool.name,
                 type=report.tool.type.name

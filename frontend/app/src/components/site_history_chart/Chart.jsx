@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import {
     Chart as ChartJS,
     TimeScale,
@@ -11,7 +12,8 @@ import {
 } from 'chart.js';
 import 'chartjs-adapter-date-fns';
 import { useState } from 'react';
-import { Scatter } from 'react-chartjs-2';
+import { useNavigate } from 'react-router-dom';
+import { Scatter, getElementAtEvent } from 'react-chartjs-2';
 
 ChartJS.register(
     TimeScale,
@@ -27,7 +29,7 @@ ChartJS.register(
 
 
 const Chart = (props) => {
-    // CHAT DATA
+    // CHART DATA
     // return the dataset for the given type (timestamp - score)
     const fetchChartData = (type) => {
         // Reports filtered by type
@@ -100,7 +102,6 @@ const Chart = (props) => {
         ],
     };
 
-
     // CHART CONFIGURATION
     const initialOptions = {
         responsive: true,
@@ -160,9 +161,37 @@ const Chart = (props) => {
         setChartOptions(updatedOptions)
     }
 
+    // handle the click on the chart's points and redirect to report's details
+    const chartRef = useRef();
+    const navigate = useNavigate();
+    const onChartClicked = (event) => {
+        const el_event = getElementAtEvent(chartRef.current, event);
+        if (el_event.length > 0) {
+            const index = el_event[0].element.$context.index;
+            switch (el_event[0].datasetIndex) { 
+                case 0: // ACCESSIBILITY
+                    var reports = props.reports_scores.filter(report_score => report_score.tool.type === "accessibility");
+                    break;
+                case 1: // PERFORMANCE
+                    var reports = props.reports_scores.filter(report_score => report_score.tool.type === "performance");
+                    break;
+                case 2: // SECURITY
+                    var reports = props.reports_scores.filter(report_score => report_score.tool.type === "security");
+                    break;
+                case 3: // SEO
+                    var reports = props.reports_scores.filter(report_score => report_score.tool.type === "seo");
+                    break;
+                case 4: // VALIDATION
+                    var reports = props.reports_scores.filter(report_score => report_score.tool.type === "validation");
+                    break;
+            }
+            navigate('/report/' + reports[index].id);
+        }
+    }
+
     return (
       <>
-        <Scatter options={options} data={data} />
+        <Scatter options={options} data={data} onClick={onChartClicked} ref={chartRef}/>
         <button className='btn bg-primary text-white my-3 px-4 py-2' onClick={() => updateTimeRender('week')}>WEEK</button>
         <button className='btn bg-primary text-white ms-4 my-3 px-4 py-2' onClick={() => updateTimeRender('day')}>DAY</button>
         <button className='btn bg-primary text-white ms-4 my-3 px-4 py-2' onClick={() => updateTimeRender('hour')}>HOUR</button>

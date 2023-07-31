@@ -1,5 +1,5 @@
 from __future__ import annotations
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, UUID4
 from datetime import datetime
 from typing import Optional, Any, List
 
@@ -29,6 +29,7 @@ class ReportUpdate(ReportBase):
 
 # class to return all scores data from API
 class ReportScores(BaseModel):
+    id: UUID4
     tool: ToolBase
     scores: List[ScoreBase]
     timestamp: datetime
