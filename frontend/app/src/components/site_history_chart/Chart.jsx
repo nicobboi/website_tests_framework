@@ -122,7 +122,7 @@ const Chart = (props) => {
                     unitStepSize: 1,
                     displayFormats: {
                         hour: 'hh:mm',
-                        day: 'MMM dd hh:mm',
+                        day: 'MMM dd',
                         week: 'MMM dd',
                         month: 'MMM dd',
                         quarter: 'MMM dd',
@@ -194,7 +194,6 @@ const Chart = (props) => {
         <Scatter options={options} data={data} onClick={onChartClicked} ref={chartRef}/>
         <button className='btn bg-primary text-white my-3 px-4 py-2' onClick={() => updateTimeRender('week')}>WEEK</button>
         <button className='btn bg-primary text-white ms-4 my-3 px-4 py-2' onClick={() => updateTimeRender('day')}>DAY</button>
-        <button className='btn bg-primary text-white ms-4 my-3 px-4 py-2' onClick={() => updateTimeRender('hour')}>HOUR</button>
       </>
     );
 }

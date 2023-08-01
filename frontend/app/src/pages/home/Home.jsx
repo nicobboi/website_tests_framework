@@ -17,7 +17,7 @@ const Home = () => {
     return (
       <>
         { isLoading ? (
-            <p>Loading component...</p>
+            <p className="text-center">Loading component...</p>
         ) : (
             <Table table_data={data}/>
         )}

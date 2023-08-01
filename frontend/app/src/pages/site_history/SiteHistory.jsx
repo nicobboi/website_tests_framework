@@ -21,7 +21,7 @@ const SiteHistory = () => {
     return (
       <>
         {isLoading ? (
-          <p>Loading component...</p>
+          <p className="text-center">Loading component...</p>
         ) : (
           <>
             <div className="container">

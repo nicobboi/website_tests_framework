@@ -35,7 +35,7 @@ const ReportDetails = () => {
     return (
       <>
         {isLoading ? (
-          <p>Loading component...</p>
+          <p className="text-center">Loading component...</p>
         ) : (
           <>
             <div className="container">
@@ -52,7 +52,7 @@ const ReportDetails = () => {
                   Test duration time: <span>{data.test_duration_time}</span>
                 </div>
                 <div className="col-6">
-                  Important notes: <span>{data.notes}</span>
+                  Notes: <br /> <span className="text-muted">{data.notes}</span>
                 </div>
               </div>
               <div className="row mt-3">
@@ -74,6 +74,18 @@ const ReportDetails = () => {
                     onClick={downloadFile}
                   >
                     Download
+                  </button>
+                </div>
+              </div>
+              <div className="row mt-3">
+                <div className="col-6">
+                  <button className="btn p-3 text-start" title="Previous report">
+                    <i className="fa-solid fa-arrow-left fs-3"></i>
+                  </button>
+                </div>
+                <div className="col-6 text-end">
+                  <button className="btn p-3">
+                    <i className="fa-solid fa-arrow-right fs-3" title="Next report"></i>
                   </button>
                 </div>
               </div>
