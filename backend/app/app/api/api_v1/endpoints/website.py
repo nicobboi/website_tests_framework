@@ -58,9 +58,10 @@ def run_tests(
     obj_in: schemas.WebsiteRun = Body(
         example={
             "url": "https://www.comune.novellara.re.it/",
-            "test_types": ["performance", "security"],
+            "test_types": ["accessibility", "performance", "security", "seo", "validation"],
         }
     ),
+    repeat_test: Union[int, None] = 1,
 ) -> Any:
     """
     Launch a different Celery task for all the test types given to test the website. <br />
@@ -71,12 +72,13 @@ def run_tests(
         <br/>"seo",
         <br/>"validation",
     """
-    try:
-        job = group(worker.test_website.s(uri=obj_in.url, test_type=test) for test in obj_in.test_types)
+    for time in range(1, repeat_test+1):
+        try:
+            job = group(worker.test_website.s(uri=obj_in.url, test_type=test) for test in obj_in.test_types)
 
-        job.apply_async()
-    except worker.test_website.OperationalError as e:
-        print("Sending task raised: " + str(e) + "\n")
+            job.apply_async()
+        except worker.test_website.OperationalError as e:
+            print("Sending task raised: " + str(e) + "\n")
     return "Run avviata!"
 
 

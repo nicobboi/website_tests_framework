@@ -1,64 +1,27 @@
-from subprocess import Popen
-from datetime import datetime
-from zoneinfo import ZoneInfo
-import json
-import os
-from glob import glob
+# import here the output handlers
+from ..toolmockup import output_handler as mockup
+from .mauve import output_handler as mauve
 
 def run_test(uri):
+    # insert here the name of the tools used
     output = {
-        "mauve++": None
+        "accessibility-mockup": None,
+        # "mauve++": None
     }
-
-    script_dir = os.path.dirname(__file__) 
 
     # MAUVE++ -------------------------------------------------------------------- #
 
-    # tool's script path
-    mauve_path = script_dir + "/mauve/index.js"
-    # report download path
-    output_path = script_dir + "/mauve/reports"
+    # print("\'Mauve++\' test started.")
 
-    print("\'Mauve++\' test started.")
+    # output["mauve++"] = mauve.get_output(uri)
 
-    start_test_timestamp = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
+    # print("Test ended.\n")
 
-    with Popen(["node", mauve_path, uri, output_path]) as proc:
-        proc.wait()
+    # MOCKUP --------------------------------------------------------------------- #
 
-    end_test_timestamp = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
+    print("\'Mockup\' test started.")
 
-    # if the url has '/' as last char, it will be removed
-    if uri[-1] == '/':
-        uri = uri[0:-1]
-    # example: mauve-earl-reporthttps___www.comune.novellara.re.it
-    report_path = output_path + "/mauve-earl-report" + uri.replace("/","_").replace(":","_") + ".json"
-
-    # there's an error in the json (",]"), so I manually removed it
-    replace_string = ""
-    with open(report_path, "r") as f:
-        replace_string = f.read()
-    replace_string = replace_string.replace(",\n\t]", "\n\t]")
-    with open(report_path, "w") as f:
-        f.write(replace_string)
-
-    with open(report_path, "r") as f:
-        mauve_out = json.load(f)
-        # compute the total number of audit passed compared to total audits
-        audits_passed = len([x for x in mauve_out['@graph'] if x['earl:result']['dcterms:title'] == "PASS"])
-        audits_total = len(mauve_out['@graph'])
-
-        output['mauve++'] = {
-            "scores": {
-                "overall": int(audits_passed / audits_total * 100),
-            },
-            "notes": str(audits_passed) + " audits passed on a total of " + str(audits_total),
-            "start_test_timestamp": start_test_timestamp,
-            "end_test_timestamp": end_test_timestamp,
-            "json_report": mauve_out
-        }
-
-    os.remove(report_path)
+    output["accessibility-mockup"] = mockup.get_output(uri, min_score=55, max_score=78)
 
     print("Test ended.\n")
 

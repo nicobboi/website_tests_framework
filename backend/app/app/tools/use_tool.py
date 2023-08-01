@@ -12,20 +12,7 @@ def run_test(uri: str, test_type: str):
         "accessibility":    accessibilityTest,
         "seo":              SEOTest,
         "validation":       validationTest,
-        "test":             Test,
     }
-
-    # # if is present 'ALL', then test on all test types
-    # if "ALL" in test_type:
-    #     for test in tests.values():
-    #         test(uri)
-    # # else, test on types given by client
-    # else:
-    #     for test_name in test_type:
-    #         if not test_name in tests.keys():
-    #             print("Test \'" + test_name + "\' not valid.") 
-    #             continue
-    #         tests[test_name](uri)
 
     if test_type in tests.keys():
         tests[test_type](uri=uri)
@@ -114,25 +101,6 @@ def SEOTest(uri):
     print("SEO test ended.\n")
 
 
-# TEST FUNCTION to send data into the db 
-def Test(uri):
-    print("Test API!\n")
-
-    output = {
-        "test_tool6": {
-            'scores': {
-                'score_1': 89, 
-                'score_2': 13
-            },
-            'notes': "Stringhe con note.",
-            'json_report': None
-        } 
-    }
-
-    # addToReport("test_type", output)
-
-
-
 # add the report in the global list of reports
 def addToReport(type, output):
     for tool in output:
@@ -183,12 +151,12 @@ def pushToDB(url):
             if res.status_code == 200:
                 print("Report sent.")
             else:
-                print("Error sending report.")
-            session.close()
+                print("Error sending report. Error: " + str(res.status_code))
         except requests.exceptions.ConnectionError:
             print("Connection error.\nShutting down...")
             exit(1)
+        finally:
+            session.close()
 
-    print("\nAll report sent.\n")
     run_reports.clear()
 

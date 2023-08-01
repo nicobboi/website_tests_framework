@@ -1,91 +1,43 @@
-from subprocess import Popen, PIPE
-from datetime import datetime
-from zoneinfo import ZoneInfo
-import json
-import os
-import inspect
+# import here the output handlers
+from ..toolmockup import output_handler as mockup
+from .shcheck import output_handler as shcheck
+from .ssllabsscan import output_handler as ssllabscan
 
 # Runs all SECURITY tool tests and return a dict with all the desired output
 def run_test(uri):
+    # insert here the name of the tools used
     output = {
-        "sh-check": None,
-        "ssllabs-scan": None
+        "security-mockup": None,
+        # "sh-check": None,
+        # "ssllabs-scan": None
     }
 
-    script_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) 
-    
     # SHCHECK -------------------------------------------------------------------- #
 
-    shcheck_path = script_dir + "/shcheck/shcheck.py"
+    # print("\'Security headers check\' test started.")
 
-    print("\'Security headers check\' test started.")
+    # output["sh-check"] = shcheck.get_output(uri)
 
-    start_test_timestamp = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
-
-    with Popen([shcheck_path, "-j", uri], stdout=PIPE) as proc:
-
-        end_test_timestamp = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
-
-        shcheck_out = json.loads(proc.stdout.read())
-
-        h_pres = list(shcheck_out[uri]['present'].keys())
-        h_miss = shcheck_out[uri]['missing']
-    
-        output['sh-check'] = {
-            "scores": None,
-            "notes": "Security headers present: " + str(len(h_pres)) + ". Missing: " + str(len(h_miss)),
-            "start_test_timestamp": start_test_timestamp,
-            "end_test_timestamp": end_test_timestamp,
-            "json_report": shcheck_out
-        }
-
-    print("Test ended.\n")
-
-    # ---------------------------------------------------------------------------- #
+    # print("Test ended.\n")
     
     # SSLLABS-SCAN --------------------------------------------------------------- #
 
-    ssllabs_path = script_dir + "/ssllabsscan/ssllabs-scan"
+    # print("\'SSLlabs-scan\' test started.")
 
-    print("\'SSLlabs-scan\' test started.")
+    # output["ssllabs-scan"] = ssllabscan.get_output(uri)
 
-    start_test_timestamp = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
+    # print("Test ended.\n")
 
-    with Popen([ssllabs_path, "--verbosity", "error", uri], stdout=PIPE) as proc:
-        ssllabs_scan_out = json.loads(proc.stdout.read())
+    # MOCKUP --------------------------------------------------------------------- #
 
-        end_test_timestamp = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
+    print("\'Mockup\' test started.")
 
-        grade = ssllabs_scan_out[0]['endpoints'][0]['grade'][0] # to get the grade (without the "+" for the "A") 
-
-        output['ssllabs-scan'] = {
-            "scores": {
-                "score_from_grade": score_from_grade(grade)
-            },
-            "notes": "SSL certificate's grade: " + grade,
-            "start_test_timestamp": start_test_timestamp,
-            "end_test_timestamp": end_test_timestamp,
-            "json_report": ssllabs_scan_out[0]
-        }
+    output["security-mockup"] = mockup.get_output(uri, min_score=75, max_score=100)
 
     print("Test ended.\n")
+    
     # ----------------------------------------------------------------------------- #
 
     return output
 
-# returns the corresponding score from the given grade
-def score_from_grade(grade):
-    score = 0
-    grades = {
-        'A': 100,
-        'B': 80,
-        'C': 65,
-        'D': 50,
-        'E': 35,
-        'F': 0
-    }
-    
-    if grade in grades:
-        score = grades[grade]
-            
-    return score
+
