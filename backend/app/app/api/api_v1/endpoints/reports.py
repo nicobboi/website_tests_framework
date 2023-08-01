@@ -65,3 +65,12 @@ def get_report(
         test_duration_time=test_duration_str,
         json_report=report.json_report,
     )
+
+# @router.get("/get-reports")
+# def get_reports(
+#     url: str, 
+#     db: Session = Depends(deps.get_db),
+# ) -> Any:
+#     reports = crud.report.get_by_website(db=db, url=url, timestamp_order=True)
+
+#     return reports

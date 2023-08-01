@@ -4,6 +4,7 @@ from typing import Optional
 
 from app.crud.base import CRUDBase
 from app.crud.crud_tool import tool
+from app import crud
 from app.models import Website, Report
 from app.schemas.website import WebsiteCreate, WebsiteUpdate, AllWebsiteScores, WebsiteReportsScores
 from app.schemas import ReportScores, ToolBase, ScoreBase
@@ -85,9 +86,11 @@ class CRUDWebsite(CRUDBase[Website, WebsiteCreate, WebsiteUpdate]):
             website = self.get_by_id(db=db, id=id)
         else:
             return []
-
+        
         if not website:
             return []
+
+        reports = crud.report.get_by_website(db=db, url=website.url, timestamp_order=True)
         
         reports_scores = [ReportScores(
             id=report.id,
@@ -100,7 +103,7 @@ class CRUDWebsite(CRUDBase[Website, WebsiteCreate, WebsiteUpdate]):
                 score=score.score
             ) for score in report.scores if score.score != None],
             timestamp=report.end_test_timestamp
-        ) for report in website.reports]
+        ) for report in reports]
 
         reports_score_null = [report for report in reports_scores if not report.scores]
 

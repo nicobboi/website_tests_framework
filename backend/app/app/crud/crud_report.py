@@ -2,6 +2,7 @@ from datetime import datetime
 from pydantic import UUID4
 
 from sqlalchemy.orm import Session
+from sqlalchemy import asc
 
 from app.crud.base import CRUDBase
 from app import crud
@@ -11,8 +12,10 @@ from app.schemas import ReportScores, ToolBase, ScoreBase
 
 
 class CRUDReport(CRUDBase[Report, ReportCreate, ReportUpdate]):
-    # insert a new report into the db
     def create(self, db: Session, *, obj_in: ReportCreate):
+        """
+        insert a new report into the db
+        """
         db_obj = Report(
             notes=obj_in.notes,
             json_report=obj_in.json_report,
@@ -82,7 +85,23 @@ class CRUDReport(CRUDBase[Report, ReportCreate, ReportUpdate]):
         )
     
     def get_by_id(self, *, db: Session, id: UUID4) -> Report:
+        """
+        Get the report by its ID
+        """
         return db.query(Report).filter(Report.id == id).first()
+    
+    def get_by_website(self, *, db: Session, url: str, timestamp_order: bool = False):
+        """
+        Get all the reports by the website associated (optional: timestamp order)
+        """
+        website = crud.website.get_by_url(db=db, url=url)
+        if not website:
+            return []
+
+        if timestamp_order:
+            return db.query(Report).filter(Report.site_id == website.id).order_by(asc(Report.end_test_timestamp)).all()
+        else:
+            return db.query(Report).filter(Report.site_id == website.id).all()
     
 
     

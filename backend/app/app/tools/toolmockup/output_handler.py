@@ -7,7 +7,8 @@ from dateutil.relativedelta import relativedelta
 from zoneinfo import ZoneInfo
 
 def get_output(uri, min_score=0, max_score=100):
-    start_test_timestamp = datetime.now(tz=ZoneInfo("Europe/Rome"))+relativedelta(days=10)
+    time_now = datetime.now(tz=ZoneInfo("Europe/Rome"))
+    start_test_timestamp = random_date(str(time_now), str(time_now+relativedelta(days=10)), random.random())
 
     # organize the output
     output = {
@@ -44,7 +45,7 @@ def str_time_prop(start, end, time_format, prop):
 
     ptime = stime + prop * (etime - stime)
 
-    return datetime.strftime(datetime.fromtimestamp(ptime, tz=ZoneInfo("Europe/Rome")), time_format)
+    return datetime.fromtimestamp(ptime, tz=ZoneInfo("Europe/Rome"))
 
 
 def random_date(start, end, prop):
