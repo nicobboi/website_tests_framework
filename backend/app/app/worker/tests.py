@@ -14,6 +14,11 @@ async def test_celery(word: str) -> str:
 
 
 @celery_app.task
+def hello_world(word: str) -> str:
+    return f"test task return {word}"
+
+
+@celery_app.task
 def test_website(uri: str, test_type: str) -> str:
     use_tool.run_test(uri=uri, test_type=test_type)
     return "Tests ended."
