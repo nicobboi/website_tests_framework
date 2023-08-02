@@ -1,11 +1,8 @@
-import { useParams } from "react-router-dom";
 import useFetch from "react-fetch-hook";
 
-const ReportDetails = () => {
-    const { id } = useParams()
-
+const ReportDetails = (props) => {
     // API call
-    const { isLoading, data, error } = useFetch("http://localhost/api/v1/report/get?id=" + id);
+    const { isLoading, data, error } = useFetch("http://localhost/api/v1/report/get?id=" + props.report_id);
  
     if (error) {
         console.log(error)
@@ -32,6 +29,15 @@ const ReportDetails = () => {
         URL.revokeObjectURL(url);
     }
 
+    // handle change report details
+    const changeReport = (event) => {
+      if (event.target.title === "Previous report") {
+        props.change_details(props.report_index-1, props.dataset_index);
+      } else if (event.target.title === "Next report"){
+        props.change_details(props.report_index+1, props.dataset_index);
+      }
+    }
+
     return (
       <>
         {isLoading ? (
@@ -39,8 +45,8 @@ const ReportDetails = () => {
         ) : (
           <>
             <div className="container">
-              <h1 className="text-center">Dettagli report: {data.tool.name}</h1>
-              <div className="row mt-3">
+              <h1 className="text-center">{data.tool.name} | n. {props.report_index+1}</h1>
+              <div className="row mt-5">
                 <div className="col-6">
                   URL: <span className="text-muted">{data.url}</span>
                   <br />
@@ -78,13 +84,13 @@ const ReportDetails = () => {
                 </div>
               </div>
               <div className="row mt-3">
-                <div className="col-6">
+                <div className="col-6" onClick={changeReport}>
                   <button className="btn p-3 text-start" title="Previous report">
-                    <i className="fa-solid fa-arrow-left fs-3"></i>
+                    <i className="fa-solid fa-arrow-left fs-3" title="Previous report"></i>
                   </button>
                 </div>
-                <div className="col-6 text-end">
-                  <button className="btn p-3">
+                <div className="col-6 text-end" onClick={changeReport}>
+                  <button className="btn p-3" title="Next report">
                     <i className="fa-solid fa-arrow-right fs-3" title="Next report"></i>
                   </button>
                 </div>

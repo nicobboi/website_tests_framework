@@ -8,12 +8,15 @@ import {
     Tooltip,
     Title,
     Legend,
-    Colors
+    Colors,
+    elements
 } from 'chart.js';
 import 'chartjs-adapter-date-fns';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Scatter, getElementAtEvent } from 'react-chartjs-2';
+
+import ReportDetails from '../report_details/ReportDetails';
+
 
 ChartJS.register(
     TimeScale,
@@ -29,6 +32,56 @@ ChartJS.register(
 
 
 const Chart = (props) => {
+    const getTypeFromIndex = (datasetIndex) => {
+        switch(datasetIndex) {
+            case 0: return "accessibility";
+            case 1: return "performance";
+            case 2: return "security";
+            case 3: return "seo";
+            case 4: return "validation";
+        }
+    }
+
+    // scroll behaviour on render chidl component
+    const scrollToChild = () => {
+        const child = document.getElementById("child-render");
+        if (child) 
+            child.scrollIntoView({behavior: 'smooth'});
+    }
+    // function called from the report details component child to change it
+    const changeReportDetails = (new_index, type) => {
+        if (type >= 0 && type <= 5) {
+            var reports = props.reports_scores.filter(report_score => report_score.tool.type === getTypeFromIndex(type));
+        }
+        if (new_index >= 0 && new_index < reports.length) {
+            setReportDetails({
+                report_id: reports[new_index].id,
+                graph_index: new_index,
+                dataset_index: type
+            })
+        }
+    }
+
+    // handle the click on the chart's points and redirect to report's details
+    const [reportDetails, setReportDetails] = useState(null);
+    const chartRef = useRef();
+    const onChartClicked = (event) => {
+        const el_event = getElementAtEvent(chartRef.current, event);
+        if (el_event.length > 0) {
+            const index = el_event[0].element.$context.index;
+            const datasetIndex = el_event[0].datasetIndex;
+            var reports = props.reports_scores.filter(report_score => report_score.tool.type === getTypeFromIndex(datasetIndex));
+
+            setReportDetails({
+                report_id: reports[index].id,
+                graph_index: index,
+                dataset_index: datasetIndex
+            });
+            scrollToChild();
+        }
+    }
+
+
     // CHART DATA
     // return the dataset for the given type (timestamp - score)
     const fetchChartData = (type) => {
@@ -63,41 +116,31 @@ const Chart = (props) => {
                 label: 'Accessibility',
                 data: fetchChartData("accessibility"),
                 showLine: true,
-                fill: false
-                // borderColor: 'rgb(255, 99, 132)',
-                // backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                fill: false,
             },
             {
                 label: 'Performance',
                 data: fetchChartData("performance"),
                 showLine: true,
-                fill: false
-                // borderColor: 'rgb(255, 99, 132)',
-                // backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                fill: false,
             },
             {
                 label: 'Security',
                 data: fetchChartData("security"),
                 showLine: true,
-                fill: false
-                // borderColor: 'rgb(255, 99, 132)',
-                // backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                fill: false,
             },
             {
                 label: 'SEO',
                 data: fetchChartData("seo"),
                 showLine: true,
-                fill: false
-                // borderColor: 'rgb(255, 99, 132)',
-                // backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                fill: false,
             },
             {
                 label: 'Validation',
                 data: fetchChartData("validation"),
                 showLine: true,
-                fill: false
-                // borderColor: 'rgb(255, 99, 132)',
-                // backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                fill: false,
             },
         ],
     };
@@ -105,6 +148,32 @@ const Chart = (props) => {
     // CHART CONFIGURATION
     const initialOptions = {
         responsive: true,
+        interaction: {
+            mode: 'nearest',
+            intersect: false
+        },
+        // events: ['click', 'mousemove', 'mouseout'],
+        // onClick: (event, elements, chart) => {
+        //     // console.log({event: event, elements: elements, chart: chart});
+        //     chart.options.elements.point.radius = (context) => {
+        //         console.log(reportDetails);
+        //         if (reportDetails){
+        //         console.log(context.datasetIndex , " " , reportDetails["dataset_index"]);}
+        //         return (reportDetails && 
+        //             context.datasetIndex === reportDetails["dataset_index"] && 
+        //             context.index === reportDetails["graph_index"] ? 10 : 3);
+        //     }
+        // },
+        elements: {
+            point: {
+                display: true,
+                hoverRadius: 15,
+                radius: 3
+            },
+        },
+        tooltip: {
+            usePointStyle: true
+        },
         plugins: {
             legend: {
                 position: 'top',
@@ -161,39 +230,37 @@ const Chart = (props) => {
         setChartOptions(updatedOptions)
     }
 
-    // handle the click on the chart's points and redirect to report's details
-    const chartRef = useRef();
-    const navigate = useNavigate();
-    const onChartClicked = (event) => {
-        const el_event = getElementAtEvent(chartRef.current, event);
-        if (el_event.length > 0) {
-            const index = el_event[0].element.$context.index;
-            switch (el_event[0].datasetIndex) { 
-                case 0: // ACCESSIBILITY
-                    var reports = props.reports_scores.filter(report_score => report_score.tool.type === "accessibility");
-                    break;
-                case 1: // PERFORMANCE
-                    var reports = props.reports_scores.filter(report_score => report_score.tool.type === "performance");
-                    break;
-                case 2: // SECURITY
-                    var reports = props.reports_scores.filter(report_score => report_score.tool.type === "security");
-                    break;
-                case 3: // SEO
-                    var reports = props.reports_scores.filter(report_score => report_score.tool.type === "seo");
-                    break;
-                case 4: // VALIDATION
-                    var reports = props.reports_scores.filter(report_score => report_score.tool.type === "validation");
-                    break;
-            }
-            navigate('/report/' + reports[index].id);
-        }
-    }
-
     return (
       <>
-        <Scatter options={options} data={data} onClick={onChartClicked} ref={chartRef}/>
-        <button className='btn bg-primary text-white my-3 px-4 py-2' onClick={() => updateTimeRender('week')}>WEEK</button>
-        <button className='btn bg-primary text-white ms-4 my-3 px-4 py-2' onClick={() => updateTimeRender('day')}>DAY</button>
+        <Scatter
+          options={options}
+          data={data}
+          onClick={onChartClicked}
+          ref={chartRef}
+        />
+        <button
+          className="btn bg-primary text-white my-3 px-4 py-2"
+          onClick={() => updateTimeRender("week")}
+        >
+          WEEK
+        </button>
+        <button
+          className="btn bg-primary text-white ms-4 my-3 px-4 py-2"
+          onClick={() => updateTimeRender("day")}
+        >
+          DAY
+        </button>
+
+        <div id="child-render">
+          {reportDetails && (
+            <ReportDetails
+              report_id={reportDetails["report_id"]}
+              report_index={reportDetails["graph_index"]}
+              dataset_index={reportDetails["dataset_index"]}
+              change_details={changeReportDetails}
+            />
+          )}
+        </div>
       </>
     );
 }
