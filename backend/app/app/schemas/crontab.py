@@ -8,3 +8,4 @@ class CrontabBase(BaseModel):
 class CrontabCreate(CrontabBase):
     url: str = Field(description="Website'url to schedule test tasks.")
     test_types: list[str] = Field(description="List of test's types to schedule.")
+

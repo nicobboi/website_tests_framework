@@ -7,6 +7,7 @@ from app.api.api_v1.endpoints import (
     # services,
     reports,
     website,
+    schedule
 )
 
 api_router = APIRouter()
@@ -16,3 +17,4 @@ api_router = APIRouter()
 # api_router.include_router(services.router, prefix="/service", tags=["service"])
 api_router.include_router(reports.router, prefix="/report", tags=["report"])
 api_router.include_router(website.router, prefix="/website", tags=["website"])
+api_router.include_router(schedule.router, prefix="/schedule", tags=["schedule"])

@@ -1,3 +1,3 @@
 from app.core.celery_app import celery_app
-from .tests     import test_celery, test_website
-from .scheduler import schedule_tasks
+from .tasks     import test_website, hello_world
+from .scheduler import add_schedule, remove_schedule

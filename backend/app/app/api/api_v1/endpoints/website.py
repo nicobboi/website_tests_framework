@@ -82,22 +82,25 @@ def run_tests(
     return "Run avviata!"
 
 
-@router.post("/schedule", response_model=str)
-def set_schedule(*, db: Session = Depends(deps.get_db), obj_in: schemas.WebsiteSchedule) -> Any:
+@router.post("/add-schedule")
+def add_schedule(*, db: Session = Depends(deps.get_db), obj_in: schemas.WebsiteSchedule) -> Any:
     crontab_model = crud.crontab.create(
         db=db, obj_in=schemas.CrontabCreate(info=obj_in.crontab, url=obj_in.url, test_types=obj_in.test_types)
     )
 
-    worker.schedule_tasks()
+    print(crontab_model)
 
-    # TODO start new scheduled tasks with crontab info
-    # try:
-    #     scheduler.setup_periodic_tasks(crontab_conf=obj_in.crontab, url=obj_in.url, test_types=obj_in.test_types, id=crontab_model.id)
-    #     return "Scheduler started!"
-    # except Exception as e:
-    #     return "An exception occurred: " + str(e)
+    return
 
-    return "Fatto"
+    return worker.add_schedule(url=obj_in.url, test_types=obj_in.test_types, crontab_info=obj_in.crontab, schedule_id=crontab_model.id)
+
+
+@router.post("/remove-schedule")
+def rem_schedule(*, db: Session = Depends(deps.get_db), crontab_id: UUID4):
+    """
+    
+    """
+    return worker.remove_schedule(crontab_id)
 
 
 @router.post("/scheduler/setstatus")
