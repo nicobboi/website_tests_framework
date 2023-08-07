@@ -205,17 +205,17 @@ services:
   #     - traefik.http.routers.${STACK_NAME?Variable not set}-frontend-http.rule=PathPrefix(`/`)
   #     - traefik.http.services.${STACK_NAME?Variable not set}-frontend.loadbalancer.server.port=3000
 
-  scheduler:
-    image: "${DOCKER_IMAGE_SCHEDULER?Variable not set}:${TAG-latest}"
-    depends_on:
-      - db
-      - backend
-      - celeryworker
-    env_file:
-      - .env
-    build: 
-      context: ./backend
-      dockerfile: scheduler.dockerfile
+  # scheduler:
+  #   image: "${DOCKER_IMAGE_SCHEDULER?Variable not set}:${TAG-latest}"
+  #   depends_on:
+  #     - db
+  #     - backend
+  #     - celeryworker
+  #   env_file:
+  #     - .env
+  #   build: 
+  #     context: ./backend
+  #     dockerfile: scheduler.dockerfile
 
 volumes:
   app-db-data:

@@ -16,6 +16,7 @@ import { useState } from 'react';
 import { Scatter, getElementAtEvent } from 'react-chartjs-2';
 
 import ReportDetails from '../report_details/ReportDetails';
+import ReportTypeDetails from '../report_type_details/ReportTypeDetails';
 
 
 ChartJS.register(
@@ -64,6 +65,8 @@ const Chart = (props) => {
 
     // handle the click on the chart's points and redirect to report's details
     const [reportDetails, setReportDetails] = useState(null);
+    const [reportTypeDetails, setReportTypeDetails] = useState(null);
+
     const chartRef = useRef();
     const onChartClicked = (event) => {
         const el_event = getElementAtEvent(chartRef.current, event);
@@ -72,6 +75,7 @@ const Chart = (props) => {
             const datasetIndex = el_event[0].datasetIndex;
             var reports = props.reports_scores.filter(report_score => report_score.tool.type === getTypeFromIndex(datasetIndex));
 
+            setReportTypeDetails(null);
             setReportDetails({
                 report_id: reports[index].id,
                 graph_index: index,
@@ -116,35 +120,35 @@ const Chart = (props) => {
                 label: 'Accessibility',
                 data: fetchChartData("accessibility"),
                 showLine: true,
-                fill: false,
+                borderWidth: 3
             },
             {
                 label: 'Performance',
                 data: fetchChartData("performance"),
                 showLine: true,
-                fill: false,
+                borderWidth: 3
             },
             {
                 label: 'Security',
                 data: fetchChartData("security"),
                 showLine: true,
-                fill: false,
+                borderWidth: 3
             },
             {
                 label: 'SEO',
                 data: fetchChartData("seo"),
                 showLine: true,
-                fill: false,
+                borderWidth: 3
             },
             {
                 label: 'Validation',
                 data: fetchChartData("validation"),
                 showLine: true,
-                fill: false,
+                borderWidth: 3
             },
         ],
     };
-
+    
     // CHART CONFIGURATION
     const initialOptions = {
         responsive: true,
@@ -152,18 +156,6 @@ const Chart = (props) => {
             mode: 'nearest',
             intersect: false
         },
-        // events: ['click', 'mousemove', 'mouseout'],
-        // onClick: (event, elements, chart) => {
-        //     // console.log({event: event, elements: elements, chart: chart});
-        //     chart.options.elements.point.radius = (context) => {
-        //         console.log(reportDetails);
-        //         if (reportDetails){
-        //         console.log(context.datasetIndex , " " , reportDetails["dataset_index"]);}
-        //         return (reportDetails && 
-        //             context.datasetIndex === reportDetails["dataset_index"] && 
-        //             context.index === reportDetails["graph_index"] ? 10 : 3);
-        //     }
-        // },
         elements: {
             point: {
                 display: true,
@@ -172,15 +164,63 @@ const Chart = (props) => {
             },
         },
         tooltip: {
-            usePointStyle: true
+            usePointStyle: true,
         },
         plugins: {
             legend: {
-                position: 'top',
-            },
-            title: {
-                display: true,
-                text: props.url + ' reports history',
+                events: ['click', 'mousemove', 'mouseout'],
+                labels: {
+                    // color: "#0f0f0f",
+                    font: {
+                        size: 16,
+                        weight: 'bold'
+                    },
+                    padding: 30,
+                    usePointStyle: true,
+                    pointStyle: 'triangle',
+                    useBorderRadius: true,
+                    borderRadius: 5
+                },
+                onHover: (event, legendItem, legend) => {
+                    event.native.target.style.cursor = "pointer";
+                },
+                onLeave: (event, legendItem, legend) => {
+                    event.native.target.style.cursor = "default";
+                },
+                onClick: function(e, legendItem) {
+                    // chart update
+                    var index = legendItem.datasetIndex;
+                    var ci = this.chart;
+                    var alreadyHidden = (ci.getDatasetMeta(index).hidden === null) ? false : ci.getDatasetMeta(index).hidden;
+                    var hiddenList = [];
+          
+                    ci.data.datasets.forEach(function(e, i) {
+                        var meta = ci.getDatasetMeta(i);
+            
+                        if (i !== index) {
+                            if (!alreadyHidden) {
+                                meta.hidden = meta.hidden === null ? !meta.hidden : null;
+                            } else if (meta.hidden === null) {
+                                meta.hidden = true;
+                            }
+                        } else if (i === index) {
+                            meta.hidden = null;
+                        }
+
+                        hiddenList.push(meta.hidden);
+                    });
+          
+                    ci.update();
+
+                    // report type details render
+                    if (hiddenList.some((element) => element === true)) {
+                        setReportDetails(null);
+                        setReportTypeDetails({
+                            reports_type: getTypeFromIndex(index)
+                        });
+                    } else 
+                        setReportTypeDetails(null);
+                },
             },
         },
         scales: {
@@ -235,6 +275,7 @@ const Chart = (props) => {
         <Scatter
           options={options}
           data={data}
+        //   plugins={plugins}
           onClick={onChartClicked}
           ref={chartRef}
         />
@@ -252,12 +293,17 @@ const Chart = (props) => {
         </button>
 
         <div id="child-render">
-          {reportDetails && (
+          {reportDetails && !reportTypeDetails && (
             <ReportDetails
               report_id={reportDetails["report_id"]}
               report_index={reportDetails["graph_index"]}
               dataset_index={reportDetails["dataset_index"]}
               change_details={changeReportDetails}
+            />
+          )}
+          {reportTypeDetails && !reportDetails && (
+            <ReportTypeDetails 
+                reports_type={reportTypeDetails["reports_type"]}
             />
           )}
         </div>
