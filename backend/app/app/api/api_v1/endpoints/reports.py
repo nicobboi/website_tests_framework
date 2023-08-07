@@ -68,14 +68,14 @@ def get_report(
 
 @router.get("/get-all-filtered", response_model=list[schemas.ReportDetails])
 def get_reports(
-    url: Union[str, None] = None, 
+    url: str, 
     type: Union[str, None] = None,
     db: Session = Depends(deps.get_db),
 ) -> Any:
-    if url:
-        reports = crud.report.get_all_by_website(db=db, url=url, timestamp_order=True)
-    elif type:
-        reports = crud.report.get_all_by_type(db=db, type=type, timestamp_order=True)
+    """
+    Get all reports by url (optional: filter by type)
+    """
+    reports = crud.report.get_all_by_website(db=db, url=url, type_name=type, timestamp_order=True)
 
     def test_time(start, end):
         test_duration = end - start

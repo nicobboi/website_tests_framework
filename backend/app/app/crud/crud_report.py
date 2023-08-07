@@ -1,5 +1,6 @@
 from datetime import datetime
 from pydantic import UUID4
+from typing import Union
 
 from sqlalchemy.orm import Session
 from sqlalchemy import asc
@@ -90,31 +91,38 @@ class CRUDReport(CRUDBase[Report, ReportCreate, ReportUpdate]):
         """
         return db.query(Report).filter(Report.id == id).first()
     
-    def get_all_by_website(self, *, db: Session, url: str, timestamp_order: bool = False):
+    def get_all_by_website(self, *, db: Session, url: str, type_name: Union[str, None] = None, timestamp_order: bool = False):
         """
-        Get all the reports by the website associated (optional: timestamp order)
+        Get all the reports by the website associated (optional: timestamp order, tool type filter)
         """
         website = crud.website.get_by_url(db=db, url=url)
         if not website:
             return []
+        
+        main_query = db.query(Report).filter(Report.site_id == website.id)
+
+        if type_name:
+            type = crud.type.get_by_name(db=db, name=type_name)
+            if type:
+                main_query = main_query.join(Report.tool).filter(Tool.type_id == type.id)
 
         if timestamp_order:
-            return db.query(Report).filter(Report.site_id == website.id).order_by(asc(Report.end_test_timestamp)).all()
-        else:
-            return db.query(Report).filter(Report.site_id == website.id).all()
+            main_query = main_query.order_by(asc(Report.end_test_timestamp))
+
+        return main_query.all()
     
-    def get_all_by_type(self, *, db: Session, type: str, timestamp_order: bool = False):
-        """
-        Get all the reports by their type (optional: timestamp order)
-        """
-        type = crud.type.get_by_name(db=db, name=type)
-        if not type:
-            return []
+    # def get_all_by_type(self, *, db: Session, type: str, timestamp_order: bool = False):
+    #     """
+    #     Get all the reports by their type (optional: timestamp order)
+    #     """
+    #     type = crud.type.get_by_name(db=db, name=type)
+    #     if not type:
+    #         return []
         
-        if timestamp_order:
-            return db.query(Report).join(Report.tool).filter(Tool.type_id == type.id).order_by(asc(Report.end_test_timestamp)).all()
-        else:
-            return db.query(Report).join(Report.tool).filter(Tool.type_id == type.id).all()
+    #     if timestamp_order:
+    #         return db.query(Report).join(Report.tool).filter(Tool.type_id == type.id).order_by(asc(Report.end_test_timestamp)).all()
+    #     else:
+    #         return db.query(Report).join(Report.tool).filter(Tool.type_id == type.id).all()
 
 
     
