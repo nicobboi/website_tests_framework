@@ -90,7 +90,7 @@ class CRUDWebsite(CRUDBase[Website, WebsiteCreate, WebsiteUpdate]):
         if not website:
             return []
 
-        reports = crud.report.get_by_website(db=db, url=website.url, timestamp_order=True)
+        reports = crud.report.get_all_by_website(db=db, url=website.url, timestamp_order=True)
         
         reports_scores = [ReportScores(
             id=report.id,
