@@ -4,23 +4,14 @@ const ReportRow = (props) => {
 
     return (
       <>
-          <tbody>
-            <tr>
-              {/* must change the parameter with a slug */}
-              <th scope="row">
-                1
-              </th>
-              <td>
-                nome
-              </td>
-              <td>
-                ieri
-              </td>
-              <td>
-                note
-              </td>
-            </tr>
-          </tbody>
+        <tbody>
+          <tr>
+            <th scope="row">{props.id}</th>
+            <td>{props.tool}</td>
+            <td>{props.end_time}</td>
+            <td>{props.notes}</td>
+          </tr>
+        </tbody>
       </>
     );
 }

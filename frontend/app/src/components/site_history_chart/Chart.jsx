@@ -304,6 +304,7 @@ const Chart = (props) => {
           {reportTypeDetails && !reportDetails && (
             <ReportTypeDetails 
                 reports_type={reportTypeDetails["reports_type"]}
+                reports_url={props.url}
             />
           )}
         </div>
