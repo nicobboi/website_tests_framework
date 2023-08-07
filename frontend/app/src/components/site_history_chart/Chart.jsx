@@ -12,11 +12,17 @@ import {
     elements
 } from 'chart.js';
 import 'chartjs-adapter-date-fns';
-import { useState } from 'react';
 import { Scatter, getElementAtEvent } from 'react-chartjs-2';
+
+import { useState } from 'react';
+
+import DateTimePicker from 'react-datetime-picker';
+import 'react-datetime-picker/dist/DateTimePicker.css';
+import 'react-calendar/dist/Calendar.css';
 
 import ReportDetails from '../report_details/ReportDetails';
 import ReportTypeDetails from '../report_type_details/ReportTypeDetails';
+import { parse, secondsInDay, secondsInWeek } from 'date-fns';
 
 
 ChartJS.register(
@@ -88,9 +94,11 @@ const Chart = (props) => {
 
     // CHART DATA
     // return the dataset for the given type (timestamp - score)
-    const fetchChartData = (type) => {
+    const fetchChartData = (type, start_time = null, end_time = null) => {
         // Reports filtered by type
-        const reports = props.reports_scores.filter(report_score => report_score.tool.type === type);
+        const reports = props.reports_scores.filter(report_score => report_score.tool.type === type)
+            .filter((report_score) => (start_time ? report_score.timestamp > start_time : report_score))
+            .filter((report_score) => (end_time ? report_score.timestamp < end_time : report_score))
 
         // scores
         const report_scores = reports.map(report => report.scores.map(score => score.score)).flat();
@@ -114,40 +122,70 @@ const Chart = (props) => {
     }
 
     // datasets of the chart
-    const data = {
+    const initialData = {
         datasets: [
             {
                 label: 'Accessibility',
-                data: fetchChartData("accessibility"),
+                data: fetchChartData(getTypeFromIndex(0)),
                 showLine: true,
                 borderWidth: 3
             },
             {
                 label: 'Performance',
-                data: fetchChartData("performance"),
+                data: fetchChartData(getTypeFromIndex(1)),
                 showLine: true,
                 borderWidth: 3
             },
             {
                 label: 'Security',
-                data: fetchChartData("security"),
+                data: fetchChartData(getTypeFromIndex(2)),
                 showLine: true,
                 borderWidth: 3
             },
             {
                 label: 'SEO',
-                data: fetchChartData("seo"),
+                data: fetchChartData(getTypeFromIndex(3)),
                 showLine: true,
                 borderWidth: 3
             },
             {
                 label: 'Validation',
-                data: fetchChartData("validation"),
+                data: fetchChartData(getTypeFromIndex(4)),
                 showLine: true,
                 borderWidth: 3
             },
         ],
     };
+
+    const [data, setData] = useState(initialData);
+    const updateDataRender = (start, end) => {
+        const updatedData = {
+            datasets: [
+                {
+                    ...data.datasets[0],
+                    data: fetchChartData(getTypeFromIndex(0), start, end)
+                },
+                {
+                    ...data.datasets[1],
+                    data: fetchChartData(getTypeFromIndex(1), start, end)
+                },
+                {
+                    ...data.datasets[2],
+                    data: fetchChartData(getTypeFromIndex(2), start, end)
+                },
+                {
+                    ...data.datasets[3],
+                    data: fetchChartData(getTypeFromIndex(3), start, end)
+                },
+                {
+                    ...data.datasets[4],
+                    data: fetchChartData(getTypeFromIndex(4), start, end)
+                }
+            ]
+        }
+
+        setData(updatedData);
+    }
     
     // CHART CONFIGURATION
     const initialOptions = {
@@ -227,7 +265,7 @@ const Chart = (props) => {
             x: {
                 type: 'time',
                 time: {
-                    unit: 'day',
+                    unit: 'week',
                     unitStepSize: 1,
                     displayFormats: {
                         hour: 'hh:mm',
@@ -251,8 +289,70 @@ const Chart = (props) => {
 
     // to update the time render on x axis of the chart
     const [options, setChartOptions] = useState(initialOptions);
-    const updateTimeRender = (time_format) => {
+    const [startDate, setStartDate] = useState(null);
+    // format Date to string
+    const formatTimestampFromDate = (date) => {
+        if (!date) return null;
+
+        const year = date.getUTCFullYear();
+        const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+        const day = String(date.getUTCDate()).padStart(2, '0');
+        const hours = String(date.getUTCHours()).padStart(2, '0');
+        const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+        const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+        const milliseconds = String(date.getUTCMilliseconds()).padStart(3, '0');
+        const offset = date.getTimezoneOffset();
+        const offsetHours = Math.floor(Math.abs(offset) / 60).toString().padStart(2, '0');
+        const offsetMinutes = (Math.abs(offset) % 60).toString().padStart(2, '0');
+        const offsetSign = offset < 0 ? '+' : '-';
+
+        const formattedTimestamp =
+            `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}${offsetSign}${offsetHours}:${offsetMinutes}`;
+
+        return formattedTimestamp;
+    }
+    const [endDate, setEndDate] = useState(formatTimestampFromDate(new Date()));
+    // format string to Date
+    const parseTimestampToDate = (dateString) => {
+        if (!dateString) return null;
+
+        const [isoDate, offsetPart] = dateString.split('+');
+        const offsetHours = parseInt(offsetPart.slice(0, 2), 10);
+        const offsetMinutes = parseInt(offsetPart.slice(3), 10);
+        const totalOffsetMinutes = (offsetHours * 60) + offsetMinutes;
+        
+        const dateWithOffset = new Date(isoDate);
+        dateWithOffset.setUTCMinutes(dateWithOffset.getUTCMinutes() - totalOffsetMinutes);
+
+        return dateWithOffset;
+    }
+    // update the time render of the chart
+    const updateTimeRender = (filter_time, change_date) => {
+        const new_date = formatTimestampFromDate(change_date);
+        if (filter_time === "start") {
+            if (new_date > endDate) return;
+            setStartDate(new_date);
+            updateDataRender(new_date, endDate);
+            var seconds_between = Math.floor((parseTimestampToDate(endDate) - parseTimestampToDate(new_date)) / 1000);
+        }
+        else if (filter_time === "end") {
+            if (new_date < startDate) return;
+            setEndDate(new_date);
+            updateDataRender(startDate, new_date);
+            var seconds_between = Math.floor((parseTimestampToDate(new_date) - parseTimestampToDate(startDate)) / 1000);
+        }
+
         // Modify the chart option you want to change dynamically
+        var time_format = null
+
+        if (seconds_between < secondsInDay) {
+            time_format = "hour";
+        } else if (seconds_between < (secondsInWeek * 2)) {
+            time_format = "day";
+        } else {
+            time_format = "week";
+        }
+
         const updatedOptions = {
             ...options,
             scales: {
@@ -275,22 +375,19 @@ const Chart = (props) => {
         <Scatter
           options={options}
           data={data}
-        //   plugins={plugins}
           onClick={onChartClicked}
           ref={chartRef}
         />
-        <button
-          className="btn bg-primary text-white my-3 px-4 py-2"
-          onClick={() => updateTimeRender("week")}
-        >
-          WEEK
-        </button>
-        <button
-          className="btn bg-primary text-white ms-4 my-3 px-4 py-2"
-          onClick={() => updateTimeRender("day")}
-        >
-          DAY
-        </button>
+        <div className="d-flex m-4 ms-5">
+          <div className="d-flex flex-column">
+            <span className='fs-5'>Start Date</span>
+            <DateTimePicker onChange={(new_date) => updateTimeRender("start", new_date)} value={startDate} />
+          </div>
+          <div className="d-flex flex-column ms-5">
+            <span className='fs-5'>End Date</span>
+            <DateTimePicker onChange={(new_date) => updateTimeRender("end", new_date)} value={endDate} />
+          </div>
+        </div>
 
         <div id="child-render">
           {reportDetails && !reportTypeDetails && (
@@ -302,9 +399,9 @@ const Chart = (props) => {
             />
           )}
           {reportTypeDetails && !reportDetails && (
-            <ReportTypeDetails 
-                reports_type={reportTypeDetails["reports_type"]}
-                reports_url={props.url}
+            <ReportTypeDetails
+              reports_type={reportTypeDetails["reports_type"]}
+              reports_url={props.url}
             />
           )}
         </div>
