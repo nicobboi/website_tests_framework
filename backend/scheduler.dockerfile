@@ -18,4 +18,4 @@ COPY ./app /app
 
 WORKDIR /app/app/scheduler/
 
-CMD ["python3", "scheduler.py"]
+CMD ["python3", "-u", "scheduler.py"]

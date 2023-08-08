@@ -8,4 +8,4 @@ from app.models.website import Website
 from app.models.tool    import Tool
 from app.models.score   import Score 
 from app.models.type    import Type
-from app.models.crontab import Crontab
+from app.models.schedule import Schedule

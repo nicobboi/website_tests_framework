@@ -84,34 +84,31 @@ def run_tests(
 
 @router.post("/add-schedule")
 def add_schedule(*, db: Session = Depends(deps.get_db), obj_in: schemas.WebsiteSchedule) -> Any:
-    crontab_model = crud.crontab.create(
-        db=db, obj_in=schemas.CrontabCreate(info=obj_in.crontab, url=obj_in.url, test_types=obj_in.test_types)
+    schedule_model = crud.schedule.create(
+        db=db, obj_in=schemas.ScheduleBaseCreate(info=obj_in.schedule, url=obj_in.url, test_types=obj_in.test_types)
     )
 
-    print(crontab_model)
+    print(schedule_model)
 
     return
 
-    return worker.add_schedule(url=obj_in.url, test_types=obj_in.test_types, crontab_info=obj_in.crontab, schedule_id=crontab_model.id)
-
 
 @router.post("/remove-schedule")
-def rem_schedule(*, db: Session = Depends(deps.get_db), crontab_id: UUID4):
+def rem_schedule(*, db: Session = Depends(deps.get_db), schedule_id: UUID4):
     """
     
     """
-    return worker.remove_schedule(crontab_id)
 
 
 @router.post("/scheduler/setstatus")
 def change_scheduler_status(
     *,
     db: Session = Depends(deps.get_db),
-    scheduler_name,  # id crontab in the db
+    scheduler_name,  # id schedule in the db
 ) -> Any:
     # TODO: attivare/disattivare scheduler
 
-    # change the status of a crontab task
-    crud.crontab.change_status(db=db, id=scheduler_name)
+    # change the status of a schedule task
+    crud.schedule.change_status(db=db, id=scheduler_name)
 
     return "Scheduler status modified!"

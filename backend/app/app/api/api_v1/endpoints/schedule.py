@@ -17,4 +17,4 @@ def get_all_active_schedules(*, db: Session = Depends(deps.get_db)):
     Get all schedules
     """
 
-    return crud.crontab.get_all_active(db=db)
+    return crud.schedule.get_all_active(db=db)

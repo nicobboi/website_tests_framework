@@ -4,5 +4,5 @@ from .report import Report
 from .website import Website
 from .score import Score
 from .tool import Tool
-from .crontab import Crontab
+from .schedule import Schedule
 from .type import Type

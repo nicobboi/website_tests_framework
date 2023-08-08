@@ -27,4 +27,4 @@ from .report import ReportBase, ReportCreate, ReportUpdate, ReportScores, Report
 from .tool import ToolBase
 from .score import ScoreBase
 from .type import TypeBase
-from .crontab import CrontabBase, CrontabCreate
+from .schedule import ScheduleBase, ScheduleCreate

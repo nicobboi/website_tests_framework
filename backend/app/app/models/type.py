@@ -9,13 +9,13 @@ from app.db.base_class import Base
 
 if TYPE_CHECKING:
     from .tool import Tool
-    from .crontab import Crontab
+    from .schedule import Schedule
 
 class Type(Base):
     id:         Mapped[UUID]            = mapped_column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid4)
     name:       Mapped[str]             = mapped_column(nullable=False)
 
     tools:      Mapped[list["Tool"]]    = relationship(back_populates="type", cascade="all, delete, delete-orphan")
-    crontabs:   Mapped[list["Crontab"]] = relationship(back_populates="type", cascade="all, delete, delete-orphan")
+    schedules:   Mapped[list["Schedule"]] = relationship(back_populates="type", cascade="all, delete, delete-orphan")
 
     UniqueConstraint(name)

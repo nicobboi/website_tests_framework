@@ -4,7 +4,7 @@ from .crud_report import report
 from .crud_website import website
 from .crud_tool import tool
 from .crud_type import type
-from .crud_crontab import crontab
+from .crud_schedule import schedule
 
 
 # For a new basic set of CRUD operations you could just do
