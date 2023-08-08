@@ -1,15 +1,14 @@
-import { Link } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 
 const Navbar = () => {
-
 
   return (
     <>
       <nav className="navbar navbar-light navbar-expand-lg bg-light">
         <div className="container-fluid">
-          <Link to="/" className="navbar-brand ms-4 fs-4">
+          <NavLink to="/" className="navbar-brand ms-4 fs-4">
             SITE TESTING
-          </Link>
+          </NavLink>
           <button
             className="navbar-toggler"
             type="button"
@@ -24,14 +23,14 @@ const Navbar = () => {
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav ms-4">
               <li className="nav-item">
-                <Link className="nav-link active" to="/run-test">
+                <NavLink className={({ isActive }) => (isActive ? "active" : "") + " nav-link"} to="/run-test">
                   Start Test
-                </Link>
+                </NavLink>
               </li>
               <li className="nav-item">
-                <Link className="nav-link" to="#">
-                  Scheduled test
-                </Link>
+                <NavLink className={({ isActive }) => (isActive ? "active" : "") + " nav-link ms-4"} to="/schedules">
+                  Schedules list
+                </NavLink>
               </li>
             </ul>
           </div>

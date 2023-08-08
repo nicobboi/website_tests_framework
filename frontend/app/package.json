@@ -11,6 +11,7 @@
     "chartjs-adapter-date-fns": "^3.0.0",
     "date-fns": "^2.30.0",
     "i": "^0.3.7",
+    "node-sass": "^7.0.3",
     "npm": "^9.8.1",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",

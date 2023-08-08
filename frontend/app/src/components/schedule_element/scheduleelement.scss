@@ -1,0 +1,42 @@
+/* The container <div> - needed to position the dropdown content */
+.c-dropdown {
+    position: relative;
+    display: inline-block;
+}
+    
+/* Dropdown Content (Hidden by Default) */
+.c-dropdown-content {
+    display: none;
+    position: absolute;
+    z-index: 1;
+    right: 0;
+    background-color: rgb(240, 240, 240);
+    border-radius: 5px;
+    border-width: 1px;
+    width: max-content;
+}
+
+.c-dropdown-content li {
+    padding: 1rem;
+    border-radius: 5px;
+}
+  
+/* Change color of dropdown links on hover */
+.c-dropdown-content li:hover {
+    background-color: #ddd;
+    cursor: pointer;
+}
+
+// /* Show the dropdown menu on hover */
+.c-dropdown:hover .c-dropdown-content {display: block;}
+
+/* Change the background color of the dropdown button when the dropdown content is shown */
+//   .c-dropdown:hover .c-dropbtn {background-color: #3e8e41;}
+
+
+
+button.schedule-info-btn {border: none !important;}
+
+button.schedule-info-btn:hover {background-color: #27272710;}
+
+button.schedule-info-btn:active {background-color: #27272730 !important;}
