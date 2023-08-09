@@ -55,7 +55,6 @@ const RunTest = () => {
             .then(response => response.json()) 
             .then(json => {
                 setResponse("Scheduled successfully!");
-                console.log(json);
                 setTimeout(() => setResponse(null), 3000);
             })
             .catch(err => console.log("Error sending data: ", err));

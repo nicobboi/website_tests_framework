@@ -25,16 +25,49 @@ const ScheduleElement = (props) => {
         setModified(false);
     }
 
+    // commit the changes to database
     const commitChanges = () => {
-        // API call to change schedule info
+      const payload = {
+        min: mins,
+        hour: hours,
+        day: days,
+        active: active
+      }
 
-        setModified(false);
+      const request_url = "http://localhost/api/v1/schedule/update?scheduler_id=" + schedule.id;
+
+      // API call to change schedule info
+      const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      };
+      fetch(request_url, requestOptions)
+          .then(response => response.json()) 
+          .then(json => {
+              setTimeout(() => 3000);
+          })
+          .catch(err => console.log("Error sending data: ", err));
+
+      setModified(false);
     }
 
+    // delete the schedule
     const deleteSchedule = () => {
-        // check if the use is sure
+      // check if the use is sure
 
-        // API call to delete this schedule
+      const request_url = "http://localhost/api/v1/schedule/remove?schedule_id=" + schedule.id;
+
+      // API call to change schedule info
+      fetch(request_url, {method: 'POST'})
+          .then(response => response.json()) 
+          .then(json => {
+              setTimeout(() => 3000);
+          })
+          .catch(err => console.log("Error sending data: ", err));
+
+      // delete this child component
+      props.ondelete(props.url, props.data_index);
     }
 
     return (
