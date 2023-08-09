@@ -6,8 +6,13 @@ const RunTest = () => {
     const [response, setResponse] = useState(null);
     const [testMode, setTestMode] = useState("run");
 
+    const [mins, setMins] = useState(undefined);
+    const [hours, setHours] = useState(undefined);
+    const [days, setDays] = useState(undefined);
+
+    // handle form submit
     const onSubmit = (data) => {
-        const payload = {
+        var payload = {
             url: data["url"],
             test_types: []
         };
@@ -25,15 +30,32 @@ const RunTest = () => {
 
         // console.log(payload);
 
+        var request_url = ""
+
+        if (testMode === "run") {
+          request_url = "http://localhost/api/v1/website/run"
+        } else if (testMode === "schedule") {
+          payload = {
+            min: data["minutes"],
+            hour: data["hours"],
+            day: data["days"],
+            ...payload
+          }
+        
+          request_url = "http://localhost/api/v1/schedule/add"
+        }
+
+        // API call to start a run/add a schedule
         const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
         };
-        fetch("http://localhost/api/v1/website/run", requestOptions)
+        fetch(request_url, requestOptions)
             .then(response => response.json()) 
             .then(json => {
-                setResponse(json);
+                setResponse("Scheduled successfully!");
+                console.log(json);
                 setTimeout(() => setResponse(null), 3000);
             })
             .catch(err => console.log("Error sending data: ", err));
@@ -46,93 +68,75 @@ const RunTest = () => {
 
           {/* FORM */}
           <form
-            className="
-          form-floating row mt-3"
+            className="form-floating row mt-4"
             onSubmit={handleSubmit(onSubmit)}
           >
             {/* URL and SUBMIT */}
             <div className="col-6 mb-3">
-              <label htmlFor="url-input" className="form-label">
-                URL
-              </label>
-              <input
-                name="url"
-                type="text"
-                className="form-control"
-                id="url-input"
-                placeholder="https://site-name.domain"
-                {...register("url", { required: true })}
-              />
+              <div className="input-group">
+                <span className="input-group-text" id="icon-text-input">
+                  <i className="fa-solid fa-globe"></i>
+                </span>
+                <input
+                  name="url"
+                  type="text"
+                  className="form-control"
+                  id="url-input"
+                  placeholder="https://site-name.domain"
+                  {...register("url", { required: true })}
+                />
+              </div>
               {/* Error handling */}
               <span className="fs-6 text-danger">
                 {errors.url && <p>This field is required!</p>}
               </span>
 
-              {/* CRONTAB INFO */}
+              {/* SCHEDULE INFO */}
               {testMode === "schedule" && (
                 <>
-                  <div className="mt-2">Crontab Info</div>
-                  <div className="d-flex flex-row justify-content-evenly">
-                    <div className="input-group input-group-sm mt-1 mx-1">
-                      <div className="d-flex flex-column align-items-center align-items-center">
-                        <label htmlFor="minutes" style={{"font-size": 12}} className="form-label mx-1">
-                          Minutes
-                        </label>
-                        <input
-                          type="text"
-                          className="form-control mx-1"
-                          id="minutes"
-                          placeholder="0-59"
-                        />
-                      </div>
+                  <div className="d-flex flex-row justify-content-evenly mt-3">
+                    <div className="my-auto fs-3">
+                      <i className="fa-regular fa-calendar-days"></i>
                     </div>
-                    <div className="input-group input-group-sm mt-1 mx-1">
-                      <div className="d-flex flex-column align-items-center">
-                        <label htmlFor="hours" style={{"font-size": 12}} className="form-label mx-1">
-                          Hours
-                        </label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="0-23"
-                        />
-                      </div>
+                    <div className="form-floating">
+                      <input
+                        type="number"
+                        id="minutes"
+                        className="form-control schedule-info-box mx-1"
+                        value={mins}
+                        onChange={(event) => {
+                          console.log(event.target);
+                          setMins(event.target.value);
+                        }}
+                        {...register("minutes")}
+                      />
+                      <label htmlFor="minutes">minutes</label>
                     </div>
-                    <div className="input-group input-group-sm mt-1 mx-1">
-                      <div className="d-flex flex-column align-items-center">
-                        <label htmlFor="days-of-week" style={{"font-size": 12}} className="form-label mx-1">
-                          Days week
-                        </label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="0-6"
-                        />
-                      </div>
+                    <div className="form-floating">
+                      <input
+                        type="number"
+                        id="hours"
+                        className="form-control schedule-info-box mx-1"
+                        value={hours}
+                        onChange={(event) => {
+                          setHours(event.target.value);
+                        }}
+                        {...register("hours")}
+                      />
+                      <label htmlFor="hours">hours</label>
                     </div>
-                    <div className="input-group input-group-sm mt-1 mx-1">
-                      <div className="d-flex flex-column align-items-center">
-                        <label htmlFor="Days-of-months" style={{"font-size": 12}} className="form-label mx-1">
-                          Days month
-                        </label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="1-31"
-                        />
-                      </div>
-                    </div>
-                    <div className="input-group input-group-sm mt-1 mx-1">
-                      <div className="d-flex flex-column align-items-center">
-                        <label htmlFor="Months-of-year" style={{"font-size": 12}} className="form-label mx-1">
-                          Months year
-                        </label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="1-12"
-                        />
-                      </div>
+                    <div className="form-floating">
+                      <input
+                        type="number"
+                        id="days"
+                        className="form-control schedule-info-box mx-1"
+                        value={days}
+                        onChange={(event) => {
+                          setDays(event.target.value);
+                        }}
+                        {...register("days")}
+                      />
+                      <label htmlFor="days">days</label>
                     </div>
                   </div>
                 </>
