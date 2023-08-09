@@ -81,34 +81,3 @@ def run_tests(
             print("Sending task raised: " + str(e) + "\n")
     return "Run avviata!"
 
-
-@router.post("/add-schedule")
-def add_schedule(*, db: Session = Depends(deps.get_db), obj_in: schemas.WebsiteSchedule) -> Any:
-    schedule_model = crud.schedule.create(
-        db=db, obj_in=schemas.ScheduleBaseCreate(info=obj_in.schedule, url=obj_in.url, test_types=obj_in.test_types)
-    )
-
-    print(schedule_model)
-
-    return
-
-
-@router.post("/remove-schedule")
-def rem_schedule(*, db: Session = Depends(deps.get_db), schedule_id: UUID4):
-    """
-    
-    """
-
-
-@router.post("/scheduler/setstatus")
-def change_scheduler_status(
-    *,
-    db: Session = Depends(deps.get_db),
-    scheduler_name,  # id schedule in the db
-) -> Any:
-    # TODO: attivare/disattivare scheduler
-
-    # change the status of a schedule task
-    crud.schedule.change_status(db=db, id=scheduler_name)
-
-    return "Scheduler status modified!"

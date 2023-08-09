@@ -28,10 +28,6 @@ class WebsiteRun(WebsiteBase):
     test_types: List[TestTypes] = Field(description="List of test's types to launch on website.")
 
 
-class WebsiteSchedule(WebsiteRun):
-    crontab: str = Field(description="Crontab string for scheduling task.")
-
-
 class WebsiteReportsScores(WebsiteBase):
     reports_scores: List[ReportScores] = Field(description="All reports scores of this website.")
 

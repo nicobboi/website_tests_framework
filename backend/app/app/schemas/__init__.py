@@ -19,7 +19,6 @@ from .website import (
     WebsiteCreate,
     WebsiteUpdate,
     WebsiteRun,
-    WebsiteSchedule,
     AllWebsiteScores,
     WebsiteReportsScores,
 )
@@ -27,4 +26,4 @@ from .report import ReportBase, ReportCreate, ReportUpdate, ReportScores, Report
 from .tool import ToolBase
 from .score import ScoreBase
 from .type import TypeBase
-from .schedule import ScheduleBase, ScheduleCreate
+from .schedule import ScheduleBase, ScheduleCreate, ScheduleUpdate, ScheduleOutput

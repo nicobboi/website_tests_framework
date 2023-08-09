@@ -21,7 +21,7 @@ class Schedule(Base):
     day:                Mapped[int]                 = mapped_column(nullable=True, default=None)
     active:             Mapped[bool]                = mapped_column(nullable=False)
     n_run:              Mapped[int]                 = mapped_column(nullable=False, default=0)
-    scheduled_time:     Mapped[datetime]            = mapped_column(nullable=True, default=None)
+    scheduled_time:     Mapped[datetime]            = mapped_column(nullable=True)
     last_time_launched: Mapped[datetime]            = mapped_column(nullable=True, default=None)
 
     website:        Mapped[Website]             = relationship(back_populates="schedules")
