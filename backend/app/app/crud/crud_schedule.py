@@ -9,44 +9,65 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from pydantic import UUID4
+from typing import Union
 
 
 class CRUDSchedule(CRUDBase[Schedule, ScheduleCreate, ScheduleUpdate]):
     # insert a new schedule into the db
     def create(self, db: Session, *, obj_in: ScheduleCreate):
-        # schedule
-        schedule = Schedule(
-            active=True,
-            min=obj_in.min,
-            hour=obj_in.hour,
-            day=obj_in.day,
-            scheduled_time=datetime.now()
-        )
-        db.add(schedule)
+        schedule_added = []
 
-        # website
-        url = obj_in.url
-        website = crud.website.get_by_url(db=db, url=url)
-        if not website:
-            website = Website(
-                url=url
+        for test_type in obj_in.test_types:
+            # check if already exist a schedule for this url and test_type
+            if self.get_by_url(db=db, url=obj_in.url, type_name=test_type):
+                break
+
+            # schedule
+            schedule = Schedule(
+                active=True,
+                min=obj_in.min,
+                hour=obj_in.hour,
+                day=obj_in.day,
+                scheduled_time=str(datetime.now())
             )
-            db.add(website)
-        website.schedules.append(schedule)
+            db.add(schedule)
 
-        # verifica tipi
-        for type_name in obj_in.test_types:
-            type = crud.type.get_by_name(db=db, name=type_name)
+            # website
+            url = obj_in.url
+            website = crud.website.get_by_url(db=db, url=url)
+            if not website:
+                website = Website(
+                    url=url
+                )
+                db.add(website)
+            website.schedules.append(schedule)
+
+            # verifica tipi
+            type = crud.type.get_by_name(db=db, name=test_type)
             if not type:
                 type = Type(
-                    name=type_name
+                    name=test_type
                 )
                 db.add(type)
             type.schedules.append(schedule)
 
-        db.commit()
+            db.commit()
 
-        return
+            schedule_added.append(ScheduleOutput(
+                url=website.url,
+                test_type=type.name,
+                schedule_info=ScheduleBase(
+                    min=schedule.min,
+                    hour=schedule.hour,
+                    day=schedule.day
+                ),
+                active=schedule.active,
+                n_run=schedule.n_run,
+                scheduled_time=schedule.scheduled_time,
+                last_time_launched=schedule.last_time_launched
+            ))
+
+        return schedule_added
     
     def remove(self, db: Session, *, id: UUID4) -> ScheduleOutput:
         """
@@ -89,6 +110,16 @@ class CRUDSchedule(CRUDBase[Schedule, ScheduleCreate, ScheduleUpdate]):
         """
         return db.query(Schedule).filter(Schedule.id == id).first()
     
+    def get_by_url(self, db: Session, *, url: str, type_name: Union[str, None] = None) -> Schedule:
+        """
+        Get a schedule instance from the db by its url (optional: filter by type_name)
+        """
+        main_query = db.query(Schedule).join(Schedule.website).filter(Website.url == url)
+
+        if type_name:
+            main_query = main_query.join(Schedule.type).filter(Type.name == type_name)
+
+        return main_query.first()
 
     def get_all(self, db: Session) -> list[dict]:
         """

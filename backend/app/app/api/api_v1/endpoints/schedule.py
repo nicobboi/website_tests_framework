@@ -20,7 +20,7 @@ def get_all_schedules(*, db: Session = Depends(deps.get_db)):
     return crud.schedule.get_all(db=db)
 
 
-@router.post("/add")
+@router.post("/add", response_model=list[schemas.ScheduleOutput])
 def add_schedule(
     *, 
     db: Session = Depends(deps.get_db), 
@@ -40,9 +40,11 @@ def add_schedule(
     """
     Add a new schedule to db
     """
-    schedule_model = crud.schedule.create(db=db, obj_in=schedule_in)
+    schedule = crud.schedule.create(db=db, obj_in=schedule_in)
 
     # start schedule with scheduler
+
+    return schedule 
 
 
 @router.post("/remove", response_model=schemas.ScheduleOutput)
