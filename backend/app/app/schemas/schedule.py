@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, UUID4
 from typing import Union
 from datetime import datetime
 
@@ -28,6 +28,7 @@ class ScheduleOutput(BaseModel):
     """
     Validation class to return schedule items via API
     """
+    id: UUID4                                   = Field(description="")
     url: str                                    = Field(description="")
     test_type: str                              = Field(description="")
     schedule_info: ScheduleBase                 = Field(description="")

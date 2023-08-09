@@ -14,7 +14,7 @@ from typing import Union
 
 class CRUDSchedule(CRUDBase[Schedule, ScheduleCreate, ScheduleUpdate]):
 
-    def create(self, db: Session, *, obj_in: ScheduleCreate):
+    def create(self, db: Session, *, obj_in: ScheduleCreate) -> list[ScheduleOutput]:
         """
         insert a new schedule into the db
         """
@@ -57,6 +57,7 @@ class CRUDSchedule(CRUDBase[Schedule, ScheduleCreate, ScheduleUpdate]):
             db.commit()
 
             schedule_added.append(ScheduleOutput(
+                id=schedule.id,
                 url=website.url,
                 test_type=type.name,
                 schedule_info=ScheduleBase(
@@ -79,6 +80,7 @@ class CRUDSchedule(CRUDBase[Schedule, ScheduleCreate, ScheduleUpdate]):
         schedule = self.get_by_id(db=db, id=id)
 
         output = ScheduleOutput(
+            id=schedule.id,
             url=schedule.website.url,
             test_type=schedule.type.name,
             schedule_info=ScheduleBase(
@@ -112,6 +114,7 @@ class CRUDSchedule(CRUDBase[Schedule, ScheduleCreate, ScheduleUpdate]):
         db.commit()
 
         return ScheduleOutput(
+            id=schedule.id,
             url=schedule.website.url,
             test_type=schedule.type.name,
             schedule_info=ScheduleBase(
@@ -143,13 +146,14 @@ class CRUDSchedule(CRUDBase[Schedule, ScheduleCreate, ScheduleUpdate]):
 
         return main_query.first()
 
-    def get_all(self, db: Session) -> list[dict]:
+    def get_all(self, db: Session) -> list[ScheduleOutput]:
         """
         Get all schedules
         """
         schedules = db.query(Schedule).all()
 
         return [ScheduleOutput(
+            id=schedule.id,
             url=schedule.website.url,
             test_type=schedule.type.name,
             schedule_info=ScheduleBase(
