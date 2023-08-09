@@ -41,7 +41,9 @@ const ScheduleElement = (props) => {
       <>
         <div className="mt-3">
           <ul className={`${styles.list} list-inline`}>
-            <li className={`d-flex justify-content-between ${styles.scheduleItem}`}>
+            <li
+              className={`d-flex justify-content-between ${styles.scheduleItem}`}
+            >
               <div className="d-flex flex-row align-items-center">
                 {/* Is active icon */}
                 <i
@@ -60,9 +62,11 @@ const ScheduleElement = (props) => {
                 <div className="ms-4">
                   {/* URL */}
                   <h6 className="mb-0">
-                    {schedule.url} {modified ? "*" : ""}
+                    {schedule.test_type} {modified ? "*" : ""}
                   </h6>
-                  <div className={`d-flex flex-row mt-1 text-black-50 ${styles.dateTime}`}>
+                  <div
+                    className={`d-flex flex-row mt-1 text-black-50 ${styles.dateTime}`}
+                  >
                     <div className="mt-1">
                       {/* START TIME */}
                       <i className="fa-regular fa-calendar"></i>
@@ -152,9 +156,6 @@ const ScheduleElement = (props) => {
                   />
                   <label htmlFor="years">years</label>
                 </div> */}
-              </div>
-              <div className="text-muted">
-                <span className="">{schedule.test_type}</span>
               </div>
               <div className={`${styles.cDropdown} my-auto`}>
                 <button className={`btn ${styles.scheduleInfoBtn} p-3`}>

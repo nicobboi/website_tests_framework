@@ -1,5 +1,7 @@
 import useFetch from "react-fetch-hook";
 import styles from "./scheduleslist.module.scss";
+import {Accordion, AccordionSummary, AccordionDetails, Typography} from "@mui/material";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import ScheduleElement from "../../components/schedule_element/ScheduleElement";
 
@@ -14,6 +16,21 @@ const SchedulesList = () => {
             <p>Message: {error.statusText}</p>
         </div>
         )
+    }
+
+    // fetch the data to organize by URL
+    const fetchDataByUrl = (data) => {
+      const listByUrl = {};
+
+      for (const schedule of data) {
+        const { url, ...otherAttributes} = schedule;
+
+        if (!listByUrl[url]) listByUrl[url] = [];
+
+        listByUrl[url].push(otherAttributes);
+      }
+
+      return listByUrl;
     }
 
     // get the current time in a formatted string like "dd/MM/YY hh:mm"
@@ -52,10 +69,25 @@ const SchedulesList = () => {
                     </div>
                   </div>
 
-                  {/* ROWs */}
-                  {data.map((schedule, index) => (
-                    <ScheduleElement key={index} schedule={schedule} />
-                  ))}
+                  {Object.entries(fetchDataByUrl(data)).map(
+                    (accordion_data, index) => (
+                      <div key={index}>
+                        <Accordion className="my-4">
+                          <AccordionSummary
+                            expandIcon={<ExpandMoreIcon />}
+                            id="panel1a-content"
+                          >
+                            <Typography><strong>{accordion_data[0]}</strong></Typography>
+                          </AccordionSummary>
+                          <AccordionDetails>
+                            {accordion_data[1].map((schedule_data, index) => (
+                              <ScheduleElement key={index} schedule={schedule_data}/>
+                            ))}
+                          </AccordionDetails>
+                        </Accordion>
+                      </div>
+                    )
+                  )}
                 </div>
               </div>
             </div>
