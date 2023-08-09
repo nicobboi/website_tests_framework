@@ -84,4 +84,4 @@ def update_scheduler(
     
     # update schedule from the scheduler (remove and re-add)
 
-    return update_scheduler
+    return updated_schedule

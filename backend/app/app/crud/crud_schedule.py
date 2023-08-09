@@ -13,8 +13,11 @@ from typing import Union
 
 
 class CRUDSchedule(CRUDBase[Schedule, ScheduleCreate, ScheduleUpdate]):
-    # insert a new schedule into the db
+
     def create(self, db: Session, *, obj_in: ScheduleCreate):
+        """
+        insert a new schedule into the db
+        """
         schedule_added = []
 
         for test_type in obj_in.test_types:
@@ -75,8 +78,37 @@ class CRUDSchedule(CRUDBase[Schedule, ScheduleCreate, ScheduleUpdate]):
         """
         schedule = self.get_by_id(db=db, id=id)
 
+        output = ScheduleOutput(
+            url=schedule.website.url,
+            test_type=schedule.type.name,
+            schedule_info=ScheduleBase(
+                min=schedule.min,
+                hour=schedule.hour,
+                day=schedule.day
+            ),
+            active=schedule.active,
+            n_run=schedule.n_run,
+            scheduled_time=schedule.scheduled_time,
+            last_time_launched=schedule.last_time_launched
+        )
+
         db.delete(schedule)
 
+        db.commit()
+
+        return output
+
+    def update(self, db: Session, *, id: UUID4, obj_in: ScheduleUpdate) -> ScheduleOutput:
+        """
+        Update a schedule
+        """
+        schedule = self.get_by_id(db=db, id=id)
+
+        schedule.min = obj_in.min
+        schedule.hour = obj_in.hour
+        schedule.day = obj_in.day
+        schedule.active = obj_in.active
+        
         db.commit()
 
         return ScheduleOutput(
@@ -92,16 +124,6 @@ class CRUDSchedule(CRUDBase[Schedule, ScheduleCreate, ScheduleUpdate]):
             scheduled_time=schedule.scheduled_time,
             last_time_launched=schedule.last_time_launched
         )
-
-    # change status of a schedule task
-    def update(self, db: Session, *, id: UUID4, obj_in: ScheduleUpdate) -> ScheduleOutput:
-        schedule = self.get_by_id(db=db, id=id)
-
-        schedule.active = not schedule.active
-        
-        db.commit()
-
-        return schedule.active
 
 
     def get_by_id(self, db: Session, *, id: UUID4) -> Schedule:
