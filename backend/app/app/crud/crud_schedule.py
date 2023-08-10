@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from typing import Union
 
 from app.crud.base import CRUDBase
 from app import crud
@@ -100,11 +101,13 @@ class CRUDSchedule(CRUDBase[Schedule, ScheduleCreate, ScheduleUpdate]):
 
         return output
 
-    def update(self, db: Session, *, id: UUID4, obj_in: ScheduleUpdate) -> ScheduleOutput:
+    def update(self, db: Session, *, id: UUID4, obj_in: ScheduleUpdate) -> Union[ScheduleOutput, bool]:
         """
-        Update a schedule
+        Update a schedule (return updated schedule and if it was active before update)
         """
         schedule = self.get_by_id(db=db, id=id)
+
+        was_active = schedule.active
 
         schedule.min = obj_in.min
         schedule.hour = obj_in.hour
@@ -126,7 +129,7 @@ class CRUDSchedule(CRUDBase[Schedule, ScheduleCreate, ScheduleUpdate]):
             n_run=schedule.n_run,
             scheduled_time=schedule.scheduled_time,
             last_time_launched=schedule.last_time_launched
-        )
+        ), was_active
 
 
     def get_by_id(self, db: Session, *, id: UUID4) -> Schedule:

@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from app import crud, models, schemas
 from app.api import deps
 
-from app.worker import add_schedule, rem_schedule
+from app.worker import scheduler
 
 
 router = APIRouter()
@@ -42,11 +42,22 @@ def add_schedule(
     """
     Add a new schedule to db
     """
-    schedule = crud.schedule.create(db=db, obj_in=schedule_in)
+    added_schedules = crud.schedule.create(db=db, obj_in=schedule_in)
 
     # start schedule with scheduler
+    for schedule in added_schedules:
+        scheduler.add_schedule(
+            url=schedule.url,
+            schedule_name=str(schedule.id),
+            test_type=schedule.test_type,
+            schedule_time=scheduler.ScheduleInfo(
+                min=schedule.schedule_info.min,
+                hour=schedule.schedule_info.hour,
+                day=schedule.schedule_info.day
+            )
+        )
 
-    return schedule 
+    return added_schedules 
 
 
 @router.post("/remove", response_model=schemas.ScheduleOutput)
@@ -60,7 +71,7 @@ def rem_schedule(
     """
     removed_schedule = crud.schedule.remove(db=db, id=schedule_id)
 
-    # remove schedule from scheduler
+    scheduler.rem_schedule(schedule_name=str(removed_schedule.id))
 
     return removed_schedule
 
@@ -82,8 +93,24 @@ def update_scheduler(
     """
     Update a schedule and return it
     """
-    updated_schedule = crud.schedule.update(db=db, id=scheduler_id, obj_in=schedule_in)
+
+    updated_schedule, was_active = crud.schedule.update(db=db, id=scheduler_id, obj_in=schedule_in)
     
     # update schedule from the scheduler (remove and re-add)
+    # if was active and now is disabled, remove from scheduler
+    if was_active and not updated_schedule.active:
+        scheduler.rem_schedule(str(updated_schedule.id))
+    # if wasn't active and now is enabled, add to the scheduler
+    elif not was_active and updated_schedule.active:
+        scheduler.add_schedule(
+            url=updated_schedule.url,
+            schedule_name=str(updated_schedule.id),
+            test_type=updated_schedule.test_type,
+            schedule_time=scheduler.ScheduleInfo(
+                min=updated_schedule.schedule_info.min,
+                hour=updated_schedule.schedule_info.hour,
+                day=updated_schedule.schedule_info.day
+            )
+        )
 
     return updated_schedule

@@ -16,23 +16,23 @@ def add_schedule(url: str, schedule_name: str, test_type: str, schedule_time: Sc
     """
     Add new schedule (return True on success)
     """
-    with RedisScheduler(app=celery_app) as scheduler:
-        schedule_info = timedelta(
-            minutes=schedule_time.min,
-            hours=schedule_time.hour,
-            days=schedule_time.day
-        )
+    scheduler = RedisScheduler(app=celery_app)
+    schedule_info = timedelta(
+        minutes=schedule_time.min,
+        hours=schedule_time.hour,
+        days=schedule_time.day
+    )
 
-        # schedule configuration
-        schedule = {
-            'name': schedule_name,
-            'task': 'app.worker.tasks.test_add',
-            'schedule': schedule_info,
-            'options': {'queue': 'main-queue'},
-            'args': (url, test_type)
-        }
-        # add schedule to scheduler
-        response = scheduler.add(**schedule)
+    # schedule configuration
+    schedule = {
+        'name': schedule_name,
+        'task': 'app.worker.tasks.test_website',
+        'schedule': schedule_info,
+        'options': {'queue': 'main-queue'},
+        'args': (url, test_type)
+    }
+    # add schedule to scheduler
+    response = scheduler.add(**schedule)
 
     return response
 
@@ -40,8 +40,8 @@ def rem_schedule(schedule_name: str):
     """
     Remove a schedule by its name/identifier (return True if has been found, False else)
     """
-    with RedisScheduler(app=celery_app) as scheduler:
-        response = scheduler.remove(schedule_name)
+    scheduler = RedisScheduler(app=celery_app)
+    response = scheduler.remove(schedule_name)
 
     return response
 
@@ -50,7 +50,7 @@ def schedule_list():
     """
     Return the list of all the schedules currently operating
     """
-    with RedisScheduler(app=celery_app) as scheduler:
-        s_list = scheduler.list()
+    scheduler = RedisScheduler(app=celery_app)
+    s_list = scheduler.list()
 
     return s_list
