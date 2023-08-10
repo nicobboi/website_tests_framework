@@ -112,5 +112,18 @@ def update_scheduler(
                 day=updated_schedule.schedule_info.day
             )
         )
+    # if is still active, remove and readd to update schedule
+    elif was_active and updated_schedule.active:
+        scheduler.rem_schedule(str(updated_schedule.id))
+        scheduler.add_schedule(
+            url=updated_schedule.url,
+            schedule_name=str(updated_schedule.id),
+            test_type=updated_schedule.test_type,
+            schedule_time=scheduler.ScheduleInfo(
+                min=updated_schedule.schedule_info.min,
+                hour=updated_schedule.schedule_info.hour,
+                day=updated_schedule.schedule_info.day
+            )
+        )
 
     return updated_schedule
