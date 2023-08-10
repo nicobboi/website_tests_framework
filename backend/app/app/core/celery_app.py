@@ -4,6 +4,7 @@ from celery import Celery
 celery_app = Celery('worker')
 celery_app.conf.broker_url = 'redis://redis:6379'
 celery_app.conf.result_backend = 'redis://redis:6379'
+celery_app.conf.beat_sync_every = 1
 
 celery_app.conf.update(
     CELERY_REDIS_SCHEDULER_URL = 'redis://redis:6379',

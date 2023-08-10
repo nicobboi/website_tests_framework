@@ -17,10 +17,14 @@ class ScheduleCreate(ScheduleBase):
     url: str                = Field(description="Website'url to schedule test tasks.")
     test_types: list[str]   = Field(description="List of test's types to schedule.")
 
-class ScheduleUpdate(ScheduleBase):
+class ScheduleUpdate(BaseModel):
     """
     """
-    active: bool    = Field(description="")
+    min: Union[int, None]                        = Field(description="Schedule \'min\' for scheduling a task.")
+    hour: Union[int, None]                       = Field(description="Schedule \'hour\' for scheduling a task.")
+    day: Union[int, None]                        = Field(description="Schedule \'day\' for scheduling a task.")
+    active: Union[bool, None]                    = Field(description="")
+    last_time_launched: Union[datetime, None]    = Field(description="")
 
 
 

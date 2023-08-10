@@ -101,18 +101,32 @@ class CRUDSchedule(CRUDBase[Schedule, ScheduleCreate, ScheduleUpdate]):
 
         return output
 
-    def update(self, db: Session, *, id: UUID4, obj_in: ScheduleUpdate) -> Union[ScheduleOutput, bool]:
+    def update(
+        self, 
+        db: Session, 
+        *, 
+        id: Union[UUID4, None] = None, 
+        url: Union[str, None] = None , 
+        test_type: Union[str, None] = None, 
+        obj_in: ScheduleUpdate
+    ) -> Union[ScheduleOutput, bool, None]:
         """
         Update a schedule (return updated schedule and if it was active before update)
         """
-        schedule = self.get_by_id(db=db, id=id)
+        schedule = None
+        if id:                  schedule = self.get_by_id(db=db, id=id)
+        elif url and test_type: schedule = self.get_by_url(db=db, url=url, type_name=test_type)
+        if not schedule:        raise AttributeError
 
         was_active = schedule.active
 
-        schedule.min = obj_in.min
-        schedule.hour = obj_in.hour
-        schedule.day = obj_in.day
-        schedule.active = obj_in.active
+        if obj_in.min:              schedule.min = obj_in.min
+        if obj_in.hour:             schedule.hour = obj_in.hour
+        if obj_in.day:              schedule.day = obj_in.day
+        if obj_in.active != None:   schedule.active = obj_in.active
+        if obj_in.last_time_launched and (schedule.last_time_launched != obj_in.last_time_launched):
+            schedule.last_time_launched = obj_in.last_time_launched
+            schedule.n_run = schedule.n_run + 1
         
         db.commit()
 

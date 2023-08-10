@@ -1,6 +1,7 @@
 from typing import Any
 from datetime import datetime
 from pydantic import UUID4
+from typing import Union
 
 from fastapi import APIRouter, Depends, Body
 from sqlalchemy.orm import Session
@@ -20,6 +21,41 @@ def get_all_schedules(*, db: Session = Depends(deps.get_db)):
     """
 
     return crud.schedule.get_all(db=db)
+
+@router.get("/get", response_model=Union[schemas.ScheduleOutput, None])
+def get_schedule(
+    *, 
+    db: Session = Depends(deps.get_db),
+    scheduler_id: Union[UUID4, None] = None,
+    scheduler_url: Union[str, None] = None,
+    scheduler_test_type: Union[str, None] = None
+) -> Any:
+    """
+    Get a schedule by ID, url or/and type
+    """
+    if scheduler_id:
+        schedule = crud.schedule.get_by_id(db=db, id=scheduler_id)
+    elif scheduler_url and scheduler_test_type:
+        schedule = crud.schedule.get_by_url(db=db, url=scheduler_url, type_name=scheduler_test_type)
+
+    print(str(schedule))
+
+    if schedule:
+        return schemas.ScheduleOutput(
+            id=schedule.id,
+            url=scheduler_url,
+            test_type=scheduler_test_type,
+            schedule_info=schemas.ScheduleBase(
+                min=schedule.min,
+                hour=schedule.hour,
+                day=schedule.day
+            ),
+            active=schedule.active,
+            n_run=schedule.n_run,
+            scheduled_time=schedule.scheduled_time,
+            last_time_launched=schedule.last_time_launched
+        )
+    else: return None
 
 
 @router.post("/add", response_model=list[schemas.ScheduleOutput])
@@ -76,26 +112,37 @@ def rem_schedule(
     return removed_schedule
 
 
-@router.post("/update", response_model=schemas.ScheduleOutput)
-def update_scheduler(
+@router.post("/update", response_model=Union[schemas.ScheduleOutput, None])
+def update_schedule(
     *,
     db: Session = Depends(deps.get_db),
-    scheduler_id: UUID4,
+    schedule_id: Union[UUID4, None] = None,
+    schedule_url: Union[str, None] = None,
+    schedule_test_type: Union[str, None] = None,
     schedule_in: schemas.ScheduleUpdate = Body(
         example={
             "min": 1,
             "hour": 5,
             "day": 1,
-            "active": True
+            "active": True,
+            "last_time_launched": datetime.now()
         }
     )
 ) -> Any:
     """
     Update a schedule and return it
     """
+    try:
+        updated_schedule, was_active = crud.schedule.update(
+            db=db, 
+            id=schedule_id, 
+            url=schedule_url,
+            test_type=schedule_test_type,
+            obj_in=schedule_in
+        )
+    except AttributeError:
+        return None
 
-    updated_schedule, was_active = crud.schedule.update(db=db, id=scheduler_id, obj_in=schedule_in)
-    
     # update schedule from the scheduler (remove and re-add)
     # if was active and now is disabled, remove from scheduler
     if was_active and not updated_schedule.active:

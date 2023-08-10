@@ -74,7 +74,7 @@ def run_tests(
     """
     for time in range(1, repeat_test+1):
         try:
-            job = group(worker.test_website.s(uri=obj_in.url, test_type=test) for test in obj_in.test_types)
+            job = group(worker.test_website.s(url=obj_in.url, test_type=test, scheduled=False) for test in obj_in.test_types)
 
             job.apply_async()
         except worker.test_website.OperationalError as e:
