@@ -106,8 +106,8 @@ services:
   redis:
     image: 'redis:alpine'
     hostname: redis
-    # ports:
-    #   - "6379:6379"
+    ports:
+      - "6379:6379"
 
   flower:
     image: mher/flower:0.9.7
@@ -120,7 +120,7 @@ services:
       - "--broker=redis://guest@redis:6379//"
       # For the "Broker" tab to work in the flower UI, uncomment the following command argument,
       # and change the queue service's image as well
-      # - "--broker_api=http://guest:guest@queue:15672/api//"
+      # - "--broker_api=http://guest:guest@redis:15672/api//"
     deploy:
       labels:
         - traefik.enable=true
@@ -171,6 +171,8 @@ services:
     depends_on:
       - db
       - redis
+    volumes:
+      - ./backend/app:/app
     logging:
       driver: "json-file"
       options:

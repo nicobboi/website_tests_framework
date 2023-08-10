@@ -8,6 +8,8 @@ from sqlalchemy.orm import Session
 from app import crud, models, schemas
 from app.api import deps
 
+from app.worker import add_schedule, rem_schedule
+
 
 router = APIRouter()
 
