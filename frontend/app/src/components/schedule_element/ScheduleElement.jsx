@@ -31,10 +31,11 @@ const ScheduleElement = (props) => {
         min: mins,
         hour: hours,
         day: days,
-        active: active
+        active: active,
+        last_time_launched: null
       }
 
-      const request_url = "http://localhost/api/v1/schedule/update?scheduler_id=" + schedule.id;
+      const request_url = "http://localhost/api/v1/schedule/update?schedule_id=" + schedule.id;
 
       // API call to change schedule info
       const requestOptions = {
