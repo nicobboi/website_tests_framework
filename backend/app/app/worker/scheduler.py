@@ -1,6 +1,6 @@
 from datetime import timedelta
 from app.core.celery_app import celery_app
-from redisbeat import RedisScheduler
+from .redisbeat import RedisScheduler
 
 from pydantic import BaseModel
 
