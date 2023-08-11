@@ -46,9 +46,9 @@ def get_schedule(
             url=scheduler_url,
             test_type=scheduler_test_type,
             schedule_info=schemas.ScheduleBase(
-                min=schedule.min,
-                hour=schedule.hour,
-                day=schedule.day
+                min=schedule.schedule_info.min,
+                hour=schedule.schedule_info.hour,
+                day=schedule.schedule_info.days
             ),
             active=schedule.active,
             n_run=schedule.n_run,
@@ -66,7 +66,10 @@ def add_schedule(
         example={
             "min": 5,
             "hour": 12,
-            "day": 1,
+            "days": [
+                "monday",
+                "saturday"
+            ],
             "url": "https://www.comune.novellara.re.it/",
             "test_types": [
                 "accessibility",
@@ -89,7 +92,7 @@ def add_schedule(
             schedule_time=scheduler.ScheduleInfo(
                 min=schedule.schedule_info.min,
                 hour=schedule.schedule_info.hour,
-                day=schedule.schedule_info.day
+                days=schedule.schedule_info.days
             )
         )
 
@@ -123,7 +126,10 @@ def update_schedule(
         example={
             "min": 1,
             "hour": 5,
-            "day": 1,
+            "days": [
+                "monday",
+                "saturday"
+            ],
             "active": True,
             "last_time_launched": datetime.now()
         }
@@ -156,7 +162,7 @@ def update_schedule(
             schedule_time=scheduler.ScheduleInfo(
                 min=updated_schedule.schedule_info.min,
                 hour=updated_schedule.schedule_info.hour,
-                day=updated_schedule.schedule_info.day
+                days=updated_schedule.schedule_info.days
             )
         )
     # if is still active, remove and readd to update schedule
@@ -169,7 +175,7 @@ def update_schedule(
             schedule_time=scheduler.ScheduleInfo(
                 min=updated_schedule.schedule_info.min,
                 hour=updated_schedule.schedule_info.hour,
-                day=updated_schedule.schedule_info.day
+                days=updated_schedule.schedule_info.days
             )
         )
 

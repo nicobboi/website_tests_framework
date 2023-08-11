@@ -1,4 +1,4 @@
-from datetime import timedelta
+from celery.schedules import crontab
 from app.core.celery_app import celery_app
 from .redisbeat import RedisScheduler
 
@@ -10,17 +10,34 @@ class ScheduleInfo(BaseModel):
     """
     min: int
     hour: int
-    day: int
+    days: list[str]
+
+def intFromDay(days: list[str]) -> list[int]:
+    """
+    Return a list of integer from days name (for crontab 'day_of_week' attribute)
+    """
+    output = []
+    for day in days:
+        if day == "sunday": output.append(0)
+        if day == "monday": output.append(1)
+        if day == "tuesday": output.append(2)
+        if day == "wednesday": output.append(3)
+        if day == "thursday": output.append(4)
+        if day == "friday": output.append(5)
+        if day == "saturday": output.append(6)
+
+    return output
+
 
 def add_schedule(url: str, schedule_name: str, test_type: str, schedule_time: ScheduleInfo):
     """
     Add new schedule (return True on success)
     """
     scheduler = RedisScheduler(app=celery_app)
-    schedule_info = timedelta(
-        minutes=schedule_time.min,
-        hours=schedule_time.hour,
-        days=schedule_time.day
+    schedule_info = crontab(
+        minute=[schedule_time.min],
+        hour=[schedule_time.hour],
+        day_of_week=intFromDay(schedule_time.days)
     )
 
     # schedule configuration

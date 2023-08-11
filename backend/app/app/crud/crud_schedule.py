@@ -4,7 +4,7 @@ from typing import Union
 
 from app.crud.base import CRUDBase
 from app import crud
-from app.models import Schedule, Website, Type
+from app.models import Schedule, Website, Type, ScheduleInfo
 from app.schemas.schedule import ScheduleBase, ScheduleCreate, ScheduleUpdate, ScheduleOutput
 
 from datetime import datetime
@@ -30,12 +30,26 @@ class CRUDSchedule(CRUDBase[Schedule, ScheduleCreate, ScheduleUpdate]):
             # schedule
             schedule = Schedule(
                 active=True,
-                min=obj_in.min,
-                hour=obj_in.hour,
-                day=obj_in.day,
                 scheduled_time=str(datetime.now())
             )
             db.add(schedule)
+
+            # schedule info
+            schedule_info = db.query(ScheduleInfo).filter(
+                ScheduleInfo.min         == obj_in.min and \
+                ScheduleInfo.hour        == obj_in.hour and \
+                set(ScheduleInfo.days)   == set(obj_in.days)
+            ).first()
+            if not schedule_info:  
+                schedule_info = ScheduleInfo(
+                    min=obj_in.min,
+                    hour=obj_in.hour,
+                    days=obj_in.days
+                )
+                db.add(schedule_info)
+
+            schedule_info.schedules.append(schedule)
+                
 
             # website
             url = obj_in.url
@@ -63,9 +77,9 @@ class CRUDSchedule(CRUDBase[Schedule, ScheduleCreate, ScheduleUpdate]):
                 url=website.url,
                 test_type=type.name,
                 schedule_info=ScheduleBase(
-                    min=schedule.min,
-                    hour=schedule.hour,
-                    day=schedule.day
+                    min=schedule_info.min,
+                    hour=schedule_info.hour,
+                    days=schedule_info.days
                 ),
                 active=schedule.active,
                 n_run=schedule.n_run,
@@ -86,9 +100,9 @@ class CRUDSchedule(CRUDBase[Schedule, ScheduleCreate, ScheduleUpdate]):
             url=schedule.website.url,
             test_type=schedule.type.name,
             schedule_info=ScheduleBase(
-                min=schedule.min,
-                hour=schedule.hour,
-                day=schedule.day
+                min=schedule.schedule_info.min,
+                hour=schedule.schedule_info.hour,
+                days=schedule.schedule_info.days
             ),
             active=schedule.active,
             n_run=schedule.n_run,
@@ -121,9 +135,9 @@ class CRUDSchedule(CRUDBase[Schedule, ScheduleCreate, ScheduleUpdate]):
 
         was_active = schedule.active
 
-        if obj_in.min:              schedule.min = obj_in.min
-        if obj_in.hour:             schedule.hour = obj_in.hour
-        if obj_in.day:              schedule.day = obj_in.day
+        if obj_in.min:              schedule.schedule_info.min = obj_in.min
+        if obj_in.hour:             schedule.schedule_info.hour = obj_in.hour
+        if obj_in.days:             schedule.schedule_info.days = obj_in.days
         if obj_in.active != None:   schedule.active = obj_in.active
         if obj_in.last_time_launched and (schedule.last_time_launched != obj_in.last_time_launched):
             schedule.last_time_launched = obj_in.last_time_launched
@@ -136,9 +150,9 @@ class CRUDSchedule(CRUDBase[Schedule, ScheduleCreate, ScheduleUpdate]):
             url=schedule.website.url,
             test_type=schedule.type.name,
             schedule_info=ScheduleBase(
-                min=schedule.min,
-                hour=schedule.hour,
-                day=schedule.day
+                min=schedule.schedule_info.min,
+                hour=schedule.schedule_info.hour,
+                days=schedule.schedule_info.days
             ),
             active=schedule.active,
             n_run=schedule.n_run,
@@ -175,9 +189,9 @@ class CRUDSchedule(CRUDBase[Schedule, ScheduleCreate, ScheduleUpdate]):
             url=schedule.website.url,
             test_type=schedule.type.name,
             schedule_info=ScheduleBase(
-                min=schedule.min,
-                hour=schedule.hour,
-                day=schedule.day
+                min=schedule.schedule_info.min,
+                hour=schedule.schedule_info.hour,
+                days=schedule.schedule_info.days
             ),
             active=schedule.active,
             scheduled_time=schedule.scheduled_time,

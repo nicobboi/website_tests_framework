@@ -6,9 +6,9 @@ from datetime import datetime
 class ScheduleBase(BaseModel):
     """
     """
-    min: int    = Field(description="Schedule \'min\' for scheduling a task.")
-    hour: int   = Field(description="Schedule \'hour\' for scheduling a task.")
-    day: int    = Field(description="Schedule \'day\' for scheduling a task.")
+    min: int        = Field(description="Schedule \'min\' for scheduling a task.")
+    hour: int       = Field(description="Schedule \'hour\' for scheduling a task.")
+    days: list[str] = Field(description="Schedule \'day\' for scheduling a task.")
 
 
 class ScheduleCreate(ScheduleBase):
@@ -22,7 +22,7 @@ class ScheduleUpdate(BaseModel):
     """
     min: Union[int, None]                        = Field(description="Schedule \'min\' for scheduling a task.")
     hour: Union[int, None]                       = Field(description="Schedule \'hour\' for scheduling a task.")
-    day: Union[int, None]                        = Field(description="Schedule \'day\' for scheduling a task.")
+    days: Union[list[str], None]                 = Field(description="Schedule \'day\' for scheduling a task.")
     active: Union[bool, None]                    = Field(description="")
     last_time_launched: Union[datetime, None]    = Field(description="")
 
