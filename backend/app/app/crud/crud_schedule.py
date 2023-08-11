@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import asc
 from typing import Union
 
 from app.crud.base import CRUDBase
@@ -167,7 +168,7 @@ class CRUDSchedule(CRUDBase[Schedule, ScheduleCreate, ScheduleUpdate]):
         """
         Get all schedules
         """
-        schedules = db.query(Schedule).all()
+        schedules = db.query(Schedule).join(Schedule.website).order_by(asc(Website.url)).all()
 
         return [ScheduleOutput(
             id=schedule.id,

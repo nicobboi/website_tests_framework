@@ -44,6 +44,6 @@ def test_website(url: str, test_type: str, scheduled: bool = True) -> str:
             "schedule_url": url,
             "schedule_test_type": test_type
         }
-        response = requests.get("http://backend/api/v1/schedule/update", params=params, json=payload)
+        response = requests.post("http://backend/api/v1/schedule/update", params=params, json=payload)
     return "Tests ended."
 
