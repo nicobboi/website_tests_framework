@@ -1,14 +1,25 @@
-import { useForm }  from  "react-hook-form";
+import { Form, useForm }  from  "react-hook-form";
 import { useState } from "react";
+
+import { useTheme } from '@mui/material/styles';
+import Box from '@mui/material/Box';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import Chip from '@mui/material/Chip';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import dayjs from 'dayjs';
 
 const RunTest = () => {
     const { register, handleSubmit, formState:{errors} } = useForm();
     const [response, setResponse] = useState(null);
     const [testMode, setTestMode] = useState("run");
 
-    const [mins, setMins] = useState(undefined);
-    const [hours, setHours] = useState(undefined);
-    const [days, setDays] = useState(undefined);
+    // schedule info to send via API
+    const [scheduleTime, setScheduleTime] = useState(dayjs(new Date()));
+    const [days, setDays] = useState([]);
 
     // handle form submit
     const onSubmit = (data) => {
@@ -36,9 +47,9 @@ const RunTest = () => {
           request_url = "http://localhost/api/v1/website/run"
         } else if (testMode === "schedule") {
           payload = {
-            min: data["minutes"],
-            hour: data["hours"],
-            day: data["days"],
+            min: scheduleTime.$m,
+            hour: scheduleTime.$H,
+            days: days,
             ...payload
           }
         
@@ -55,10 +66,54 @@ const RunTest = () => {
             .then(response => response.json()) 
             .then(json => {
                 setResponse("Scheduled successfully!");
+                console.log(json);
                 setTimeout(() => setResponse(null), 3000);
             })
             .catch(err => console.log("Error sending data: ", err));
     }
+
+    /* SELECT COMPONENT CONF ---------------------- */
+    const ITEM_HEIGHT = 48;
+    const ITEM_PADDING_TOP = 8;
+    const MenuProps = {
+      PaperProps: {
+        style: {
+          maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+          width: 250,
+        },
+      },
+    };
+
+    const selectDays = [
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday",
+      "saturday",
+      "sunday"
+    ]
+
+    function getStyles(day, days, theme) {
+      return {
+        fontWeight:
+          days.indexOf(day) === -1
+            ? theme.typography.fontWeightRegular
+            : theme.typography.fontWeightMedium,
+      };
+    }
+    const theme = useTheme();
+    const handleChange = (event) => {
+      const {
+        target: { value },
+      } = event;
+      setDays(
+        // On autofill we get a stringified value.
+        typeof value === 'string' ? value.split(',') : value,
+      );
+    };
+
+    /* -------------------------------------------- */
 
     return (
       <>
@@ -97,7 +152,52 @@ const RunTest = () => {
                     <div className="my-auto fs-3">
                       <i className="fa-regular fa-calendar-days"></i>
                     </div>
-                    <div className="form-floating">
+
+                    <TimePicker
+                      sx={{ width: 150 }}
+                      label="Select schedule time"
+                      value={scheduleTime}
+                      onChange={(newValue) => setScheduleTime(newValue)}
+                    />
+                    <FormControl sx={{ width: 250 }}>
+                      <InputLabel id="demo-multiple-chip-label">
+                        Select schedule days
+                      </InputLabel>
+                      <Select 
+                        labelId="demo-multiple-chip-label"
+                        id="demo-multiple-chip"
+                        multiple
+                        value={days}
+                        onChange={handleChange}
+                        input={
+                          <OutlinedInput
+                            id="select-multiple-chip"
+                            label="Chip"
+                          />
+                        }
+                        renderValue={(selected) => (
+                          <Box
+                            sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}
+                          >
+                            {selected.map((value) => (
+                              <Chip key={value} label={value} />
+                            ))}
+                          </Box>
+                        )}
+                        MenuProps={MenuProps}
+                      >
+                        {selectDays.map((day) => (
+                          <MenuItem
+                            key={day}
+                            value={day}
+                            style={getStyles(day, days, theme)}
+                          >
+                            {day}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    {/* <div className="form-floating">
                       <input
                         type="number"
                         id="minutes"
@@ -136,7 +236,7 @@ const RunTest = () => {
                         {...register("days")}
                       />
                       <label htmlFor="days">days</label>
-                    </div>
+                    </div> */}
                   </div>
                 </>
               )}

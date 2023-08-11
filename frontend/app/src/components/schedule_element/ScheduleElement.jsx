@@ -1,25 +1,32 @@
 import { useState } from "react";
 import styles from "./scheduleelement.module.scss";
 
+import { useTheme } from '@mui/material/styles';
+import Box from '@mui/material/Box';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import Chip from '@mui/material/Chip';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import dayjs from 'dayjs';
+
 const ScheduleElement = (props) => {
     const schedule = props.schedule;
 
-    const [mins, setMins] = useState(schedule.schedule_info.min);
-    const [hours, setHours] = useState(schedule.schedule_info.hour);
-    const [days, setDays] = useState(schedule.schedule_info.day);
-    // const [weeks, setWeeks] = useState(schedule.crontab.week);
-    // const [months, setMonths] = useState(schedule.crontab.month);
+    // schedule info to send via API
+    const initialTime = new Date(); initialTime.setHours(schedule.schedule_info.hour, schedule.schedule_info.min);
+    const [scheduleTime, setScheduleTime] = useState(dayjs(initialTime));
+    const [days, setDays] = useState(schedule.schedule_info.days);
 
     const [active, setActive] = useState(schedule.active);
     const [modified, setModified] = useState(false);
 
     // reset all changes not confirmed
     const resetStatus = () => {
-        setMins(schedule.schedule_info.min);
-        setHours(schedule.schedule_info.hour);
-        setDays(schedule.schedule_info.day);
-        // setWeeks(schedule.crontab.week);
-        // setMonths(schedule.crontab.month);
+        setScheduleTime(dayjs(new Date()))
+        setDays([])
 
         setActive(schedule.active);
         setModified(false);
@@ -27,9 +34,11 @@ const ScheduleElement = (props) => {
 
     // commit the changes to database
     const commitChanges = () => {
+      if (!modified) return;
+
       const payload = {
-        min: mins,
-        hour: hours,
+        min: scheduleTime.$m,
+        hour: scheduleTime.$H,
         day: days,
         active: active,
         last_time_launched: null
@@ -70,6 +79,64 @@ const ScheduleElement = (props) => {
       // delete this child component
       props.ondelete(props.url, props.data_index);
     }
+
+    function formatDate(inputDateStr) {
+      const inputDate = new Date(inputDateStr);
+      
+      const day = inputDate.getDate().toString().padStart(2, '0');
+      const month = (inputDate.getMonth() + 1).toString().padStart(2, '0');
+      const year = inputDate.getFullYear();
+      
+      const hours = inputDate.getHours().toString().padStart(2, '0');
+      const minutes = inputDate.getMinutes().toString().padStart(2, '0');
+      
+      const formattedDate = `${day}/${month}/${year} ${hours}:${minutes}`;
+      return formattedDate;
+  }
+
+    /* SELECT COMPONENT CONF ---------------------- */
+    const ITEM_HEIGHT = 48;
+    const ITEM_PADDING_TOP = 8;
+    const MenuProps = {
+      PaperProps: {
+        style: {
+          maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+          width: 250,
+        },
+      },
+    };
+
+    const selectDays = [
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday",
+      "saturday",
+      "sunday"
+    ]
+
+    function getStyles(day, days, theme) {
+      return {
+        fontWeight:
+          days.indexOf(day) === -1
+            ? theme.typography.fontWeightRegular
+            : theme.typography.fontWeightMedium,
+      };
+    }
+    const theme = useTheme();
+    const handleChange = (event) => {
+      const {
+        target: { value },
+      } = event;
+      setDays(
+        // On autofill we get a stringified value.
+        typeof value === 'string' ? value.split(',') : value,
+      );
+      setModified(true);
+    };
+
+    /* -------------------------------------------- */
 
     return (
       <>
@@ -115,7 +182,7 @@ const ScheduleElement = (props) => {
                 <div className="date-time">
                   <i className="fa-regular fa-clock"></i>
                   <i className="fa-solid fa-backward ms-1"></i>
-                  <span className="ms-2">{schedule.last_time_launched}</span>
+                  <span className="ms-2">{schedule.last_time_launched ? formatDate(schedule.last_time_launched) : "Schedule not launched yet"}</span>
                 </div>
                 <div>
                   <i className="fa-solid fa-layer-group"></i>
@@ -124,73 +191,49 @@ const ScheduleElement = (props) => {
               </div>
 
               {/* crontab info */}
-              <div className="d-flex flex-row mx-5">
-                <div className="form-floating">
-                  <input
-                    type="text"
-                    id="minutes"
-                    className="form-control schedule-info-box mx-1"
-                    value={mins}
-                    onChange={(event) => {
-                      setMins(event.target.value);
-                      setModified(true);
-                    }}
-                  />
-                  <label htmlFor="minutes">minutes</label>
-                </div>
-                <div className="form-floating">
-                  <input
-                    type="text"
-                    id="hours"
-                    className="form-control schedule-info-box mx-1"
-                    value={hours}
-                    onChange={(event) => {
-                      setHours(event.target.value);
-                      setModified(true);
-                    }}
-                  />
-                  <label htmlFor="hours">hours</label>
-                </div>
-                <div className="form-floating">
-                  <input
-                    type="text"
-                    id="days"
-                    className="form-control schedule-info-box mx-1"
+              <div className="d-flex flex-row mx-2">
+                <TimePicker
+                  className="me-2"
+                  sx={{ width: 150 }}
+                  label="Select schedule time"
+                  value={scheduleTime}
+                  onChange={(newValue) => {setScheduleTime(newValue); setModified(true);}}
+                />
+                <FormControl sx={{ width: 250 }}>
+                  <InputLabel id="demo-multiple-chip-label">
+                    Select schedule days
+                  </InputLabel>
+                  <Select
+                    labelId="demo-multiple-chip-label"
+                    id="demo-multiple-chip"
+                    multiple
                     value={days}
-                    onChange={(event) => {
-                      setDays(event.target.value);
-                      setModified(true);
-                    }}
-                  />
-                  <label htmlFor="days">days</label>
-                </div>
-                {/* <div className="form-floating">
-                  <input
-                    type="text"
-                    id="months"
-                    className="form-control schedule-info-box mx-1"
-                    value={weeks}
-                    onChange={(event) => {
-                      setWeeks(event.target.value);
-                      setModified(true);
-                    }}
-                  />
-                  <label htmlFor="months">months</label>
-                </div>
-                <div className="form-floating">
-                  <input
-                    type="text"
-                    id="years"
-                    className="form-control schedule-info-box mx-1"
-                    value={months}
-                    onChange={(event) => {
-                      setMonths(event.target.value);
-                      setModified(true);
-                    }}
-                  />
-                  <label htmlFor="years">years</label>
-                </div> */}
+                    onChange={handleChange}
+                    input={
+                      <OutlinedInput id="select-multiple-chip" label="Chip" />
+                    }
+                    renderValue={(selected) => (
+                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                        {selected.map((value) => (
+                          <Chip key={value} label={value} />
+                        ))}
+                      </Box>
+                    )}
+                    MenuProps={MenuProps}
+                  >
+                    {selectDays.map((day) => (
+                      <MenuItem
+                        key={day}
+                        value={day}
+                        style={getStyles(day, days, theme)}
+                      >
+                        {day}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               </div>
+
               <div className={`${styles.cDropdown} my-auto`}>
                 <button className={`btn ${styles.scheduleInfoBtn} p-3`}>
                   <i className="fa-solid fa-ellipsis-vertical my-auto fs-5"></i>
