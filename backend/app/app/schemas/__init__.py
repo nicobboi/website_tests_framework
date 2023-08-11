@@ -21,6 +21,7 @@ from .website import (
     WebsiteRun,
     AllWebsiteScores,
     WebsiteReportsScores,
+    TestTypes
 )
 from .report import ReportBase, ReportCreate, ReportUpdate, ReportScores, ReportDetails
 from .tool import ToolBase
