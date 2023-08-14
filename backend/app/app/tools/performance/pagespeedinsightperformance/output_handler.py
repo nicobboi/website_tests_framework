@@ -1,14 +1,13 @@
 from . import pagespeedperf as psp
-from datetime import datetime
-from zoneinfo import ZoneInfo
+from datetime import datetime, timezone
 
 def get_output(uri):
-    start_test_timestamp = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
+    start_test_timestamp = str(datetime.now(tz=timezone.utc))
 
     # run script for pagespeed insight test
     psp_out = psp.test(uri)
 
-    end_test_timestamp = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
+    end_test_timestamp = str(datetime.now(tz=timezone.utc))
 
     try:
         # organize the output

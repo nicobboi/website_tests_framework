@@ -1,6 +1,5 @@
 from subprocess import Popen
-from datetime import datetime
-from zoneinfo import ZoneInfo
+from datetime import datetime, timezone
 import json
 import os
 
@@ -10,12 +9,12 @@ def get_output(uri):
     # report download path
     output_path = "./reports"
 
-    start_test_timestamp = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
+    start_test_timestamp = str(datetime.now(tz=timezone.utc))
 
     with Popen(["node", mauve_path, uri, output_path]) as proc:
         proc.wait()
 
-    end_test_timestamp = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
+    end_test_timestamp = str(datetime.now(tz=timezone.utc))
 
     # if the url has '/' as last char, it will be removed
     if uri[-1] == '/':

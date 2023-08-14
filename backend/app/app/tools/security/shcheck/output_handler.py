@@ -1,16 +1,15 @@
 from subprocess import Popen, PIPE
-from datetime import datetime
-from zoneinfo import ZoneInfo
+from datetime import datetime, timezone
 import json
 
 def get_output(uri):
     shcheck_path = "./shcheck.py"
 
-    start_test_timestamp = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
+    start_test_timestamp = str(datetime.now(tz=timezone.utc))
 
     with Popen([shcheck_path, "-j", uri], stdout=PIPE) as proc:
 
-        end_test_timestamp = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
+        end_test_timestamp = str(datetime.now(tz=timezone.utc))
 
         shcheck_out = json.loads(proc.stdout.read())
 

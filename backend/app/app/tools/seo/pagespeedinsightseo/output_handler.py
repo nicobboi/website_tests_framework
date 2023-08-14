@@ -1,14 +1,13 @@
 from . import pagespeedseo as pss
-from datetime import datetime
-from zoneinfo import ZoneInfo
+from datetime import datetime, timezone
 
 def get_output(uri):
-    start_test_timestamp = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
+    start_test_timestamp = str(datetime.now(tz=timezone.utc))
 
     # runs pagespeed insight seo test
     pss_out = pss.test(uri)
 
-    end_test_timestamp = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
+    end_test_timestamp = str(datetime.now(tz=timezone.utc))
     
     try:
         # organizing pss output 

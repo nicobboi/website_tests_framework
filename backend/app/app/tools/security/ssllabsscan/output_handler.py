@@ -1,17 +1,16 @@
 from subprocess import Popen, PIPE
-from datetime import datetime
-from zoneinfo import ZoneInfo
+from datetime import datetime, timezone
 import json
 
 def get_output(uri):
     ssllabs_path = "./ssllabs-scan"
 
-    start_test_timestamp = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
+    start_test_timestamp = str(datetime.now(tz=timezone.utc))
 
     with Popen([ssllabs_path, "--verbosity", "error", uri], stdout=PIPE) as proc:
         ssllabs_scan_out = json.loads(proc.stdout.read())
 
-        end_test_timestamp = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
+        end_test_timestamp = str(datetime.now(tz=timezone.utc))
 
         grade = ssllabs_scan_out[0]['endpoints'][0]['grade'][0] # to get the grade (without the "+" for the "A") 
 

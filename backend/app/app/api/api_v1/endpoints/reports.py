@@ -1,5 +1,5 @@
 from typing import Any, Union
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from pydantic import UUID4
 
 from fastapi import APIRouter, Depends, Body
@@ -18,8 +18,8 @@ def create_report(
         example={
             "notes": "Some notes...",
             "json_report": {},
-            "start_test_timestamp": datetime.now(),
-            "end_test_timestamp": datetime.now(),
+            "start_test_timestamp": datetime.now(timezone.utc),
+            "end_test_timestamp": datetime.now(timezone.utc) + timedelta(minutes=10),
             "tool": {"name": "tool_name", "type": "tool_type"},
             "scores": [{"name": "overall", "score": 100}],
             "url": "http://websiteurl",

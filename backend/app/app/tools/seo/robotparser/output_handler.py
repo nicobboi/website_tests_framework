@@ -1,6 +1,5 @@
 from . import robotparser as rp 
-from datetime import datetime
-from zoneinfo import ZoneInfo
+from datetime import datetime, timezone
 
 def get_output(uri, robot_valid):
     output = {
@@ -13,9 +12,9 @@ def get_output(uri, robot_valid):
 
     if robot_valid:
         output["notes"] = "Robots.txt is valid!\n\n"
-        output["start_test_timestamp"] = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
+        output["start_test_timestamp"] = str(datetime.now(tz=timezone.utc))
         output["notes"] += rp.test(uri)
-        output["end_test_timestamp"] = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
+        output["end_test_timestamp"] = str(datetime.now(tz=timezone.utc))
     else:
         output["notes"] = "Test not started because robots.txt is not valid!"
 
