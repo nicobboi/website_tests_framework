@@ -10,8 +10,6 @@ celery_app.conf.update(
     CELERY_REDIS_SCHEDULER_URL = 'redis://redis:6379',
 )
 
-celery_app.conf.timezone = "Europe/Rome"
-
 celery_app.conf.task_routes = {"app.worker.*": "main-queue"}
 
 

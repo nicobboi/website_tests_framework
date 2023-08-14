@@ -29,8 +29,8 @@ def upgrade():
     sa.Column('day', sa.Integer(), nullable=True),
     sa.Column('active', sa.Boolean(), nullable=False),
     sa.Column('n_run', sa.Integer(), nullable=False),
-    sa.Column('scheduled_time', sa.DateTime(), nullable=True),
-    sa.Column('last_time_launched', sa.DateTime(), nullable=True),
+    sa.Column('scheduled_time', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('last_time_launched', sa.DateTime(timezone=True), nullable=True),
     sa.ForeignKeyConstraint(['type_id'], ['type.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['website_id'], ['website.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
