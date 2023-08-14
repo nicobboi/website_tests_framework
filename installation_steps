@@ -8,7 +8,7 @@ Versions used inside the containers:
 
 GUIDE:
 - git clone
-- copy .env file
+- copy .env file from .env.template and change the project configuration
 - docker-compose up
 
 If needed, launch npm install into the celeryworker container for mauve and pa-website-validator
