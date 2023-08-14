@@ -4,4 +4,4 @@
 * [ ] splittare il README in più file: uno INSTALL per gli ops per l'installazione delle varie componenti e della soluzione,
       uno DEVELOPMENT per lo sviluppo
 * [ ] rimuovere, moduli, componenti, documentazione non utilizzata nel progetto
-
+* [ ] CI/CD su github actions
