@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import styles from "./scheduleslist.module.scss";
 import {Accordion, AccordionSummary, AccordionDetails, Typography} from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import dayjs from "dayjs";
 
 import ScheduleElement from "../../components/schedule_element/ScheduleElement";
 
@@ -37,20 +38,6 @@ const SchedulesList = () => {
         )
     }
 
-    // get the current time in a formatted string like "dd/MM/YY hh:mm"
-    const getCurrentDateFormatted = () => {
-        const date = new Date();
-
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
-        const hours = String(date.getHours()).padStart(2, '0');
-        const minutes = String(date.getMinutes()).padStart(2, '0');
-
-        const formattedString = `${day}/${month}/${year} ${hours}:${minutes}`;
-        return formattedString;
-    }
-
     // delete the child schedule and rerender
     const deleteScheduleRender = (url, data_index) => {
       var tempData = {...dataFetched};
@@ -72,7 +59,7 @@ const SchedulesList = () => {
                   <div className="d-flex justify-content-between align-items-center activity">
                     <div>
                       <i className="fa-regular fa-clock"></i>
-                      <span className="ms-2">{getCurrentDateFormatted()}</span>
+                      <span className="ms-2">{dayjs(new Date()).format('DD/MM/YYYY HH:mm')}</span>
                     </div>
                     <div className={styles.icons}>
                       <i className="fa fa-search"></i>

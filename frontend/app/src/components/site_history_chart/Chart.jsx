@@ -13,7 +13,7 @@ import {
 import 'chartjs-adapter-date-fns';
 import { Scatter, getElementAtEvent } from 'react-chartjs-2';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import DateTimePicker from 'react-datetime-picker';
 import 'react-datetime-picker/dist/DateTimePicker.css';
@@ -22,6 +22,10 @@ import 'react-calendar/dist/Calendar.css';
 import ReportDetails from '../report_details/ReportDetails';
 import ReportTypeDetails from '../report_type_details/ReportTypeDetails';
 import { secondsInDay, secondsInWeek } from 'date-fns';
+
+import dayjs from 'dayjs';
+import utc from 'dayjs-plugin-utc';
+dayjs.extend(utc);
 
 
 ChartJS.register(
@@ -97,8 +101,8 @@ const Chart = (props) => {
     const fetchChartData = (type, start_time = null, end_time = null) => {
         // Reports filtered by type
         const reports = props.reports_scores.filter(report_score => report_score.tool.type === type)
-            .filter((report_score) => (start_time ? report_score.timestamp > start_time : report_score))
-            .filter((report_score) => (end_time ? report_score.timestamp < end_time : report_score))
+            .filter((report_score) => (start_time ? dayjs(report_score.timestamp) > start_time : report_score))
+            .filter((report_score) => (end_time ? dayjs(report_score.timestamp) < end_time : report_score))
 
         // scores
         const report_scores = reports.map(report => report.scores.map(score => score.score)).flat();
@@ -110,7 +114,7 @@ const Chart = (props) => {
         if (report_scores.length === report_timestamps.length) {
             report_scores.forEach((score, index) => {
                 dataset.push({
-                    x: report_timestamps[index],
+                    x: dayjs(report_timestamps[index]).utcOffset(dayjs().utcOffset()).format(),
                     y: score
                 })
             });
@@ -268,7 +272,7 @@ const Chart = (props) => {
                     unit: 'week',
                     unitStepSize: 1,
                     displayFormats: {
-                        hour: 'hh:mm',
+                        hour: 'HH:mm',
                         day: 'MMM dd',
                         week: 'MMM dd',
                         month: 'MMM dd',
@@ -290,65 +294,28 @@ const Chart = (props) => {
     // to update the time render on x axis of the chart
     const [options, setChartOptions] = useState(initialOptions);
     const [startDate, setStartDate] = useState(null);
-    // format Date to string
-    const formatTimestampFromDate = (date) => {
-        if (!date) return null;
-
-        const year = date.getUTCFullYear();
-        const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-        const day = String(date.getUTCDate()).padStart(2, '0');
-        const hours = String(date.getUTCHours()).padStart(2, '0');
-        const minutes = String(date.getUTCMinutes()).padStart(2, '0');
-        const seconds = String(date.getUTCSeconds()).padStart(2, '0');
-        const milliseconds = String(date.getUTCMilliseconds()).padStart(3, '0');
-        const offset = date.getTimezoneOffset();
-        const offsetHours = Math.floor(Math.abs(offset) / 60).toString().padStart(2, '0');
-        const offsetMinutes = (Math.abs(offset) % 60).toString().padStart(2, '0');
-        const offsetSign = offset < 0 ? '+' : '-';
-
-        const formattedTimestamp =
-            `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}${offsetSign}${offsetHours}:${offsetMinutes}`;
-
-        return formattedTimestamp;
-    }
-    const [endDate, setEndDate] = useState(formatTimestampFromDate(new Date()));
-    // format string to Date
-    const parseTimestampToDate = (dateString) => {
-        if (!dateString) return null;
-
-        const [isoDate, offsetPart] = dateString.split('+');
-        const offsetHours = parseInt(offsetPart.slice(0, 2), 10);
-        const offsetMinutes = parseInt(offsetPart.slice(3), 10);
-        const totalOffsetMinutes = (offsetHours * 60) + offsetMinutes;
-        
-        const dateWithOffset = new Date(isoDate);
-        dateWithOffset.setUTCMinutes(dateWithOffset.getUTCMinutes() - totalOffsetMinutes);
-
-        return dateWithOffset;
-    }
+    const [endDate, setEndDate] = useState(null);
     // update the time render of the chart
     const updateTimeRender = (filter_time, change_date) => {
-        const new_date = formatTimestampFromDate(change_date);
-        var seconds_between;
+        const new_date = dayjs(change_date);
+        var time_between;
         if (filter_time === "start") {
-            if (new_date > endDate) return;
-            setStartDate(new_date);
-            updateDataRender(new_date, endDate);
-            seconds_between = Math.floor((parseTimestampToDate(endDate) - parseTimestampToDate(new_date)) / 1000);
+            if (endDate && new_date > endDate) return;
+            setStartDate(change_date);
+            time_between = endDate ? Math.floor((endDate - new_date) / 1000) : null;
         }
         else if (filter_time === "end") {
-            if (new_date < startDate) return;
-            setEndDate(new_date);
-            updateDataRender(startDate, new_date);
-            seconds_between = Math.floor((parseTimestampToDate(new_date) - parseTimestampToDate(startDate)) / 1000);
+            if (startDate && new_date < startDate) return;
+            setEndDate(change_date);
+            time_between = startDate ? Math.floor((new_date - startDate) / 1000) : null;
         }
 
         // Modify the chart option you want to change dynamically
-        var time_format = null
+        var time_format;
 
-        if (seconds_between < secondsInDay) {
+        if (time_between && time_between < secondsInDay * 2) {
             time_format = "hour";
-        } else if (seconds_between < (secondsInWeek * 2)) {
+        } else if (time_between && time_between < (secondsInWeek * 2)) {
             time_format = "day";
         } else {
             time_format = "week";
@@ -370,6 +337,10 @@ const Chart = (props) => {
 
         setChartOptions(updatedOptions)
     }
+
+    useEffect(() => {
+        updateDataRender(startDate, endDate)
+    }, [startDate, endDate])
 
     return (
       <>

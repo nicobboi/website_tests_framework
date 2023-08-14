@@ -10,14 +10,16 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import Chip from '@mui/material/Chip';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+
 import dayjs from 'dayjs';
+import utc from 'dayjs-plugin-utc';
+dayjs.extend(utc);
 
 const ScheduleElement = (props) => {
     const schedule = props.schedule;
 
     // schedule info to send via API
-    const initialTime = new Date(); initialTime.setHours(schedule.schedule_info.hour, schedule.schedule_info.min);
-    const [scheduleTime, setScheduleTime] = useState(dayjs(initialTime));
+    const [scheduleTime, setScheduleTime] = useState(dayjs(schedule.schedule_info.time_info, 'HH:mm:ssZ'));
     const [days, setDays] = useState(schedule.schedule_info.days);
 
     const [active, setActive] = useState(schedule.active);
@@ -25,7 +27,7 @@ const ScheduleElement = (props) => {
 
     // reset all changes not confirmed
     const resetStatus = () => {
-        setScheduleTime(dayjs(new Date()))
+        setScheduleTime(dayjs(schedule.schedule_info.time_info, 'HH:mm:ssZ'))
         setDays([])
 
         setActive(schedule.active);
@@ -37,8 +39,7 @@ const ScheduleElement = (props) => {
       if (!modified) return;
 
       const payload = {
-        min: scheduleTime.$m,
-        hour: scheduleTime.$H,
+        time_info: scheduleTime.utcOffset(0).format('HH:mm:ssZ'),
         days: days,
         active: active,
         last_time_launched: null
@@ -79,20 +80,6 @@ const ScheduleElement = (props) => {
       // delete this child component
       props.ondelete(props.url, props.data_index);
     }
-
-    function formatDate(inputDateStr) {
-      const inputDate = new Date(inputDateStr);
-      
-      const day = inputDate.getDate().toString().padStart(2, '0');
-      const month = (inputDate.getMonth() + 1).toString().padStart(2, '0');
-      const year = inputDate.getFullYear();
-      
-      const hours = inputDate.getHours().toString().padStart(2, '0');
-      const minutes = inputDate.getMinutes().toString().padStart(2, '0');
-      
-      const formattedDate = `${day}/${month}/${year} ${hours}:${minutes}`;
-      return formattedDate;
-  }
 
     /* SELECT COMPONENT CONF ---------------------- */
     const ITEM_HEIGHT = 48;
@@ -171,7 +158,7 @@ const ScheduleElement = (props) => {
                     <div className="mt-1">
                       {/* START TIME */}
                       <i className="fa-regular fa-calendar"></i>
-                      <span className="ms-2">{schedule.scheduled_time}</span>
+                      <span className="ms-2">{dayjs(schedule.scheduled_time).utcOffset(dayjs().utcOffset()).format('DD/MM/YYYY HH:mm')}</span>
                     </div>
                   </div>
                 </div>
@@ -182,7 +169,7 @@ const ScheduleElement = (props) => {
                 <div className="date-time">
                   <i className="fa-regular fa-clock"></i>
                   <i className="fa-solid fa-backward ms-1"></i>
-                  <span className="ms-2">{schedule.last_time_launched ? formatDate(schedule.last_time_launched) : "Schedule not launched yet"}</span>
+                  <span className="ms-2">{schedule.last_time_launched ? dayjs(schedule.last_time_launchedl).utcOffset(dayjs().utcOffset()).format('DD/MM/YYYY HH:mm') : "Schedule not launched yet"}</span>
                 </div>
                 <div>
                   <i className="fa-solid fa-layer-group"></i>

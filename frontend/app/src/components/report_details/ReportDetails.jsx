@@ -1,5 +1,9 @@
 import useFetch from "react-fetch-hook";
 
+import dayjs from 'dayjs';
+import utc from 'dayjs-plugin-utc';
+dayjs.extend(utc);
+
 const ReportDetails = (props) => {
     // API call
     const { isLoading, data, error } = useFetch("http://localhost/api/v1/report/get?id=" + props.report_id);
@@ -53,7 +57,7 @@ const ReportDetails = (props) => {
                   Test type: <span>{data.tool.type}</span>
                   <br />
                   Test ended at:{" "}
-                  <span className="text-muted">{data.end_test_time}</span>
+                  <span className="text-muted">{dayjs(data.end_test_time).utcOffset(dayjs().utcOffset()).format('DD/MM/YYYY HH:mm')}</span>
                   <br />
                   Test duration time: <span>{data.test_duration_time}</span>
                 </div>
@@ -64,10 +68,10 @@ const ReportDetails = (props) => {
               <div className="row mt-3">
                 SCORES: <br />
                 <div>
-                  {data.scores.map((score) => (
-                    <>
+                  {data.scores.map((score, index) => (
+                    <div key={index}>
                       {score.name}: {score.score} <br />
-                    </>
+                    </div>
                   ))}
                 </div>
               </div>

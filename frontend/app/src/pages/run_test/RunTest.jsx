@@ -11,6 +11,8 @@ import Select from '@mui/material/Select';
 import Chip from '@mui/material/Chip';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import dayjs from 'dayjs';
+import utc from 'dayjs-plugin-utc';
+dayjs.extend(utc);
 
 const RunTest = () => {
     const { register, handleSubmit, formState:{errors} } = useForm();
@@ -47,8 +49,7 @@ const RunTest = () => {
           request_url = "http://localhost/api/v1/website/run"
         } else if (testMode === "schedule") {
           payload = {
-            min: scheduleTime.$m,
-            hour: scheduleTime.$H,
+            time_info: scheduleTime.utcOffset(0).format('HH:mm:ssZ'),
             days: days,
             ...payload
           }
