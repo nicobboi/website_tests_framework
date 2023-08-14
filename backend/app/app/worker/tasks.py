@@ -1,8 +1,7 @@
 from raven import Client
 import asyncio
 import requests
-from datetime import datetime
-from zoneinfo import ZoneInfo
+from datetime import datetime, timezone
 
 from app.core.celery_app import celery_app
 from app.core.config import settings
@@ -38,7 +37,7 @@ def test_website(url: str, test_type: str, scheduled: bool = True) -> str:
             "hour": None,
             "day": None,
             "active": None,
-            "last_time_launched": str(datetime.now(tz=ZoneInfo("Europe/Rome"))),
+            "last_time_launched": str(datetime.now(tz=timezone.utc)),
         }
         params = {
             "schedule_url": url,

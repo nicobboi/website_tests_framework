@@ -7,8 +7,7 @@ from app import crud
 from app.models import Schedule, Website, Type, ScheduleInfo
 from app.schemas.schedule import ScheduleBase, ScheduleCreate, ScheduleUpdate, ScheduleOutput
 
-from datetime import datetime
-from zoneinfo import ZoneInfo
+from datetime import datetime, timezone
 
 from pydantic import UUID4
 from typing import Union
@@ -30,7 +29,7 @@ class CRUDSchedule(CRUDBase[Schedule, ScheduleCreate, ScheduleUpdate]):
             # schedule
             schedule = Schedule(
                 active=True,
-                scheduled_time=str(datetime.now())
+                scheduled_time=datetime.now(tz=timezone.utc)
             )
             db.add(schedule)
 
