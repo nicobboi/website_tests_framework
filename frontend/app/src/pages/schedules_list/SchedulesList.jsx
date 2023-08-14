@@ -25,7 +25,7 @@ const SchedulesList = () => {
 
         setDataFetched(listByUrl);
       }
-    }, [isLoading])
+    }, [isLoading, data])
   
     if (error) {
         console.log(error)

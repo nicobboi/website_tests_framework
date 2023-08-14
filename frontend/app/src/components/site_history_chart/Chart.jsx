@@ -9,7 +9,6 @@ import {
     Title,
     Legend,
     Colors,
-    elements
 } from 'chart.js';
 import 'chartjs-adapter-date-fns';
 import { Scatter, getElementAtEvent } from 'react-chartjs-2';
@@ -22,7 +21,7 @@ import 'react-calendar/dist/Calendar.css';
 
 import ReportDetails from '../report_details/ReportDetails';
 import ReportTypeDetails from '../report_type_details/ReportTypeDetails';
-import { parse, secondsInDay, secondsInWeek } from 'date-fns';
+import { secondsInDay, secondsInWeek } from 'date-fns';
 
 
 ChartJS.register(
@@ -41,6 +40,7 @@ ChartJS.register(
 const Chart = (props) => {
     const getTypeFromIndex = (datasetIndex) => {
         switch(datasetIndex) {
+            default: return null;
             case 0: return "accessibility";
             case 1: return "performance";
             case 2: return "security";
@@ -329,17 +329,18 @@ const Chart = (props) => {
     // update the time render of the chart
     const updateTimeRender = (filter_time, change_date) => {
         const new_date = formatTimestampFromDate(change_date);
+        var seconds_between;
         if (filter_time === "start") {
             if (new_date > endDate) return;
             setStartDate(new_date);
             updateDataRender(new_date, endDate);
-            var seconds_between = Math.floor((parseTimestampToDate(endDate) - parseTimestampToDate(new_date)) / 1000);
+            seconds_between = Math.floor((parseTimestampToDate(endDate) - parseTimestampToDate(new_date)) / 1000);
         }
         else if (filter_time === "end") {
             if (new_date < startDate) return;
             setEndDate(new_date);
             updateDataRender(startDate, new_date);
-            var seconds_between = Math.floor((parseTimestampToDate(new_date) - parseTimestampToDate(startDate)) / 1000);
+            seconds_between = Math.floor((parseTimestampToDate(new_date) - parseTimestampToDate(startDate)) / 1000);
         }
 
         // Modify the chart option you want to change dynamically

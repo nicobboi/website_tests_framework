@@ -39,7 +39,7 @@ const ScheduleElement = (props) => {
       const payload = {
         min: scheduleTime.$m,
         hour: scheduleTime.$H,
-        day: days,
+        days: days,
         active: active,
         last_time_launched: null
       }
