@@ -1,5 +1,5 @@
 from typing import Any
-from datetime import datetime
+from datetime import datetime, time, timezone
 from pydantic import UUID4
 from typing import Union
 
@@ -64,8 +64,7 @@ def add_schedule(
     db: Session = Depends(deps.get_db), 
     schedule_in: schemas.ScheduleCreate = Body(
         example={
-            "min": 5,
-            "hour": 12,
+            "time_info": time(hour=13, minute=46, tzinfo=timezone.utc),
             "days": [
                 "monday",
                 "saturday"
@@ -90,8 +89,7 @@ def add_schedule(
             schedule_name=str(schedule.id),
             test_type=schedule.test_type,
             schedule_time=scheduler.ScheduleInfo(
-                min=schedule.schedule_info.min,
-                hour=schedule.schedule_info.hour,
+                time_info=schedule.schedule_info.time_info,
                 days=schedule.schedule_info.days
             )
         )
@@ -124,8 +122,7 @@ def update_schedule(
     schedule_test_type: Union[str, None] = None,
     schedule_in: schemas.ScheduleUpdate = Body(
         example={
-            "min": 1,
-            "hour": 5,
+            "time_info": time(hour=13, minute=46, tzinfo=timezone.utc),
             "days": [
                 "monday",
                 "saturday"
@@ -160,8 +157,7 @@ def update_schedule(
             schedule_name=str(updated_schedule.id),
             test_type=updated_schedule.test_type,
             schedule_time=scheduler.ScheduleInfo(
-                min=updated_schedule.schedule_info.min,
-                hour=updated_schedule.schedule_info.hour,
+                time_info=updated_schedule.schedule_info.time_info,
                 days=updated_schedule.schedule_info.days
             )
         )
@@ -173,8 +169,7 @@ def update_schedule(
             schedule_name=str(updated_schedule.id),
             test_type=updated_schedule.test_type,
             schedule_time=scheduler.ScheduleInfo(
-                min=updated_schedule.schedule_info.min,
-                hour=updated_schedule.schedule_info.hour,
+                time_info=updated_schedule.schedule_info.time_info,
                 days=updated_schedule.schedule_info.days
             )
         )

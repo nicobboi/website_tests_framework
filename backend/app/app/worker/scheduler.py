@@ -1,6 +1,7 @@
 from celery.schedules import crontab
 from app.core.celery_app import celery_app
 from .redisbeat import RedisScheduler
+from datetime import time, timezone
 
 from pydantic import BaseModel
 
@@ -8,8 +9,7 @@ class ScheduleInfo(BaseModel):
     """
     Validation class for schedule time info
     """
-    min: int
-    hour: int
+    time_info: time
     days: list[str]
 
 def intFromDay(days: list[str]) -> list[int]:
@@ -35,8 +35,8 @@ def add_schedule(url: str, schedule_name: str, test_type: str, schedule_time: Sc
     """
     scheduler = RedisScheduler(app=celery_app)
     schedule_info = crontab(
-        minute=[schedule_time.min],
-        hour=[schedule_time.hour],
+        minute=str(schedule_time.time_info.minute),
+        hour=str(schedule_time.time_info.hour),
         day_of_week=intFromDay(schedule_time.days)
     )
 

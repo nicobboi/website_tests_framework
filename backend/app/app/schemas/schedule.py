@@ -1,13 +1,12 @@
 from pydantic import BaseModel, Field, UUID4
 from typing import Union
-from datetime import datetime
+from datetime import datetime, time
 
 
 class ScheduleBase(BaseModel):
     """
     """
-    min: int        = Field(description="Schedule \'min\' for scheduling a task.")
-    hour: int       = Field(description="Schedule \'hour\' for scheduling a task.")
+    time_info: time      = Field(description="Schedule \'time\' for scheduling a task.")
     days: list[str] = Field(description="Schedule \'day\' for scheduling a task.")
 
 
@@ -20,11 +19,10 @@ class ScheduleCreate(ScheduleBase):
 class ScheduleUpdate(BaseModel):
     """
     """
-    min: Union[int, None]                        = Field(description="Schedule \'min\' for scheduling a task.")
-    hour: Union[int, None]                       = Field(description="Schedule \'hour\' for scheduling a task.")
-    days: Union[list[str], None]                 = Field(description="Schedule \'day\' for scheduling a task.")
-    active: Union[bool, None]                    = Field(description="")
-    last_time_launched: Union[datetime, None]    = Field(description="")
+    time_info: Union[time, None]                    = Field(description="Schedule \'time\' for scheduling a task.")
+    days: Union[list[str], None]                    = Field(description="Schedule \'day\' for scheduling a task.")
+    active: Union[bool, None]                       = Field(description="")
+    last_time_launched: Union[datetime, None]       = Field(description="")
 
 
 

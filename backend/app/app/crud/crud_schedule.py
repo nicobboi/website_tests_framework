@@ -36,14 +36,12 @@ class CRUDSchedule(CRUDBase[Schedule, ScheduleCreate, ScheduleUpdate]):
 
             # schedule info
             schedule_info = db.query(ScheduleInfo).filter(
-                ScheduleInfo.min         == obj_in.min and \
-                ScheduleInfo.hour        == obj_in.hour and \
+                ScheduleInfo.time        == obj_in.time_info and \
                 set(ScheduleInfo.days)   == set(obj_in.days)
             ).first()
             if not schedule_info:  
                 schedule_info = ScheduleInfo(
-                    min=obj_in.min,
-                    hour=obj_in.hour,
+                    time=obj_in.time_info,
                     days=obj_in.days
                 )
                 db.add(schedule_info)
@@ -77,8 +75,7 @@ class CRUDSchedule(CRUDBase[Schedule, ScheduleCreate, ScheduleUpdate]):
                 url=website.url,
                 test_type=type.name,
                 schedule_info=ScheduleBase(
-                    min=schedule_info.min,
-                    hour=schedule_info.hour,
+                    time_info=schedule_info.time,
                     days=schedule_info.days
                 ),
                 active=schedule.active,
@@ -100,8 +97,7 @@ class CRUDSchedule(CRUDBase[Schedule, ScheduleCreate, ScheduleUpdate]):
             url=schedule.website.url,
             test_type=schedule.type.name,
             schedule_info=ScheduleBase(
-                min=schedule.schedule_info.min,
-                hour=schedule.schedule_info.hour,
+                time_info=schedule.schedule_info.time,
                 days=schedule.schedule_info.days
             ),
             active=schedule.active,
@@ -135,8 +131,7 @@ class CRUDSchedule(CRUDBase[Schedule, ScheduleCreate, ScheduleUpdate]):
 
         was_active = schedule.active
 
-        if obj_in.min:              schedule.schedule_info.min = obj_in.min
-        if obj_in.hour:             schedule.schedule_info.hour = obj_in.hour
+        if obj_in.time_info:        schedule.schedule_info.time = obj_in.time_info
         if obj_in.days:             schedule.schedule_info.days = obj_in.days
         if obj_in.active != None:   schedule.active = obj_in.active
         if obj_in.last_time_launched and (schedule.last_time_launched != obj_in.last_time_launched):
@@ -150,8 +145,7 @@ class CRUDSchedule(CRUDBase[Schedule, ScheduleCreate, ScheduleUpdate]):
             url=schedule.website.url,
             test_type=schedule.type.name,
             schedule_info=ScheduleBase(
-                min=schedule.schedule_info.min,
-                hour=schedule.schedule_info.hour,
+                time_info=schedule.schedule_info.time,
                 days=schedule.schedule_info.days
             ),
             active=schedule.active,
@@ -189,8 +183,7 @@ class CRUDSchedule(CRUDBase[Schedule, ScheduleCreate, ScheduleUpdate]):
             url=schedule.website.url,
             test_type=schedule.type.name,
             schedule_info=ScheduleBase(
-                min=schedule.schedule_info.min,
-                hour=schedule.schedule_info.hour,
+                time_info=schedule.schedule_info.time,
                 days=schedule.schedule_info.days
             ),
             active=schedule.active,

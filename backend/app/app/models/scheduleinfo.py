@@ -3,7 +3,8 @@ from typing import TYPE_CHECKING
 from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 from sqlalchemy.dialects.postgresql import UUID, ARRAY
 from sqlalchemy.ext.mutable import MutableList
-from sqlalchemy import Table, Column, ForeignKey, String
+from sqlalchemy import String, Time
+from datetime import time, timezone
 from uuid import uuid4
 
 from enum import Enum
@@ -29,9 +30,8 @@ class DaysEnum(str, Enum):
 
 class ScheduleInfo(Base):
     id:         Mapped[UUID]            = mapped_column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid4)
-    min:        Mapped[int]             = mapped_column(nullable=True, default=None)
-    hour:       Mapped[int]             = mapped_column(nullable=True, default=None)
-    days:       Mapped[ARRAY(String)]   = mapped_column(MutableList.as_mutable(ARRAY(String)), nullable=False, default=[])
+    time:       Mapped[Time]            = mapped_column(Time(timezone=True), nullable=False, server_default=str(time(hour=0, minute=0, tzinfo=timezone.utc)))
+    days:       Mapped[ARRAY(String)]   = mapped_column(MutableList.as_mutable(ARRAY(String)), nullable=False, server_default=str([]))
 
     @validates("min")
     def validate_min(self, key, value):
