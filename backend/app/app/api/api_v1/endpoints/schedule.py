@@ -6,7 +6,7 @@ from typing import Union
 from fastapi import APIRouter, Depends, Body
 from sqlalchemy.orm import Session
 
-from app import crud, models, schemas
+from app import crud, schemas
 from app.api import deps
 
 from app.worker import scheduler
@@ -33,29 +33,12 @@ def get_schedule(
     """
     Get a schedule by ID, url or/and type
     """
-    if scheduler_id:
-        schedule = crud.schedule.get_by_id(db=db, id=scheduler_id)
-    elif scheduler_url and scheduler_test_type:
-        schedule = crud.schedule.get_by_url(db=db, url=scheduler_url, type_name=scheduler_test_type)
-
-    print(str(schedule))
-
-    if schedule:
-        return schemas.ScheduleOutput(
-            id=schedule.id,
-            url=scheduler_url,
-            test_type=scheduler_test_type,
-            schedule_info=schemas.ScheduleBase(
-                min=schedule.schedule_info.min,
-                hour=schedule.schedule_info.hour,
-                day=schedule.schedule_info.days
-            ),
-            active=schedule.active,
-            n_run=schedule.n_run,
-            scheduled_time=schedule.scheduled_time,
-            last_time_launched=schedule.last_time_launched
-        )
-    else: return None
+    return crud.schedule.get(
+        db=db,
+        scheduler_id=scheduler_id,
+        scheduler_url=scheduler_url,
+        scheduler_test_type=scheduler_test_type
+    )
 
 
 @router.post("/add", response_model=list[schemas.ScheduleOutput])

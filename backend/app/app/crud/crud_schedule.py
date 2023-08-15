@@ -154,6 +154,39 @@ class CRUDSchedule(CRUDBase[Schedule, ScheduleCreate, ScheduleUpdate]):
         ), was_active
 
 
+    def get(
+        self, 
+        db: Session, 
+        *, 
+        scheduler_id: Union[UUID4, None] = None,
+        scheduler_url: Union[str, None] = None,
+        scheduler_test_type: Union[str, None] = None
+    ) -> Union[ScheduleOutput, None]:
+        """
+        Get a schedule by its id or url and test_type
+        """
+
+        if scheduler_id:
+            schedule = crud.schedule.get_by_id(db=db, id=scheduler_id)
+        elif scheduler_url and scheduler_test_type:
+            schedule = crud.schedule.get_by_url(db=db, url=scheduler_url, type_name=scheduler_test_type)
+
+        if schedule:
+            return ScheduleOutput(
+                id=schedule.id,
+                url=scheduler_url,
+                test_type=scheduler_test_type,
+                schedule_info=ScheduleBase(
+                    time_info=schedule.schedule_info.time,
+                    day=schedule.schedule_info.days
+                ),
+                active=schedule.active,
+                n_run=schedule.n_run,
+                scheduled_time=schedule.scheduled_time,
+                last_time_launched=schedule.last_time_launched
+            )
+        else: return None
+
     def get_by_id(self, db: Session, *, id: UUID4) -> Schedule:
         """
         Get a schedule instance by its ID
@@ -171,11 +204,14 @@ class CRUDSchedule(CRUDBase[Schedule, ScheduleCreate, ScheduleUpdate]):
 
         return main_query.first()
 
-    def get_all(self, db: Session) -> list[ScheduleOutput]:
+    def get_all(self, db: Session, *, active: bool = False) -> list[ScheduleOutput]:
         """
         Get all schedules
         """
-        schedules = db.query(Schedule).join(Schedule.website).order_by(asc(Website.url)).all()
+        main_query = db.query(Schedule).join(Schedule.website).order_by(asc(Website.url))
+        if active: main_query = main_query.filter(Schedule.active == True)
+
+        schedules = main_query.all()
 
         return [ScheduleOutput(
             id=schedule.id,
@@ -190,5 +226,6 @@ class CRUDSchedule(CRUDBase[Schedule, ScheduleCreate, ScheduleUpdate]):
             n_run=schedule.n_run,
             last_time_launched=schedule.last_time_launched
         ) for schedule in schedules]
+
 
 schedule = CRUDSchedule(Schedule)

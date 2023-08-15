@@ -8,10 +8,6 @@ from datetime import datetime
 
 from app.db.base_class import Base
 
-from .website import Website
-from .score import Score
-from .tool import Tool
-
 if TYPE_CHECKING:
     from . import Website
     from . import Score

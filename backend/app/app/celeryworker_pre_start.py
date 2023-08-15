@@ -2,6 +2,7 @@ import logging
 
 from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixed
 from sqlalchemy.sql import text
+from worker.scheduler import init_scheduler
 
 from app.db.session import SessionLocal
 
@@ -23,6 +24,7 @@ def init() -> None:
         # Try to create session to check if DB is awake
         db = SessionLocal()
         db.execute(text("SELECT 1"))
+        init_scheduler(db=db)
     except Exception as e:
         logger.error(e)
         raise e

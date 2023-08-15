@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Body
 from sqlalchemy.orm import Session
 from typing import Union
 
-from app import crud, models, schemas
+from app import crud, schemas
 from celery import group
 from typing import List, Optional
 from pydantic import UUID4
@@ -17,7 +17,10 @@ router = APIRouter()
 
 @router.get("/scores", response_model=Union[schemas.WebsiteReportsScores, List])
 def get_website_scores(
-    *, db: Session = Depends(deps.get_db), website_url: Optional[str] = None, website_id: Optional[UUID4] = None
+    *, 
+    db: Session = Depends(deps.get_db), 
+    website_url: Optional[str] = None, 
+    website_id: Optional[UUID4] = None
 ) -> Any:
     """
     Get all website's scores by URL or ID
@@ -75,7 +78,6 @@ def run_tests(
     for time in range(1, repeat_test+1):
         try:
             job = group(worker.test_website.s(url=obj_in.url, test_type=test, scheduled=False) for test in obj_in.test_types)
-
             job.apply_async()
         except worker.test_website.OperationalError as e:
             print("Sending task raised: " + str(e) + "\n")

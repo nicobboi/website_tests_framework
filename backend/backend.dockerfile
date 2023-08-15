@@ -5,9 +5,6 @@ COPY ./app/pyproject.toml ./app/poetry.lock* /app/
 
 WORKDIR /app/
 
-# Neomodel has shapely and libgeos as dependencies
-RUN apt-get update && apt-get install -y libgeos-dev
-
 # Update poetry to 1.5.1 (uninstall and re-install)
 RUN rm -rf "${POETRY_HOME:-~/.poetry}"
 RUN curl -sSL https://install.python-poetry.org | python3 - --version 1.5.1
@@ -20,18 +17,6 @@ RUN cd /usr/local/bin && \
 ARG INSTALL_DEV=false
 RUN bash -c "if [ $INSTALL_DEV == 'true' ] ; then poetry install --no-interaction --no-root ; else poetry install --no-interaction --no-root --no-dev ; fi"
 RUN pip install --upgrade setuptools
-
-# /start Project-specific dependencies
-# RUN apt-get update && apt-get install -y --no-install-recommends \
-#  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*	
-# WORKDIR /app/
-# /end Project-specific dependencies
-
-# For development, Jupyter remote kernel, Hydrogen
-# Using inside the container:
-# jupyter lab --ip=0.0.0.0 --allow-root --NotebookApp.custom_display_url=http://127.0.0.1:8888
-ARG INSTALL_JUPYTER=false
-RUN bash -c "if [ $INSTALL_JUPYTER == 'true' ] ; then pip install jupyterlab ; fi"
 
 COPY ./app/alembic/versions/* ./app/alembic/versions/
 

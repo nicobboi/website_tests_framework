@@ -5,7 +5,7 @@ from typing import Optional
 from app.crud.base import CRUDBase
 from app.crud.crud_tool import tool
 from app import crud
-from app.models import Website, Report
+from app.models import Website
 from app.schemas.website import WebsiteCreate, WebsiteUpdate, AllWebsiteScores, WebsiteReportsScores
 from app.schemas import ReportScores, ToolBase, ScoreBase
 

@@ -3,6 +3,10 @@ from app.core.celery_app import celery_app
 from .redisbeat import RedisScheduler
 from datetime import time, timezone
 
+from sqlalchemy.orm import Session
+
+from app import crud
+
 from pydantic import BaseModel
 
 class ScheduleInfo(BaseModel):
@@ -28,6 +32,24 @@ def intFromDay(days: list[str]) -> list[int]:
 
     return output
 
+
+def init_scheduler(db: Session) -> None:
+    """
+    Insert initial data into celery scheduler
+    """
+    active_schedules = crud.schedule.get_all(db=db, active=True)
+    if not active_schedules: return
+
+    for schedule in active_schedules:
+        add_schedule(
+            url=schedule.url,
+            schedule_name=schedule.id,
+            test_type=schedule.test_type,
+            schedule_time=ScheduleInfo(
+                time_info=schedule.schedule_info.time_info,
+                days=schedule.schedule_info.days
+            )
+        )
 
 def add_schedule(url: str, schedule_name: str, test_type: str, schedule_time: ScheduleInfo):
     """

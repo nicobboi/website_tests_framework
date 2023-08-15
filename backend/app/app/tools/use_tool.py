@@ -1,11 +1,13 @@
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 # Script to test tools's outputs and to print them
 
 # global list to stores all reports which will be sent to db 
 run_reports = []
 
 def run_test(uri: str, test_type: str):
-    #print("Testing \'" + uri + "\'.\n")
-
     tests = {
         "security":         securityTest,
         "performance":      performanceTest,
@@ -19,7 +21,7 @@ def run_test(uri: str, test_type: str):
 
     # if there are reports (call is valid), then push them into the db
     if run_reports:
-        print("All tests ended.\n")
+        logger.info("All tests ended.\n")
         pushToDB(uri)
 
 
@@ -30,75 +32,65 @@ def run_test(uri: str, test_type: str):
 def securityTest(uri):
     from .security import securitytest
 
-    print("Executing SECURITY test... \n")
+    logger.info("Executing SECURITY test... \n")
     
     security_output = securitytest.run_test(uri)
-    #print(security_output)
 
     addToReport("security", security_output)
 
-    print("Security test ended.\n")
+    logger.info("Security test ended.\n")
 
 
 # Runs the performance test (PageSpeed Insight) and prints the desired output
-# OUTPUT:
-#   PageSpeed Insight: ...
 def performanceTest(uri):
     from .performance import performancetest
 
-    print("Executing PERFORMANCE test...\n")
+    logger.info("Executing PERFORMANCE test...\n")
 
     performance_output = performancetest.run_test(uri)
-    #print(performance_output)
 
     addToReport("performance", performance_output)
 
-    print("Performance test ended.\n")
+    logger.info("Performance test ended.\n")
     
 
 # Runs the accessibility test (Mauve++) and prints the desired output
 def accessibilityTest(uri):  
     from .accessibility import accessibilitytest
 
-    print("Executing ACCESSIBILITY test.\n")
+    logger.info("Executing ACCESSIBILITY test.\n")
 
     accessibility_out = accessibilitytest.run_test(uri)
-    #print(accessibility_out)
 
     addToReport("accessibility", accessibility_out)
 
-    print("Accessibility test ended.\n")
+    logger.info("Accessibility test ended.\n")
 
 
 # Runs the validation test (pa-website-validator) and prints the desired output
-# OUTPUT:
-#   pa-website-validator: ...
 def validationTest(uri):
     from .validation import validationtest
 
-    print("Executing VALIDATION test...\n")
+    logger.info("Executing VALIDATION test...\n")
 
     validation_out = validationtest.run_test(uri)
-    #print(validation_out)
 
     addToReport("validation", validation_out)
 
-    print("Validation test ended.\n")
+    logger.info("Validation test ended.\n")
 
 
 # Runs the SEO tests and prints the output
 def SEOTest(uri):
     from .seo import seotest
 
-    print("Executing SEO test...\n")
+    logger.info("Executing SEO test...\n")
 
-    # returns a dict with key=test name and value=result of the test
     seo_output = seotest.run_test(uri)
-    #print(seo_output)
 
     addToReport("seo", seo_output)
 
-    print("SEO test ended.\n")
+    logger.info("SEO test ended.\n")
 
 
 # add the report in the global list of reports
@@ -149,11 +141,11 @@ def pushToDB(url):
             api_url = "http://backend/api/v1/report/set"
             res = session.post(api_url, json=payload)
             if res.status_code == 200:
-                print("Report sent.")
+                logger.info("Report sent.")
             else:
-                print("Error sending report. Error: " + str(res.status_code))
+                logger.warning("Error sending report. Error: " + str(res.status_code))
         except requests.exceptions.ConnectionError:
-            print("Connection error.\nShutting down...")
+            logger.error("Connection error.\nShutting down...")
             exit(1)
         finally:
             session.close()
