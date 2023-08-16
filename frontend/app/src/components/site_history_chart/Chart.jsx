@@ -13,7 +13,8 @@ import {
 import 'chartjs-adapter-date-fns';
 import { Scatter, getElementAtEvent } from 'react-chartjs-2';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import {useSearchParams, createSearchParams} from 'react-router-dom';
 
 import DateTimePicker from 'react-datetime-picker';
 import 'react-datetime-picker/dist/DateTimePicker.css';
@@ -42,6 +43,24 @@ ChartJS.register(
 
 
 const Chart = (props) => {
+    /* VARIABLES ------------------------------------------------------------ */
+
+    // ref to the chart
+    const chartRef = useRef();
+
+    // search params handler
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    // handle the click on the chart's points and redirect to report's details
+    const [reportDetails, setReportDetails] = useState(null);
+    const [reportTypeDetails, setReportTypeDetails] = useState(null);
+
+    // start/end dates for filtering the chart
+    const [startDate, setStartDate] = useState(null);
+    const [endDate, setEndDate] = useState(null);
+
+    /* ---------------------------------------------------------------------- */
+
     const getTypeFromIndex = (datasetIndex) => {
         switch(datasetIndex) {
             default: return null;
@@ -73,11 +92,9 @@ const Chart = (props) => {
         }
     }
 
-    // handle the click on the chart's points and redirect to report's details
-    const [reportDetails, setReportDetails] = useState(null);
-    const [reportTypeDetails, setReportTypeDetails] = useState(null);
+    /* CHART CONFIGURATION ------------------------------------------- */
 
-    const chartRef = useRef();
+    // handle the click on chart's elements
     const onChartClicked = (event) => {
         const el_event = getElementAtEvent(chartRef.current, event);
         if (el_event.length > 0) {
@@ -94,9 +111,45 @@ const Chart = (props) => {
             scrollToChild();
         }
     }
+    
+    // filter the elements of the chart by legend items
+    const filterCategory = (e, legendItem) => {
+        // chart update
+        var index = legendItem.datasetIndex;
+        var ci = (this ? this.chart : chartRef.current);
+        var alreadyHidden = (ci.getDatasetMeta(index).hidden === null) ? false : ci.getDatasetMeta(index).hidden;
+        var hiddenList = [];
 
+        ci.data.datasets.forEach(function(e, i) {
+            var meta = ci.getDatasetMeta(i);
 
-    // CHART DATA
+            if (i !== index) {
+                if (!alreadyHidden) {
+                    meta.hidden = meta.hidden === null ? !meta.hidden : null;
+                } else if (meta.hidden === null) {
+                    meta.hidden = true;
+                }
+            } else if (i === index) {
+                meta.hidden = null;
+            }
+
+            hiddenList.push(meta.hidden);
+        });
+
+        ci.update();
+
+        // report type details render
+        if (hiddenList.some((element) => element === true)) {
+            setReportDetails(null);
+            setReportTypeDetails({
+                reports_type: getTypeFromIndex(index)
+            });
+        } else 
+            setReportTypeDetails(null);
+
+        setSearchParams(createSearchParams({category: legendItem.text.toLowerCase()}))
+    }
+
     // return the dataset for the given type (timestamp - score)
     const fetchChartData = (type, start_time = null, end_time = null) => {
         // Reports filtered by type
@@ -191,7 +244,7 @@ const Chart = (props) => {
         setData(updatedData);
     }
     
-    // CHART CONFIGURATION
+    // chart options
     const initialOptions = {
         responsive: true,
         interaction: {
@@ -229,40 +282,7 @@ const Chart = (props) => {
                 onLeave: (event, legendItem, legend) => {
                     event.native.target.style.cursor = "default";
                 },
-                onClick: function(e, legendItem) {
-                    // chart update
-                    var index = legendItem.datasetIndex;
-                    var ci = this.chart;
-                    var alreadyHidden = (ci.getDatasetMeta(index).hidden === null) ? false : ci.getDatasetMeta(index).hidden;
-                    var hiddenList = [];
-          
-                    ci.data.datasets.forEach(function(e, i) {
-                        var meta = ci.getDatasetMeta(i);
-            
-                        if (i !== index) {
-                            if (!alreadyHidden) {
-                                meta.hidden = meta.hidden === null ? !meta.hidden : null;
-                            } else if (meta.hidden === null) {
-                                meta.hidden = true;
-                            }
-                        } else if (i === index) {
-                            meta.hidden = null;
-                        }
-
-                        hiddenList.push(meta.hidden);
-                    });
-          
-                    ci.update();
-
-                    // report type details render
-                    if (hiddenList.some((element) => element === true)) {
-                        setReportDetails(null);
-                        setReportTypeDetails({
-                            reports_type: getTypeFromIndex(index)
-                        });
-                    } else 
-                        setReportTypeDetails(null);
-                },
+                onClick: filterCategory,
             },
         },
         scales: {
@@ -293,8 +313,6 @@ const Chart = (props) => {
 
     // to update the time render on x axis of the chart
     const [options, setChartOptions] = useState(initialOptions);
-    const [startDate, setStartDate] = useState(null);
-    const [endDate, setEndDate] = useState(null);
     // update the time render of the chart
     const updateTimeRender = (filter_time, change_date) => {
         const new_date = dayjs(change_date);
@@ -338,9 +356,25 @@ const Chart = (props) => {
         setChartOptions(updatedOptions)
     }
 
-    useEffect(() => {
+    /* ----------------------------------------------------------- */
+
+    // update data render filtering by start/end dates
+    useMemo(() => {
         updateDataRender(startDate, endDate)
     }, [startDate, endDate])
+
+    // set filter category by search params
+    useEffect(() => {
+        const chart = chartRef.current;
+
+        if (chart) {
+            for (const legendItem of chart.legend.legendItems) {
+                if (legendItem.text.toLowerCase() === searchParams.get("category")) {
+                    filterCategory(null, legendItem);
+                }
+            }
+        }
+    }, [])
 
     return (
       <>

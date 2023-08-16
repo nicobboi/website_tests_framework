@@ -14,6 +14,8 @@ const ReportTypeDetails = (props) => {
         )
     }
 
+    console.log(data);
+
     return (
       <>
         {isLoading ? (
@@ -26,6 +28,7 @@ const ReportTypeDetails = (props) => {
                   <tr>
                     <th scope="col">n.</th>
                     <th scope="col">Tool</th>
+                    <th scope="col">Scores</th>
                     <th scope="col">End time</th>
                     <th scope="col">Notes</th>
                   </tr>
@@ -36,6 +39,7 @@ const ReportTypeDetails = (props) => {
                       key={index}
                       id={index+1}
                       tool={element.tool.name}
+                      scores={element.scores}
                       end_time={element.end_test_time}
                       notes={element.notes}
                     />
