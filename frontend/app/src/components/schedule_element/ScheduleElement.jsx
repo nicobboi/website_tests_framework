@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import styles from "./scheduleelement.module.scss";
 
 import { useTheme } from '@mui/material/styles';
@@ -25,10 +25,24 @@ const ScheduleElement = (props) => {
     const [active, setActive] = useState(schedule.active);
     const [modified, setModified] = useState(false);
 
+    const [error, setError] = useState(null);
+    const errorMessage = useMemo(() => {
+      switch (error) {
+        case 'invalidDate': {
+          return 'Time is not valid';
+        }
+  
+        default: {
+          return '';
+        }
+      }
+    }, [error]);
+  
+
     // reset all changes not confirmed
     const resetStatus = () => {
         setScheduleTime(dayjs(schedule.schedule_info.time_info, 'HH:mm:ssZ'))
-        setDays([])
+        setDays(schedule.schedule_info.days)
 
         setActive(schedule.active);
         setModified(false);
@@ -36,10 +50,10 @@ const ScheduleElement = (props) => {
 
     // commit the changes to database
     const commitChanges = () => {
-      if (!modified) return;
+      if (!modified || error) return;
 
       const payload = {
-        time_info: scheduleTime.utcOffset(0).format('HH:mm:ssZ'),
+        time_info: dayjs.utc(scheduleTime).format('HH:mm:ssZ'),
         days: days,
         active: active,
         last_time_launched: null
@@ -158,7 +172,11 @@ const ScheduleElement = (props) => {
                     <div className="mt-1">
                       {/* START TIME */}
                       <i className="fa-regular fa-calendar"></i>
-                      <span className="ms-2">{dayjs(schedule.scheduled_time).utcOffset(dayjs().utcOffset()).format('DD/MM/YYYY HH:mm')}</span>
+                      <span className="ms-2">
+                        {dayjs(schedule.scheduled_time)
+                          .utcOffset(dayjs().utcOffset())
+                          .format("DD/MM/YYYY HH:mm")}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -169,7 +187,13 @@ const ScheduleElement = (props) => {
                 <div className="date-time">
                   <i className="fa-regular fa-clock"></i>
                   <i className="fa-solid fa-backward ms-1"></i>
-                  <span className="ms-2">{schedule.last_time_launched ? dayjs(schedule.last_time_launchedl).utcOffset(dayjs().utcOffset()).format('DD/MM/YYYY HH:mm') : "Schedule not launched yet"}</span>
+                  <span className="ms-2">
+                    {schedule.last_time_launched
+                      ? dayjs(schedule.last_time_launchedl)
+                          .utcOffset(dayjs().utcOffset())
+                          .format("DD/MM/YYYY HH:mm")
+                      : "Schedule not launched yet"}
+                  </span>
                 </div>
                 <div>
                   <i className="fa-solid fa-layer-group"></i>
@@ -182,15 +206,23 @@ const ScheduleElement = (props) => {
                 <TimePicker
                   className="me-2"
                   sx={{ width: 150 }}
-                  label="Select schedule time"
+                  label="Time"
                   value={scheduleTime}
-                  onChange={(newValue) => {setScheduleTime(newValue); setModified(true);}}
+                  onChange={(newValue) => {
+                    setScheduleTime(newValue);
+                    setModified(true);
+                  }}
+                  onError={(newError) => setError(newError)}
+                  slotProps={{
+                    textField: {
+                      helperText: errorMessage,
+                    },
+                  }}
                 />
                 <FormControl sx={{ width: 250 }}>
-                  <InputLabel id="demo-multiple-chip-label">
-                    Select schedule days
-                  </InputLabel>
+                  <InputLabel id="demo-multiple-chip-label">Days</InputLabel>
                   <Select
+                    error={(days !== []) ? false : true}
                     labelId="demo-multiple-chip-label"
                     id="demo-multiple-chip"
                     multiple
