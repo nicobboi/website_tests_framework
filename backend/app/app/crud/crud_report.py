@@ -57,13 +57,10 @@ class CRUDReport(CRUDBase[Report, ReportCreate, ReportUpdate]):
         website = crud.website.get_by_url(db, url=url)
         if not website:
             website = Website(
-                url=obj_in.url,
-                reports=[db_obj]
+                url=obj_in.url
             )
             db.add(website)
-        else:
-            website.reports.append(db_obj)
-        db_obj.website = website
+        website.reports.append(db_obj)
 
         db.commit()
         db.refresh(db_obj)

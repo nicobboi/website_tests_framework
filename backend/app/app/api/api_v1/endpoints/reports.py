@@ -5,35 +5,11 @@ from pydantic import UUID4
 from fastapi import APIRouter, Depends, Body
 from sqlalchemy.orm import Session
 
-from app import crud, models, schemas
+from app import crud, schemas
 from app.api import deps
 
 
 router = APIRouter()
-
-
-@router.post("/set", response_model=schemas.ReportCreate)
-def create_report(
-    report_in: schemas.ReportCreate = Body(
-        example={
-            "notes": "Some notes...",
-            "json_report": {},
-            "start_test_timestamp": datetime.now(timezone.utc),
-            "end_test_timestamp": datetime.now(timezone.utc) + timedelta(minutes=10),
-            "tool": {"name": "tool_name", "type": "tool_type"},
-            "scores": [{"name": "overall", "score": 100}],
-            "url": "http://websiteurl",
-        }
-    ),
-    *,
-    db: Session = Depends(deps.get_db),
-) -> Any:
-    """
-    Insert a report into the database
-    """
-    report = crud.report.create(db, obj_in=report_in)
-
-    return report
 
 
 @router.get("/get", response_model=schemas.ReportDetails)
@@ -98,3 +74,27 @@ def get_reports(
         test_duration_time=test_time(report.start_test_timestamp, report.end_test_timestamp),
         json_report=report.json_report,
     ) for report in reports]
+
+
+@router.post("/set", response_model=schemas.ReportCreate)
+def create_report(
+    report_in: schemas.ReportCreate = Body(
+        example={
+            "notes": "Some notes...",
+            "json_report": {},
+            "start_test_timestamp": datetime.now(timezone.utc),
+            "end_test_timestamp": datetime.now(timezone.utc) + timedelta(minutes=10),
+            "tool": {"name": "tool_name", "type": "tool_type"},
+            "scores": [{"name": "overall", "score": 100}],
+            "url": "http://websiteurl",
+        }
+    ),
+    *,
+    db: Session = Depends(deps.get_db),
+) -> Any:
+    """
+    Insert a report into the database
+    """
+    report = crud.report.create(db, obj_in=report_in)
+
+    return report
