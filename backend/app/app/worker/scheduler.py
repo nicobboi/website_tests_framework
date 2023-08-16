@@ -1,7 +1,7 @@
 from celery.schedules import crontab
 from app.core.celery_app import celery_app
 from .redisbeat import RedisScheduler
-from datetime import time, timezone
+from datetime import time
 
 from sqlalchemy.orm import Session
 
@@ -40,10 +40,13 @@ def init_scheduler(db: Session) -> None:
     active_schedules = crud.schedule.get_all(db=db, active=True)
     if not active_schedules: return
 
+    schedule_in_scheduler = schedule_list()
+
     for schedule in active_schedules:
+        if schedule in [ss.name for ss in schedule_in_scheduler]: continue
         add_schedule(
             url=schedule.url,
-            schedule_name=schedule.id,
+            schedule_name=str(schedule.id),
             test_type=schedule.test_type,
             schedule_time=ScheduleInfo(
                 time_info=schedule.schedule_info.time_info,
@@ -90,6 +93,4 @@ def schedule_list():
     Return the list of all the schedules currently operating
     """
     scheduler = RedisScheduler(app=celery_app)
-    s_list = scheduler.list()
-
-    return s_list
+    return scheduler.list()
