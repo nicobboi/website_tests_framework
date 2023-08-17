@@ -2,7 +2,7 @@
 from ..toolmockup import output_handler as mockup
 from .pagespeedinsightperformance import output_handler as psp
 
-def run_test(uri):
+def run_test(url):
     # insert here the name of the tools used
     output = {
         "performance-mockup": None,
@@ -13,7 +13,7 @@ def run_test(uri):
 
     # print("\'PageSpeed Insight PERFORMANCE\' test started.")
 
-    # output["pagespeed_performance"] = psp.get_output(uri)
+    # output["pagespeed_performance"] = psp.get_output(url)
             
     # print("Test ended.\n")
 
@@ -21,7 +21,7 @@ def run_test(uri):
 
     print("\'Mockup\' test started.")
 
-    output["performance-mockup"] = mockup.get_output(uri, min_score=67, max_score=100)
+    output["performance-mockup"] = mockup.get_output(url, min_score=67, max_score=100)
 
     print("Test ended.\n")
 

@@ -4,7 +4,7 @@ from .shcheck import output_handler as shcheck
 from .ssllabsscan import output_handler as ssllabscan
 
 # Runs all SECURITY tool tests and return a dict with all the desired output
-def run_test(uri):
+def run_test(url):
     # insert here the name of the tools used
     output = {
         "security-mockup": None,
@@ -16,7 +16,7 @@ def run_test(uri):
 
     # print("\'Security headers check\' test started.")
 
-    # output["sh-check"] = shcheck.get_output(uri)
+    # output["sh-check"] = shcheck.get_output(url)
 
     # print("Test ended.\n")
     
@@ -24,7 +24,7 @@ def run_test(uri):
 
     # print("\'SSLlabs-scan\' test started.")
 
-    # output["ssllabs-scan"] = ssllabscan.get_output(uri)
+    # output["ssllabs-scan"] = ssllabscan.get_output(url)
 
     # print("Test ended.\n")
 
@@ -32,7 +32,7 @@ def run_test(uri):
 
     print("\'Mockup\' test started.")
 
-    output["security-mockup"] = mockup.get_output(uri, min_score=75, max_score=100)
+    output["security-mockup"] = mockup.get_output(url, min_score=75, max_score=100)
 
     print("Test ended.\n")
     

@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 # global list to stores all reports which will be sent to db 
 run_reports = []
 
-def run_test(uri: str, test_type: str):
+def run_test(url: str, test_type: str):
     tests = {
         "security":         securityTest,
         "performance":      performanceTest,
@@ -17,24 +17,24 @@ def run_test(uri: str, test_type: str):
     }
 
     if test_type in tests.keys():
-        tests[test_type](uri=uri)
+        tests[test_type](url=url)
 
     # if there are reports (call is valid), then push them into the db
     if run_reports:
         logger.info("All tests ended.\n")
-        pushToDB(uri)
+        pushToDB(url)
 
 
 # --- TESTS ----------------------------------------------------------------------------- #
 
 
 # Runs the security tests (ssllabs-scan and shcheck) and prints the desired output
-def securityTest(uri):
+def securityTest(url):
     from .security import securitytest
 
     logger.info("Executing SECURITY test... \n")
     
-    security_output = securitytest.run_test(uri)
+    security_output = securitytest.run_test(url)
 
     addToReport("security", security_output)
 
@@ -42,12 +42,12 @@ def securityTest(uri):
 
 
 # Runs the performance test (PageSpeed Insight) and prints the desired output
-def performanceTest(uri):
+def performanceTest(url):
     from .performance import performancetest
 
     logger.info("Executing PERFORMANCE test...\n")
 
-    performance_output = performancetest.run_test(uri)
+    performance_output = performancetest.run_test(url)
 
     addToReport("performance", performance_output)
 
@@ -55,12 +55,12 @@ def performanceTest(uri):
     
 
 # Runs the accessibility test (Mauve++) and prints the desired output
-def accessibilityTest(uri):  
+def accessibilityTest(url):  
     from .accessibility import accessibilitytest
 
     logger.info("Executing ACCESSIBILITY test.\n")
 
-    accessibility_out = accessibilitytest.run_test(uri)
+    accessibility_out = accessibilitytest.run_test(url)
 
     addToReport("accessibility", accessibility_out)
 
@@ -68,12 +68,12 @@ def accessibilityTest(uri):
 
 
 # Runs the validation test (pa-website-validator) and prints the desired output
-def validationTest(uri):
+def validationTest(url):
     from .validation import validationtest
 
     logger.info("Executing VALIDATION test...\n")
 
-    validation_out = validationtest.run_test(uri)
+    validation_out = validationtest.run_test(url)
 
     addToReport("validation", validation_out)
 
@@ -81,12 +81,12 @@ def validationTest(uri):
 
 
 # Runs the SEO tests and prints the output
-def SEOTest(uri):
+def SEOTest(url):
     from .seo import seotest
 
     logger.info("Executing SEO test...\n")
 
-    seo_output = seotest.run_test(uri)
+    seo_output = seotest.run_test(url)
 
     addToReport("seo", seo_output)
 

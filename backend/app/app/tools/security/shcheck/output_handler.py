@@ -2,19 +2,19 @@ from subprocess import Popen, PIPE
 from datetime import datetime, timezone
 import json
 
-def get_output(uri):
+def get_output(url: str):
     shcheck_path = "./shcheck.py"
 
     start_test_timestamp = str(datetime.now(tz=timezone.utc))
 
-    with Popen([shcheck_path, "-j", uri], stdout=PIPE) as proc:
+    with Popen([shcheck_path, "-j", url], stdout=PIPE) as proc:
 
         end_test_timestamp = str(datetime.now(tz=timezone.utc))
 
         shcheck_out = json.loads(proc.stdout.read())
 
-        h_pres = list(shcheck_out[uri]['present'].keys())
-        h_miss = shcheck_out[uri]['missing']
+        h_pres = list(shcheck_out[url]['present'].keys())
+        h_miss = shcheck_out[url]['missing']
     
         output = {
             "scores": None,

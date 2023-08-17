@@ -2,12 +2,12 @@ from subprocess import Popen, PIPE
 from datetime import datetime, timezone
 import json
 
-def get_output(uri):
+def get_output(url: str):
     ssllabs_path = "./ssllabs-scan"
 
     start_test_timestamp = str(datetime.now(tz=timezone.utc))
 
-    with Popen([ssllabs_path, "--verbosity", "error", uri], stdout=PIPE) as proc:
+    with Popen([ssllabs_path, "--verbosity", "error", url], stdout=PIPE) as proc:
         ssllabs_scan_out = json.loads(proc.stdout.read())
 
         end_test_timestamp = str(datetime.now(tz=timezone.utc))

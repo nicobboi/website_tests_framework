@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 import json
 import os
 
-def get_output(uri):
+def get_output(url: str):
     # tool's script path
     mauve_path = "./index.js"
     # report download path
@@ -11,16 +11,16 @@ def get_output(uri):
 
     start_test_timestamp = str(datetime.now(tz=timezone.utc))
 
-    with Popen(["node", mauve_path, uri, output_path]) as proc:
+    with Popen(["node", mauve_path, url, output_path]) as proc:
         proc.wait()
 
     end_test_timestamp = str(datetime.now(tz=timezone.utc))
 
     # if the url has '/' as last char, it will be removed
-    if uri[-1] == '/':
-        uri = uri[0:-1]
+    if url[-1] == '/':
+        url = url[0:-1]
     # example: mauve-earl-reporthttps___www.comune.novellara.re.it
-    report_path = output_path + "/mauve-earl-report" + uri.replace("/","_").replace(":","_") + ".json"
+    report_path = output_path + "/mauve-earl-report" + url.replace("/","_").replace(":","_") + ".json"
 
     # there's an error in the json (",]"), so I manually removed it
     replace_string = ""

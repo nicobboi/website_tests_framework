@@ -7,7 +7,7 @@ import os
 # import here the output handlers
 from ..toolmockup import output_handler as mockup
 
-def run_test(uri):
+def run_test(url):
     output = {
         "validation-mockup": None,
         # "pa-website-validator": None
@@ -25,7 +25,7 @@ def run_test(uri):
     # start_test_timestamp = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
 
     # with Popen(["node", pwv_path + "dist", "--type", "municipality", "--destination", out_fold, "--report", "report", \
-    #                       "--accuracy", "min", "--website", uri], stdout=PIPE, stderr=PIPE) as proc:
+    #                       "--accuracy", "min", "--website", url], stdout=PIPE, stderr=PIPE) as proc:
     #     proc.wait()
 
     # end_test_timestamp = str(datetime.now(tz=ZoneInfo("Europe/Rome")))
@@ -53,7 +53,7 @@ def run_test(uri):
 
     print("\'Mockup\' test started.")
 
-    output["validation-mockup"] = mockup.get_output(uri, min_score=35, max_score=90)
+    output["validation-mockup"] = mockup.get_output(url, min_score=35, max_score=90)
 
     print("Test ended.\n")
 

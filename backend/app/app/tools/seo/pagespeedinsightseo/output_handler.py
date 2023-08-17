@@ -1,11 +1,11 @@
 from . import pagespeedseo as pss
 from datetime import datetime, timezone
 
-def get_output(uri):
+def get_output(url: str):
     start_test_timestamp = str(datetime.now(tz=timezone.utc))
 
     # runs pagespeed insight seo test
-    pss_out = pss.test(uri)
+    pss_out = pss.test(url)
 
     end_test_timestamp = str(datetime.now(tz=timezone.utc))
     
