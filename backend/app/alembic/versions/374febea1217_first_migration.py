@@ -25,23 +25,23 @@ def upgrade():
     sa.UniqueConstraint('name')
     )
     op.create_index(op.f('ix_type_id'), 'type', ['id'], unique=False)
-    op.create_table('user',
-    sa.Column('id', sa.UUID(), nullable=False),
-    sa.Column('created', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-    sa.Column('modified', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-    sa.Column('full_name', sa.String(), nullable=True),
-    sa.Column('email', sa.String(), nullable=False),
-    sa.Column('hashed_password', sa.String(), nullable=True),
-    sa.Column('totp_secret', sa.String(), nullable=True),
-    sa.Column('totp_counter', sa.String(), nullable=True),
-    sa.Column('email_validated', sa.Boolean(), nullable=False),
-    sa.Column('is_active', sa.Boolean(), nullable=False),
-    sa.Column('is_superuser', sa.Boolean(), nullable=False),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_index(op.f('ix_user_email'), 'user', ['email'], unique=True)
-    op.create_index(op.f('ix_user_full_name'), 'user', ['full_name'], unique=False)
-    op.create_index(op.f('ix_user_id'), 'user', ['id'], unique=False)
+    # op.create_table('user',
+    # sa.Column('id', sa.UUID(), nullable=False),
+    # sa.Column('created', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    # sa.Column('modified', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    # sa.Column('full_name', sa.String(), nullable=True),
+    # sa.Column('email', sa.String(), nullable=False),
+    # sa.Column('hashed_password', sa.String(), nullable=True),
+    # sa.Column('totp_secret', sa.String(), nullable=True),
+    # sa.Column('totp_counter', sa.String(), nullable=True),
+    # sa.Column('email_validated', sa.Boolean(), nullable=False),
+    # sa.Column('is_active', sa.Boolean(), nullable=False),
+    # sa.Column('is_superuser', sa.Boolean(), nullable=False),
+    # sa.PrimaryKeyConstraint('id')
+    # )
+    # op.create_index(op.f('ix_user_email'), 'user', ['email'], unique=True)
+    # op.create_index(op.f('ix_user_full_name'), 'user', ['full_name'], unique=False)
+    # op.create_index(op.f('ix_user_id'), 'user', ['id'], unique=False)
     op.create_table('website',
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('url', sa.String(), nullable=False),
@@ -60,14 +60,14 @@ def upgrade():
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_crontab_id'), 'crontab', ['id'], unique=False)
-    op.create_table('token',
-    sa.Column('token', sa.String(), nullable=False),
-    sa.Column('is_valid', sa.Boolean(), nullable=False),
-    sa.Column('authenticates_id', sa.UUID(), nullable=False),
-    sa.ForeignKeyConstraint(['authenticates_id'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('token')
-    )
-    op.create_index(op.f('ix_token_token'), 'token', ['token'], unique=False)
+    # op.create_table('token',
+    # sa.Column('token', sa.String(), nullable=False),
+    # sa.Column('is_valid', sa.Boolean(), nullable=False),
+    # sa.Column('authenticates_id', sa.UUID(), nullable=False),
+    # sa.ForeignKeyConstraint(['authenticates_id'], ['user.id'], ),
+    # sa.PrimaryKeyConstraint('token')
+    # )
+    # op.create_index(op.f('ix_token_token'), 'token', ['token'], unique=False)
     op.create_table('tool',
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
@@ -109,16 +109,16 @@ def downgrade():
     op.drop_table('report')
     op.drop_index(op.f('ix_tool_id'), table_name='tool')
     op.drop_table('tool')
-    op.drop_index(op.f('ix_token_token'), table_name='token')
-    op.drop_table('token')
+    # op.drop_index(op.f('ix_token_token'), table_name='token')
+    # op.drop_table('token')
     op.drop_index(op.f('ix_crontab_id'), table_name='crontab')
     op.drop_table('crontab')
     op.drop_index(op.f('ix_website_id'), table_name='website')
     op.drop_table('website')
-    op.drop_index(op.f('ix_user_id'), table_name='user')
-    op.drop_index(op.f('ix_user_full_name'), table_name='user')
-    op.drop_index(op.f('ix_user_email'), table_name='user')
-    op.drop_table('user')
+    # op.drop_index(op.f('ix_user_id'), table_name='user')
+    # op.drop_index(op.f('ix_user_full_name'), table_name='user')
+    # op.drop_index(op.f('ix_user_email'), table_name='user')
+    # op.drop_table('user')
     op.drop_index(op.f('ix_type_id'), table_name='type')
     op.drop_table('type')
     # ### end Alembic commands ###

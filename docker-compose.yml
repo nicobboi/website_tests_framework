@@ -150,7 +150,7 @@ services:
       - SERVER_NAME=${DOMAIN?Variable not set}
       - SERVER_HOST=https://${DOMAIN?Variable not set}
       # Allow explicit env var override for tests
-      - SMTP_HOST=${SMTP_HOST}
+      # - SMTP_HOST=${SMTP_HOST}
     build:
       context: ./backend
       dockerfile: backend.dockerfile
@@ -184,7 +184,7 @@ services:
       - SERVER_NAME=${DOMAIN?Variable not set}
       - SERVER_HOST=http://${DOMAIN?Variable not set}
       # Allow explicit env var override for tests
-      - SMTP_HOST=${SMTP_HOST?Variable not set}
+      # - SMTP_HOST=${SMTP_HOST?Variable not set}
     build:
       context: ./backend
       dockerfile: celeryworker.dockerfile

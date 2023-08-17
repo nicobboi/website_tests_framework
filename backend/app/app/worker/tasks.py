@@ -1,5 +1,4 @@
-from raven import Client
-import asyncio
+# from raven import Client
 import requests
 from datetime import datetime, timezone
 
@@ -7,7 +6,7 @@ from app.core.celery_app import celery_app
 from app.core.config import settings
 from app.tools import use_tool
 
-client_sentry = Client(settings.SENTRY_DSN)
+# client_sentry = Client(settings.SENTRY_DSN)
 
 
 @celery_app.task
