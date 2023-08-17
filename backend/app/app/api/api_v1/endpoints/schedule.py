@@ -1,14 +1,12 @@
-from typing import Any
-from datetime import datetime, time, timezone
+from typing import Any, Union
 from pydantic import UUID4
-from typing import Union
+from datetime import datetime, time, timezone
 
 from fastapi import APIRouter, Depends, Body
 from sqlalchemy.orm import Session
 
 from app import crud, schemas
 from app.api import deps
-
 from app.worker import scheduler
 
 
@@ -19,7 +17,6 @@ def get_all_schedules(*, db: Session = Depends(deps.get_db)):
     """
     Get all schedules
     """
-
     return crud.schedule.get_all(db=db)
 
 @router.get("/get", response_model=Union[schemas.ScheduleOutput, None])

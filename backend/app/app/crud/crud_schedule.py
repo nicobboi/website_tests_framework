@@ -1,6 +1,8 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import asc
+
 from typing import Union
+from pydantic import UUID4
 
 from app.crud.base import CRUDBase
 from app import crud
@@ -9,8 +11,7 @@ from app.schemas.schedule import ScheduleBase, ScheduleCreate, ScheduleUpdate, S
 
 from datetime import datetime, timezone
 
-from pydantic import UUID4
-from typing import Union
+
 
 
 class CRUDSchedule(CRUDBase[Schedule, ScheduleCreate, ScheduleUpdate]):
@@ -59,7 +60,7 @@ class CRUDSchedule(CRUDBase[Schedule, ScheduleCreate, ScheduleUpdate]):
             website.schedules.append(schedule)
 
             # verifica tipi
-            type = crud.type.get_by_name(db=db, name=test_type)
+            type = db.query(Type).filter(Type.name == test_type).first()
             if not type:
                 type = Type(
                     name=test_type

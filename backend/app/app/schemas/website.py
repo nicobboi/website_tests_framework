@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field, UUID4
 from typing import List, Optional, Dict, Union
 from enum import Enum
-from .report import ReportCreate, ReportScores
+from .report import ReportCreate, ReportScoresOutput
 
 
 class TestTypes(str, Enum):
@@ -29,7 +29,7 @@ class WebsiteRun(WebsiteBase):
 
 
 class WebsiteReportsScores(WebsiteBase):
-    reports_scores: List[ReportScores] = Field(description="All reports scores of this website.")
+    reports_scores: List[ReportScoresOutput] = Field(description="All reports scores of this website.")
 
 
 class AllWebsiteScores(WebsiteBase):

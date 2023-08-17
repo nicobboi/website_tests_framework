@@ -1,13 +1,20 @@
 from sqlalchemy.orm import Session
+
 from pydantic import UUID4
 from typing import Optional
 
 from app.crud.base import CRUDBase
-from app.crud.crud_tool import tool
 from app import crud
-from app.models import Website
-from app.schemas.website import WebsiteCreate, WebsiteUpdate, AllWebsiteScores, WebsiteReportsScores
-from app.schemas import ReportScores, ToolBase, ScoreBase
+from app.models import Website, Tool
+from app.schemas import (
+    WebsiteCreate, 
+    WebsiteUpdate, 
+    AllWebsiteScores, 
+    WebsiteReportsScores, 
+    ReportScoresOutput, 
+    ReportTool, 
+    ReportScore
+)
 
 class CRUDWebsite(CRUDBase[Website, WebsiteCreate, WebsiteUpdate]):
     # return all websites with their latest scores
@@ -23,7 +30,7 @@ class CRUDWebsite(CRUDBase[Website, WebsiteCreate, WebsiteUpdate]):
                     sorted_timestamps.sort(reverse=True)
                     latest_scores = []
                     for report_score in report_scores:
-                        if report_score.timestamp in sorted_timestamps[0:tool.get_no_tool_by_type(db=db, type=type)]:
+                        if report_score.timestamp in sorted_timestamps[0:len(db.query(Tool).filter(Tool.type.has(name=type)).all())]:
                             [latest_scores.append(score.score) for score in report_score.scores]
                     
                     try:
@@ -92,13 +99,13 @@ class CRUDWebsite(CRUDBase[Website, WebsiteCreate, WebsiteUpdate]):
 
         reports = crud.report.get_all_by_website(db=db, url=website.url, timestamp_order=True)
         
-        reports_scores = [ReportScores(
+        reports_scores = [ReportScoresOutput(
             id=report.id,
-            tool=ToolBase(
+            tool=ReportTool(
                 name=report.tool.name,
                 type=report.tool.type.name
             ),
-            scores=[ScoreBase(
+            scores=[ReportScore(
                 name=score.name,
                 score=score.score
             ) for score in report.scores if score.score != None],

@@ -1,6 +1,6 @@
 from typing import Any, Union
-from datetime import datetime, timezone, timedelta
 from pydantic import UUID4
+from datetime import datetime, timezone, timedelta
 
 from fastapi import APIRouter, Depends, Body
 from sqlalchemy.orm import Session
@@ -95,6 +95,4 @@ def create_report(
     """
     Insert a report into the database
     """
-    report = crud.report.create(db, obj_in=report_in)
-
-    return report
+    return crud.report.create(db, obj_in=report_in)

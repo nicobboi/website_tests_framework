@@ -10,8 +10,14 @@ from .website import (
     WebsiteReportsScores,
     TestTypes
 )
-from .report import ReportBase, ReportCreate, ReportUpdate, ReportScores, ReportDetails
-from .tool import ToolBase
-from .score import ScoreBase
+from .report import (
+    ReportBase, 
+    ReportCreate, 
+    ReportUpdate, 
+    ReportTool,
+    ReportScore,
+    ReportScoresOutput, 
+    ReportDetails
+)
 from .type import TypeBase
 from .schedule import ScheduleBase, ScheduleCreate, ScheduleUpdate, ScheduleOutput

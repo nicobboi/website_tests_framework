@@ -7,7 +7,7 @@ class ScheduleBase(BaseModel):
     """
     """
     time_info: time      = Field(description="Schedule \'time\' for scheduling a task.")
-    days: list[str] = Field(description="Schedule \'day\' for scheduling a task.")
+    days: list[str]     = Field(description="Schedule \'day\' for scheduling a task.")
 
 
 class ScheduleCreate(ScheduleBase):

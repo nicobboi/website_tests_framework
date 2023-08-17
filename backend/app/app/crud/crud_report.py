@@ -1,15 +1,13 @@
-from datetime import datetime
-from pydantic import UUID4
-from typing import Union
-
 from sqlalchemy.orm import Session
 from sqlalchemy import asc
+
+from pydantic import UUID4
+from typing import Union
 
 from app.crud.base import CRUDBase
 from app import crud
 from app.models import Report, Tool, Score, Website, Type
-from app.schemas.report import ReportCreate, ReportUpdate, ReportScores
-from app.schemas import ReportScores, ToolBase, ScoreBase
+from app.schemas import ReportCreate, ReportUpdate, ReportTool, ReportScore
 
 
 class CRUDReport(CRUDBase[Report, ReportCreate, ReportUpdate]):
@@ -37,10 +35,10 @@ class CRUDReport(CRUDBase[Report, ReportCreate, ReportUpdate]):
 
         # Tool relationship
         tool_name = obj_in.tool.name
-        tool = crud.tool.get_by_name(db=db, name=tool_name)
+        tool = db.query(Tool).filter(Tool.name == tool_name).first()
         if not tool:
             type_name = obj_in.tool.type
-            type = crud.type.get_by_name(db=db, name=type_name)
+            type = db.query(Type).filter(Type.name == type_name).first()
             if not type:
                 type = Type(name=type_name)
             db.add(type)
@@ -68,11 +66,11 @@ class CRUDReport(CRUDBase[Report, ReportCreate, ReportUpdate]):
         # return a refactored schema output
         return ReportCreate(
             url=db_obj.website.url,
-            tool=ToolBase(
+            tool=ReportTool(
                 name=db_obj.tool.name,
                 type=db_obj.tool.type.name
             ),
-            scores=[ScoreBase(
+            scores=[ReportScore(
                 name=score.name,
                 score=score.score
             ) for score in db_obj.scores],
@@ -99,7 +97,7 @@ class CRUDReport(CRUDBase[Report, ReportCreate, ReportUpdate]):
         main_query = db.query(Report).filter(Report.site_id == website.id)
 
         if type_name:
-            type = crud.type.get_by_name(db=db, name=type_name)
+            type = db.query(Type).filter(Type.name == type_name).first()
             if type:
                 main_query = main_query.join(Report.tool).filter(Tool.type_id == type.id)
 
@@ -108,19 +106,5 @@ class CRUDReport(CRUDBase[Report, ReportCreate, ReportUpdate]):
 
         return main_query.all()
     
-    # def get_all_by_type(self, *, db: Session, type: str, timestamp_order: bool = False):
-    #     """
-    #     Get all the reports by their type (optional: timestamp order)
-    #     """
-    #     type = crud.type.get_by_name(db=db, name=type)
-    #     if not type:
-    #         return []
-        
-    #     if timestamp_order:
-    #         return db.query(Report).join(Report.tool).filter(Tool.type_id == type.id).order_by(asc(Report.end_test_timestamp)).all()
-    #     else:
-    #         return db.query(Report).join(Report.tool).filter(Tool.type_id == type.id).all()
-
-
     
 report = CRUDReport(Report)

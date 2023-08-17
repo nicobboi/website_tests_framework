@@ -1,16 +1,12 @@
-from typing import Any
+from typing import Any, List, Optional, Union
+from pydantic import UUID4
 
 from fastapi import APIRouter, Depends, Body
 from sqlalchemy.orm import Session
-from typing import Union
 
-from app import crud, schemas
-from celery import group
-from typing import List, Optional
-from pydantic import UUID4
+from app import crud, schemas, worker
 from app.api import deps
-from app import worker
-
+from celery import group
 
 router = APIRouter()
 
