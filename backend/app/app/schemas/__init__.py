@@ -19,5 +19,4 @@ from .report import (
     ReportScoresOutput, 
     ReportDetails
 )
-from .type import TypeBase
 from .schedule import ScheduleBase, ScheduleCreate, ScheduleUpdate, ScheduleOutput

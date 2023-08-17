@@ -7,7 +7,7 @@ from typing import Union
 from app.crud.base import CRUDBase
 from app import crud
 from app.models import Report, Tool, Score, Website, Type
-from app.schemas import ReportCreate, ReportUpdate, ReportTool, ReportScore
+from app.schemas import ReportCreate, ReportUpdate, ReportTool, ReportScore, ReportDetails
 
 
 class CRUDReport(CRUDBase[Report, ReportCreate, ReportUpdate]):
@@ -80,6 +80,39 @@ class CRUDReport(CRUDBase[Report, ReportCreate, ReportUpdate]):
             end_test_timestamp=db_obj.end_test_timestamp
         )
     
+
+    def get(self, *, db: Session, id: UUID4) -> ReportDetails:
+        """
+        Get a report with formatted output by its id
+        """
+        report = crud.report.get_by_id(db=db, id=id)
+
+        return ReportDetails(
+            url=report.website.url,
+            tool=ReportTool(name=report.tool.name, type=report.tool.type.name),
+            scores=[ReportScore(name=score.name, score=score.score) for score in report.scores],
+            notes=report.notes,
+            end_test_time=report.end_test_timestamp,
+            test_duration_time=test_time(start=report.start_test_timestamp, end=report.end_test_timestamp),
+            json_report=report.json_report,
+        )
+
+    def get_all_filtered(self, *, db: Session, url: str, type: Union[str, None] = None):
+        """
+        Get all reports filtered by url (optional: filter by test type)
+        """
+        reports = crud.report.get_all_by_website(db=db, url=url, type_name=type, timestamp_order=True)
+
+        return [ReportDetails(
+            url=report.website.url,
+            tool=ReportTool(name=report.tool.name, type=report.tool.type.name),
+            scores=[ReportScore(name=score.name, score=score.score) for score in report.scores],
+            notes=report.notes,
+            end_test_time=report.end_test_timestamp,
+            test_duration_time=test_time(start=report.start_test_timestamp, end=report.end_test_timestamp),
+            json_report=report.json_report,
+        ) for report in reports]
+
     def get_by_id(self, *, db: Session, id: UUID4) -> Report:
         """
         Get the report by its ID
@@ -106,5 +139,21 @@ class CRUDReport(CRUDBase[Report, ReportCreate, ReportUpdate]):
 
         return main_query.all()
     
+
+def test_time(start, end):
+    """
+    Return the test time (string) between two datetime
+    """
+
+    test_duration = end - start
+
+    if test_duration.seconds > 60:
+        minutes = test_duration.seconds / 60
+        seconds = int(60 * (minutes - int(minutes)))
+        test_duration_str = "~" + str(int(minutes)) + ":" + str(seconds) + " min."
+    else:
+        test_duration_str = str(test_duration.seconds) + " s."
+
+    return test_duration_str
     
 report = CRUDReport(Report)

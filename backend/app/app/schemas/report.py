@@ -6,7 +6,7 @@ from typing import Optional, List
 
 class ReportBase(BaseModel):
     """
-    
+    Base class for Report model validation
     """
     notes: Optional[str]            = Field(description="Notes write by report.")
     json_report: Optional[dict]     = Field(default=None, description="Full report in JSON format.")
@@ -15,51 +15,52 @@ class ReportBase(BaseModel):
 
 class ReportTool(BaseModel):
     """
+    Class to handle report's tool validation
     """
     name: str = Field(description="Tool's name.")
     type: str = Field(description="Tool's type.")
 
 class ReportScore(BaseModel):
     """
+    Class to handle one of report's score validation
     """
     name: str   = Field(description="Score's name.")
     score: int  = Field(description="One of the score of the report.")
 
-# class to create a new Report and return via API
 class ReportCreate(ReportBase):
     """
+    Class to handle creation of Report model
     """
     tool: ReportTool                    = Field(description="Info about report's tool.")
     scores: Optional[List[ReportScore]] = Field(default=None, description="All scores of the report.")
     url: str                            = Field(description="Website which was tested on.")
 
-
-# ...
 class ReportUpdate(ReportBase):
     """
+    Class to handle update of Report model
     """
-    tool: Optional[ReportScore]     = Field(description="", default=None)
-    scores: Optional[ReportTool]    = Field(description="", default=None)
+    tool: Optional[ReportScore]     = Field(description="Info about report's tool.", default=None)
+    scores: Optional[ReportTool]    = Field(description="All scores of the report.", default=None)
 
 
-# class to return all scores data from API
+
 class ReportScoresOutput(BaseModel):
     """
+    Class to return all scores data from API
     """
-    id: UUID4                   = Field(description="")
-    tool: ReportTool            = Field(description="")
-    scores: List[ReportScore]   = Field(description="")
-    timestamp: datetime         = Field(description="")
+    id: UUID4                   = Field(description="Report ID")
+    tool: ReportTool            = Field(description="Report tool info")
+    scores: List[ReportScore]   = Field(description="All report scores")
+    timestamp: datetime         = Field(description="End test time")
 
-
-# schema to return all details about a report
 class ReportDetails(BaseModel):
     """
+    Class to return all details about a report
     """
-    url: str                        = Field(description="")
-    tool: ReportTool                = Field(description="")
-    scores: List[ReportScore]       = Field(description="")
-    notes: Optional[str]            = Field(description="", default=None)
-    end_test_time: datetime         = Field(description="")
-    test_duration_time: str         = Field(description="")
-    json_report: Optional[dict]     = Field(description="")
+    url: str                        = Field(description="Url tested")
+    tool: ReportTool                = Field(description="Report tool info")
+    scores: List[ReportScore]       = Field(description="All report scores")
+    notes: Optional[str]            = Field(description="Report notes", default=None)
+    end_test_time: datetime         = Field(description="End test time")
+    test_duration_time: str         = Field(description="Test time duration")
+    json_report: Optional[dict]     = Field(description="Full report with all the data")
