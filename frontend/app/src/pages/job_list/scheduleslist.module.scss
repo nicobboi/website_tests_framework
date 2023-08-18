@@ -1,0 +1,26 @@
+  .icons i {
+    color: #b5b3b3;
+    font-size: 1.2rem;
+    border-radius: 0.3rem;
+    cursor: pointer;
+  }
+
+  button.reload {
+    border: #b5b3b3 solid;
+    border-radius: 0.5rem;
+    border-width: 1px;
+
+    &:hover {
+      border: #686767 solid;
+      border-radius: 0.5rem;
+      border-width:1px;
+
+      i {
+        color: #686767;
+      }
+    }
+  }
+  
+
+
+  

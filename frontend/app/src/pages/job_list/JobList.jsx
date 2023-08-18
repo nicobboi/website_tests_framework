@@ -1,7 +1,14 @@
 import useFetch from "react-fetch-hook";
 import { useState, useMemo } from "react";
 import styles from "./scheduleslist.module.scss";
-import {Accordion, AccordionSummary, AccordionDetails, Typography} from "@mui/material";
+import {
+  Accordion, 
+  AccordionSummary, 
+  AccordionDetails, 
+  Typography,
+  ToggleButton,
+  ToggleButtonGroup
+} from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import dayjs from "dayjs";
 
@@ -9,13 +16,25 @@ import { useSearchParams, createSearchParams } from "react-router-dom";
 
 import ScheduleElement from "../../components/schedule_element/ScheduleElement";
 
-const SchedulesList = () => {
-    const { isLoading, data, error } = useFetch("http://localhost/api/v1/schedule/get-all");
-    const [dataFetched, setDataFetched] = useState({});
+
+const JobList = () => {
     // search params handler
     const [searchParams, setSearchParams] = useSearchParams();
 
+    const [jobType, setJobType] = useState(searchParams.get("job"));
+    const handleJobSelection = (event, newJobType) => {
+      setJobType(newJobType);
+      setSearchParams((newJobType ? createSearchParams({ job: newJobType }) : createSearchParams({})))
+    };
+
+    var request_url = ""
+    if (jobType === "schedule") request_url = "http://localhost/api/v1/schedule/get-all";
+    const { isLoading, data, error } = useFetch(request_url);
+    const [dataFetched, setDataFetched] = useState({});
+
     useMemo(() => {
+      if (error) return;
+
       if (!isLoading) {
         // fetch the data to organize by URL
         const listByUrl = {};
@@ -32,8 +51,7 @@ const SchedulesList = () => {
       }
     }, [isLoading, data])
   
-    if (error) {
-        console.log(error)
+    if (request_url !== "" && error) {
         return (
         <div>
             <p>Code: {error.status}</p>
@@ -55,25 +73,35 @@ const SchedulesList = () => {
           <p className="text-center">Loading component...</p>
         ) : (
           <div className="container">
-            <h2 className="text-center mt-2">Schedules list</h2>
-
             <div className="container mt-3">
               <div className="row">
-                <div className="col-md-12">
-                  <div className="d-flex justify-content-between align-items-center activity">
-                    <div>
-                      <i className="fa-regular fa-clock"></i>
-                      <span className="ms-2">
-                        {dayjs(new Date()).format("DD/MM/YYYY HH:mm")}
-                      </span>
-                    </div>
-                    <div className={styles.icons}>
-                      <i className="fa fa-search"></i>
-                      <i className="fa fa-ellipsis-h"></i>
+                <div className="col-md-12 mb-4">
+                  <div className="d-flex justify-content-between align-items-center">
+                    <ToggleButtonGroup
+                      color="primary"
+                      value={jobType}
+                      exclusive
+                      onChange={handleJobSelection}
+                      aria-label="Platform"
+                    >
+                      <ToggleButton value="schedule">Schedules</ToggleButton>
+                      <ToggleButton value="tasks">Tasks</ToggleButton>
+                    </ToggleButtonGroup>
+                    <div className=" d-flex align-items-center">
+                      <div className="me-3">
+                        <i className="fa-regular fa-clock"></i>
+                        <span className="ms-2">
+                          {dayjs(new Date()).format("DD/MM/YYYY HH:mm")}
+                        </span>
+                      </div>
+                      <button className={`${styles.icons} ${styles.reload} btn`}>
+                        <i className="fa-solid fa-rotate-left"></i>
+                      </button>
                     </div>
                   </div>
 
-                  {Object.entries(dataFetched).map(
+                  {jobType === "schedule" ? (
+                  Object.entries(dataFetched).map(
                     (accordion_data, url_index) => (
                       <div key={url_index}>
                         <Accordion
@@ -82,9 +110,11 @@ const SchedulesList = () => {
                             searchParams.get("url") === accordion_data[0]
                           }
                           onChange={() =>
+                            searchParams.get("url") !== accordion_data[0] ? 
                             setSearchParams(
                               createSearchParams({ url: accordion_data[0] })
-                            )
+                            ) :
+                            setSearchParams(createSearchParams({}))
                           }
                         >
                           <AccordionSummary
@@ -111,7 +141,8 @@ const SchedulesList = () => {
                         </Accordion>
                       </div>
                     )
-                  )}
+                  )
+                  ) : null }
                 </div>
               </div>
             </div>
@@ -121,4 +152,4 @@ const SchedulesList = () => {
     );
 }
 
-export default SchedulesList;
+export default JobList;

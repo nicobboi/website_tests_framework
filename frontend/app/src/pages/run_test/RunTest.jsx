@@ -75,9 +75,9 @@ const RunTest = () => {
 
     const navigate = useNavigate()
     const toScheduleList = (url) => {
-      const params = { url: url }
+      const params = { job: "schedule", url: url  }
       navigate({
-        pathname: '/schedules/',
+        pathname: '/job-list/',
         search: `?${createSearchParams(params)}`
       })
     }

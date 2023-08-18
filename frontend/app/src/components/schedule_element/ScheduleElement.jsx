@@ -204,6 +204,7 @@ const ScheduleElement = (props) => {
               {/* crontab info */}
               <div className="d-flex flex-row mx-2">
                 <TimePicker
+                  id="time-picker"
                   className="me-2"
                   sx={{ width: 150 }}
                   label="Time"
@@ -224,12 +225,12 @@ const ScheduleElement = (props) => {
                   <Select
                     error={(days !== []) ? false : true}
                     labelId="demo-multiple-chip-label"
-                    id="demo-multiple-chip"
+                    id={`select-${props.data_index}`}
                     multiple
                     value={days}
                     onChange={handleChange}
                     input={
-                      <OutlinedInput id="select-multiple-chip" label="Chip" />
+                      <OutlinedInput id={`select-multiple-chip-${props.data_index}`} label="Chip" />
                     }
                     renderValue={(selected) => (
                       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
