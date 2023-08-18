@@ -11,7 +11,7 @@ def test_website(url: str, test_type: str, scheduled: bool = True) -> str:
     """
     Start a test (by type) on the given url
     """
-    use_tool.run_test(uri=url, test_type=test_type)
+    use_tool.run_test(url=url, test_type=test_type)
     # update schedule
     if scheduled:
         payload = {
