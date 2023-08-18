@@ -1,17 +1,21 @@
 import useFetch from "react-fetch-hook";
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import styles from "./scheduleslist.module.scss";
 import {Accordion, AccordionSummary, AccordionDetails, Typography} from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import dayjs from "dayjs";
+
+import { useSearchParams, createSearchParams } from "react-router-dom";
 
 import ScheduleElement from "../../components/schedule_element/ScheduleElement";
 
 const SchedulesList = () => {
     const { isLoading, data, error } = useFetch("http://localhost/api/v1/schedule/get-all");
     const [dataFetched, setDataFetched] = useState({});
+    // search params handler
+    const [searchParams, setSearchParams] = useSearchParams();
 
-    useEffect(() => {
+    useMemo(() => {
       if (!isLoading) {
         // fetch the data to organize by URL
         const listByUrl = {};
@@ -59,7 +63,9 @@ const SchedulesList = () => {
                   <div className="d-flex justify-content-between align-items-center activity">
                     <div>
                       <i className="fa-regular fa-clock"></i>
-                      <span className="ms-2">{dayjs(new Date()).format('DD/MM/YYYY HH:mm')}</span>
+                      <span className="ms-2">
+                        {dayjs(new Date()).format("DD/MM/YYYY HH:mm")}
+                      </span>
                     </div>
                     <div className={styles.icons}>
                       <i className="fa fa-search"></i>
@@ -67,21 +73,40 @@ const SchedulesList = () => {
                     </div>
                   </div>
 
-
                   {Object.entries(dataFetched).map(
                     (accordion_data, url_index) => (
                       <div key={url_index}>
-                        <Accordion className="my-4">
+                        <Accordion
+                          className="my-4"
+                          expanded={
+                            searchParams.get("url") === accordion_data[0]
+                          }
+                          onChange={() =>
+                            setSearchParams(
+                              createSearchParams({ url: accordion_data[0] })
+                            )
+                          }
+                        >
                           <AccordionSummary
                             expandIcon={<ExpandMoreIcon />}
                             id="panel1a-content"
                           >
-                            <Typography><strong>{accordion_data[0]}</strong></Typography>
+                            <Typography>
+                              <strong>{accordion_data[0]}</strong>
+                            </Typography>
                           </AccordionSummary>
                           <AccordionDetails>
-                            {accordion_data[1].map((schedule_data, data_index) => (
-                              <ScheduleElement key={data_index} schedule={schedule_data} ondelete={deleteScheduleRender} url={accordion_data[0]} data_index={data_index}/>
-                            ))}
+                            {accordion_data[1].map(
+                              (schedule_data, data_index) => (
+                                <ScheduleElement
+                                  key={data_index}
+                                  schedule={schedule_data}
+                                  ondelete={deleteScheduleRender}
+                                  url={accordion_data[0]}
+                                  data_index={data_index}
+                                />
+                              )
+                            )}
                           </AccordionDetails>
                         </Accordion>
                       </div>

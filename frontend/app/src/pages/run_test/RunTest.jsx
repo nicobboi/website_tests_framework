@@ -1,6 +1,8 @@
 import { useForm }  from  "react-hook-form";
 import { useState } from "react";
 
+import { useNavigate, createSearchParams } from "react-router-dom";
+
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import OutlinedInput from '@mui/material/OutlinedInput';
@@ -66,11 +68,18 @@ const RunTest = () => {
         fetch(request_url, requestOptions)
             .then(response => response.json()) 
             .then(json => {
-                setResponse("Scheduled successfully!");
-                console.log(json);
-                setTimeout(() => setResponse(null), 3000);
+                setResponse(json);
             })
             .catch(err => console.log("Error sending data: ", err));
+    }
+
+    const navigate = useNavigate()
+    const toScheduleList = (url) => {
+      const params = { url: url }
+      navigate({
+        pathname: '/schedules/',
+        search: `?${createSearchParams(params)}`
+      })
     }
 
     /* SELECT COMPONENT CONF ---------------------- */
@@ -164,7 +173,7 @@ const RunTest = () => {
                       <InputLabel id="demo-multiple-chip-label">
                         Select schedule days
                       </InputLabel>
-                      <Select 
+                      <Select
                         labelId="demo-multiple-chip-label"
                         id="demo-multiple-chip"
                         multiple
@@ -198,46 +207,6 @@ const RunTest = () => {
                         ))}
                       </Select>
                     </FormControl>
-                    {/* <div className="form-floating">
-                      <input
-                        type="number"
-                        id="minutes"
-                        className="form-control schedule-info-box mx-1"
-                        value={mins}
-                        onChange={(event) => {
-                          console.log(event.target);
-                          setMins(event.target.value);
-                        }}
-                        {...register("minutes")}
-                      />
-                      <label htmlFor="minutes">minutes</label>
-                    </div>
-                    <div className="form-floating">
-                      <input
-                        type="number"
-                        id="hours"
-                        className="form-control schedule-info-box mx-1"
-                        value={hours}
-                        onChange={(event) => {
-                          setHours(event.target.value);
-                        }}
-                        {...register("hours")}
-                      />
-                      <label htmlFor="hours">hours</label>
-                    </div>
-                    <div className="form-floating">
-                      <input
-                        type="number"
-                        id="days"
-                        className="form-control schedule-info-box mx-1"
-                        value={days}
-                        onChange={(event) => {
-                          setDays(event.target.value);
-                        }}
-                        {...register("days")}
-                      />
-                      <label htmlFor="days">days</label>
-                    </div> */}
                   </div>
                 </>
               )}
@@ -366,7 +335,12 @@ const RunTest = () => {
 
           <div className="row">
             <span className="fs-4 my-3 text-center text-success">
-              {response}
+              {response && testMode === "schedule" ? 
+              (<>
+                <span>Task scheduled correctly!</span><br />
+                <button className="btn" onClick={() => toScheduleList(response[0].url)}>Check in schedule list</button>
+              </>) 
+              : null}
             </span>
           </div>
         </div>

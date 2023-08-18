@@ -18,7 +18,7 @@ const Row = (props) => {
 
       const params = { category: type }
       navigate({
-        pathname: 'site-history/' + props.slug,
+        pathname: '/site-history/' + props.slug,
         search: `?${createSearchParams(params)}`
       })
     }
