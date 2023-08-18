@@ -51,7 +51,7 @@ def get_all_website_average_scores(
     return crud.website.get_all_average_scores(db=db)
 
 
-@router.post("/run", response_model=str)
+@router.post("/run")
 def run_tests(
     *,
     obj_in: schemas.WebsiteRun = Body(
@@ -74,8 +74,8 @@ def run_tests(
     for time in range(1, repeat_test+1):
         try:
             job = group(worker.test_website.s(url=obj_in.url, test_type=test, scheduled=False) for test in obj_in.test_types)
-            job.apply_async()
+            res = job.apply_async()
         except worker.test_website.OperationalError as e:
             print("Sending task raised: " + str(e) + "\n")
-    return "Run avviata!"
+    return res.as_tuple()
 
