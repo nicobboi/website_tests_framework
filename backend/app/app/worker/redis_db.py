@@ -22,13 +22,16 @@ def get_all_tasks(status_filter: Union[TaskStatus, None] = None):
         task_results.append(AsyncResult(id=task_id, backend=celery_app.backend))
 
     output = [{
-        "task_id": res.id,
-        "task_status": res.status,
-        "task_kwargs": res.kwargs
+        "id": res.id,
+        "finished_time": res.date_done,
+        "status": res.status,
+        "scheduled": res.kwargs["scheduled"],
+        "test_type": res.kwargs["test_type"],
+        "url": res.kwargs["url"]
     } for res in task_results]
 
     if status_filter and status_filter in TaskStatus.__members__.values():
-        output = [task for task in output if task["task_status"] == status_filter]
+        output = [task for task in output if task["status"] == status_filter]
 
     return output
 
@@ -38,7 +41,7 @@ def get_task(task_id: str):
     """
     task_checked = None
     for task in get_all_tasks():
-        if task["task_id"] == task_id:
+        if task["id"] == task_id:
             task_checked = task
             break
 
