@@ -15,6 +15,7 @@ import dayjs from "dayjs";
 import { useSearchParams, createSearchParams } from "react-router-dom";
 
 import ScheduleElement from "../../components/schedule_element/ScheduleElement";
+import TaskElement from "../../components/task_element/TaskElement";
 
 
 const JobList = () => {
@@ -27,31 +28,37 @@ const JobList = () => {
       setSearchParams((newJobType ? createSearchParams({ job: newJobType }) : createSearchParams({})))
     };
 
-    var request_url = ""
-    if (jobType === "schedule") request_url = "http://localhost/api/v1/schedule/get-all";
-    const { isLoading, data, error } = useFetch(request_url);
+    const { isLoading, data, error } = useFetch(jobType ? `http://localhost/api/v1/${jobType}/get-all` : "");
     const [dataFetched, setDataFetched] = useState({});
 
     useMemo(() => {
       if (error) return;
+      if (!jobType) {
+        setDataFetched({});
+        return;
+      };
 
       if (!isLoading) {
         // fetch the data to organize by URL
         const listByUrl = {};
 
-        for (const schedule of data) {
-          const { url, ...otherAttributes} = schedule;
+        for (const job of data) {
+          const { url, ...otherAttributes } = job;
+          const otherAttributesWithJob = {
+            ...otherAttributes,
+            job: jobType
+          }  
 
           if (!listByUrl[url]) listByUrl[url] = [];
 
-          listByUrl[url].push(otherAttributes);
+          listByUrl[url].push(otherAttributesWithJob);
         }
 
         setDataFetched(listByUrl);
       }
     }, [isLoading, data])
   
-    if (request_url !== "" && error) {
+    if (error && jobType) {
         return (
         <div>
             <p>Code: {error.status}</p>
@@ -85,7 +92,7 @@ const JobList = () => {
                       aria-label="Platform"
                     >
                       <ToggleButton value="schedule">Schedules</ToggleButton>
-                      <ToggleButton value="tasks">Tasks</ToggleButton>
+                      <ToggleButton value="task">Tasks</ToggleButton>
                     </ToggleButtonGroup>
                     <div className=" d-flex align-items-center">
                       <div className="me-3">
@@ -94,14 +101,15 @@ const JobList = () => {
                           {dayjs(new Date()).format("DD/MM/YYYY HH:mm")}
                         </span>
                       </div>
-                      <button className={`${styles.icons} ${styles.reload} btn`}>
+                      <button
+                        className={`${styles.icons} ${styles.reload} btn`}
+                      >
                         <i className="fa-solid fa-rotate-left"></i>
                       </button>
                     </div>
                   </div>
 
-                  {jobType === "schedule" ? (
-                  Object.entries(dataFetched).map(
+                  {Object.entries(dataFetched).map(
                     (accordion_data, url_index) => (
                       <div key={url_index}>
                         <Accordion
@@ -110,11 +118,11 @@ const JobList = () => {
                             searchParams.get("url") === accordion_data[0]
                           }
                           onChange={() =>
-                            searchParams.get("url") !== accordion_data[0] ? 
-                            setSearchParams(
-                              createSearchParams({ url: accordion_data[0] })
-                            ) :
-                            setSearchParams(createSearchParams({}))
+                            searchParams.get("url") !== accordion_data[0]
+                              ? setSearchParams(
+                                  createSearchParams({ url: accordion_data[0] })
+                                )
+                              : setSearchParams(createSearchParams({}))
                           }
                         >
                           <AccordionSummary
@@ -126,23 +134,30 @@ const JobList = () => {
                             </Typography>
                           </AccordionSummary>
                           <AccordionDetails>
-                            {accordion_data[1].map(
-                              (schedule_data, data_index) => (
-                                <ScheduleElement
-                                  key={data_index}
-                                  schedule={schedule_data}
-                                  ondelete={deleteScheduleRender}
-                                  url={accordion_data[0]}
-                                  data_index={data_index}
-                                />
-                              )
-                            )}
+                            {accordion_data[1].map((job_data, data_index) => (
+                              <div key={data_index}>
+                                {job_data["job"] === "schedule" ? (
+                                  <ScheduleElement
+                                    schedule={job_data}
+                                    ondelete={deleteScheduleRender}
+                                    url={accordion_data[0]}
+                                    data_index={data_index}
+                                  />
+                                ) : null}
+                                {job_data["job"] === "task" ? (
+                                  <TaskElement
+                                    task={job_data}
+                                    url={accordion_data[0]}
+                                    data_index={data_index}
+                                  />
+                                ) : null}
+                              </div>
+                            ))}
                           </AccordionDetails>
                         </Accordion>
                       </div>
                     )
-                  )
-                  ) : null }
+                  )}
                 </div>
               </div>
             </div>
