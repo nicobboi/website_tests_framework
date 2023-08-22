@@ -77,5 +77,8 @@ def run_tests(
             res = job.apply_async()
         except worker.test_website.OperationalError as e:
             print("Sending task raised: " + str(e) + "\n")
-    return res.as_tuple()
+    return [{
+        "task_id": res[0][0],
+        "url": obj_in.url
+        } for res in res.as_tuple()[1]] # return all tasks id
 

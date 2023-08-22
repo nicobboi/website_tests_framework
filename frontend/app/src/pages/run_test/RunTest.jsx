@@ -19,7 +19,7 @@ dayjs.extend(utc);
 const RunTest = () => {
     const { register, handleSubmit, formState:{errors} } = useForm();
     const [response, setResponse] = useState(null);
-    const [testMode, setTestMode] = useState("run");
+    const [testMode, setTestMode] = useState("task");
 
     // schedule info to send via API
     const [scheduleTime, setScheduleTime] = useState(dayjs(new Date()));
@@ -47,7 +47,7 @@ const RunTest = () => {
 
         var request_url = ""
 
-        if (testMode === "run") {
+        if (testMode === "task") {
           request_url = "http://localhost/api/v1/website/run"
         } else if (testMode === "schedule") {
           payload = {
@@ -74,8 +74,8 @@ const RunTest = () => {
     }
 
     const navigate = useNavigate()
-    const toScheduleList = (url) => {
-      const params = { job: "schedule", url: url  }
+    const toJobList = (url, test_mode) => {
+      const params = { job: test_mode, url: url  }
       navigate({
         pathname: '/job-list/',
         search: `?${createSearchParams(params)}`
@@ -211,19 +211,19 @@ const RunTest = () => {
                 </>
               )}
 
-              {/* TEST MODE (run / schedule) */}
+              {/* TEST MODE (task / schedule) */}
               <div className="form-check mt-3">
                 <input
                   className="form-check-input"
                   type="radio"
                   name="test-mode"
-                  id="run-radio"
-                  value="run"
-                  checked={testMode === "run"}
-                  onChange={(event) => setTestMode(event.target.value)}
+                  id="task-radio"
+                  value="task"
+                  checked={testMode === "task"}
+                  onChange={(event) => {setTestMode(event.target.value); setResponse(null);}}
                 />
-                <label className="form-check-label" htmlFor="run-radio">
-                  Single run test
+                <label className="form-check-label" htmlFor="task-radio">
+                  Single task test
                 </label>
               </div>
               <div className="form-check">
@@ -234,7 +234,7 @@ const RunTest = () => {
                   id="schedule-radio"
                   value="schedule"
                   checked={testMode === "schedule"}
-                  onChange={(event) => setTestMode(event.target.value)}
+                  onChange={(event) => {setTestMode(event.target.value); setResponse(null);}}
                 />
                 <label className="form-check-label" htmlFor="schedule-radio">
                   Schedule test
@@ -242,7 +242,7 @@ const RunTest = () => {
               </div>
 
               <button className="btn btn-warning mt-3" type="submit">
-                {testMode === "run" ? <>Launch Test</> : <>Schedule Test</>}
+                {testMode === "task" ? <>Launch Test</> : <>Schedule Test</>}
               </button>
             </div>
 
@@ -335,12 +335,18 @@ const RunTest = () => {
 
           <div className="row">
             <span className="fs-4 my-3 text-center text-success">
-              {response && testMode === "schedule" ? 
-              (<>
-                <span>Task scheduled correctly!</span><br />
-                <button className="btn" onClick={() => toScheduleList(response[0].url)}>Check in schedule list</button>
-              </>) 
-              : null}
+              {response ? (
+                <>
+                  <span>Tasks { testMode === "schedule" ? `scheduled` : `ran` } correctly!</span>
+                  <br />
+                  <button
+                    className="btn"
+                    onClick={() => toJobList(response[0].url, testMode)}
+                  >
+                    Check in { testMode } list
+                  </button>
+                </>
+              ) : null}
             </span>
           </div>
         </div>
