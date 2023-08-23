@@ -108,8 +108,8 @@ services:
     hostname: redis
     volumes:
       - redis-data:/data
-    ports:
-      - "6379:6379"
+    # ports:
+    #   - "6379:6379"
 
   flower:
     image: mher/flower:0.9.7
