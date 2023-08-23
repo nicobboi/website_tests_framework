@@ -6,7 +6,7 @@ import Chart from "../../components/site_history_chart/Chart";
 const SiteHistory = () => {
     const { id } = useParams()
 
-    const { isLoading, data, error } = useFetch("http://localhost/api/v1/website/scores?website_id=" + id);
+    const { isLoading, data, error } = useFetch("http://backend/api/v1/website/scores?website_id=" + id);
  
     if (error) {
         console.log(error)

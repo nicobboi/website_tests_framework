@@ -59,7 +59,7 @@ const ScheduleElement = (props) => {
         last_time_launched: null
       }
 
-      const request_url = "http://localhost/api/v1/schedule/update?schedule_id=" + schedule.id;
+      const request_url = "http://backend/api/v1/schedule/update?schedule_id=" + schedule.id;
 
       // API call to change schedule info
       const requestOptions = {
@@ -81,7 +81,7 @@ const ScheduleElement = (props) => {
     const deleteSchedule = () => {
       // check if the use is sure
 
-      const request_url = "http://localhost/api/v1/schedule/remove?schedule_id=" + schedule.id;
+      const request_url = "http://backend/api/v1/schedule/remove?schedule_id=" + schedule.id;
 
       // API call to change schedule info
       fetch(request_url, {method: 'POST'})

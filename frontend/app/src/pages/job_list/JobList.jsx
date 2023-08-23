@@ -28,7 +28,7 @@ const JobList = () => {
       setSearchParams((newJobType ? createSearchParams({ job: newJobType }) : createSearchParams({})))
     };
 
-    const { isLoading, data, error } = useFetch(jobType ? `http://localhost/api/v1/${jobType}/get-all` : "");
+    const { isLoading, data, error } = useFetch(jobType ? `http://backend/api/v1/${jobType}/get-all` : "");
     const [dataFetched, setDataFetched] = useState({});
 
     useMemo(() => {

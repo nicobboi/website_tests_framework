@@ -148,8 +148,6 @@ services:
     environment:
       - SERVER_NAME=${DOMAIN?Variable not set}
       - SERVER_HOST=https://${DOMAIN?Variable not set}
-      # Allow explicit env var override for tests
-      # - SMTP_HOST=${SMTP_HOST}
     build:
       context: ./backend
       dockerfile: backend.dockerfile
@@ -182,41 +180,31 @@ services:
     environment:
       - SERVER_NAME=${DOMAIN?Variable not set}
       - SERVER_HOST=http://${DOMAIN?Variable not set}
-      # Allow explicit env var override for tests
-      # - SMTP_HOST=${SMTP_HOST?Variable not set}
     build:
       context: ./backend
       dockerfile: celeryworker.dockerfile
       args:
         INSTALL_DEV: ${INSTALL_DEV-false}
 
-  # frontend:
-  #   image: "${DOCKER_IMAGE_FRONTEND?Variable not set}:${TAG-latest}"
-  #   env_file:
-  #     - .env
-  #   # networks:
-  #   #   - ${TRAEFIK_PUBLIC_NETWORK?Variable not set}
-  #   #   - default
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: frontend.dockerfile
-  #   labels:
-  #     - traefik.enable=true
-  #     - traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}
-  #     - traefik.http.routers.${STACK_NAME?Variable not set}-frontend-http.rule=PathPrefix(`/`)
-  #     - traefik.http.services.${STACK_NAME?Variable not set}-frontend.loadbalancer.server.port=3000
-
-  # scheduler:
-  #   image: "${DOCKER_IMAGE_SCHEDULER?Variable not set}:${TAG-latest}"
-  #   depends_on:
-  #     - db
-  #     - backend
-  #     - celeryworker
-  #   env_file:
-  #     - .env
-  #   build: 
-  #     context: ./backend
-  #     dockerfile: scheduler.dockerfile
+  frontend:
+    image: "${DOCKER_IMAGE_FRONTEND?Variable not set}:${TAG-latest}"
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+    networks:
+      - ${TRAEFIK_PUBLIC_NETWORK?Variable not set}
+      - default
+    build:
+      context: ./frontend
+      dockerfile: frontend.dockerfile
+    environment:
+      - API_URL=${API_URL}
+    labels:
+      - traefik.enable=true
+      - traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}
+      - traefik.http.routers.${STACK_NAME?Variable not set}-frontend-http.rule=PathPrefix(`/`)
+      - traefik.http.services.${STACK_NAME?Variable not set}-frontend.loadbalancer.server.port=3000
 
 volumes:
   app-db-data:
@@ -225,5 +213,4 @@ volumes:
 
 networks:
   traefik-public:
-    # Allow setting it to false for testing
     external: ${TRAEFIK_PUBLIC_NETWORK_IS_EXTERNAL-true}

@@ -2,7 +2,7 @@ import Table from "../../components/home_table/Table";
 import useFetch from "react-fetch-hook";
 
 const Home = () => {
-    const { isLoading, data, error } = useFetch("http://localhost/api/v1/website/latest-scores");
+    const { isLoading, data, error } = useFetch("http://backend/api/v1/website/latest-scores");
  
     if (error) {
         console.log(error)
@@ -16,10 +16,10 @@ const Home = () => {
 
     return (
       <>
-        { isLoading ? (
-            <p className="text-center">Loading component...</p>
+        {isLoading ? (
+          <p className="text-center">Loading component...</p>
         ) : (
-            <Table table_data={data}/>
+          <Table table_data={data} />
         )}
       </>
     );

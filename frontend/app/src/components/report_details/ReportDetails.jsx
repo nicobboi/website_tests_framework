@@ -6,7 +6,7 @@ dayjs.extend(utc);
 
 const ReportDetails = (props) => {
     // API call
-    const { isLoading, data, error } = useFetch("http://localhost/api/v1/report/get?id=" + props.report_id);
+    const { isLoading, data, error } = useFetch("http://backend/api/v1/report/get?id=" + props.report_id);
  
     if (error) {
         console.log(error)

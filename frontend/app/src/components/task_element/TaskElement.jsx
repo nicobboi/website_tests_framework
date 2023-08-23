@@ -1,4 +1,3 @@
-import { useState, useMemo } from "react";
 import styles from "./taskelement.module.scss";
 
 import dayjs from 'dayjs';
@@ -46,7 +45,7 @@ const TaskElement = (props) => {
               </div>
 
               <div className="d-flex align-items-center me-5">
-                <span style={ {color: ("green")} }>{task.status}</span>
+                <span style={ {color: statusColor(task.status)} }>{task.status}</span>
               </div>
 
             </li>

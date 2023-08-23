@@ -9,10 +9,10 @@ const Layout = ({children}) => {
             <footer>
                 <ul className='nav justify-content-center bg-light py-2'>
                     <li className='nav-item'>
-                        <a className='nav-link' href='http://localhost/docs'>OpenApi</a>
+                        <a className='nav-link' href='http://backend/docs'>OpenApi</a>
                     </li>
                     <li className='nav-item'>
-                        <a className='nav-link' href='http://localhost/redoc'>ReDoc</a>
+                        <a className='nav-link' href='http://backend/redoc'>ReDoc</a>
                     </li>
                 </ul>
             </footer>

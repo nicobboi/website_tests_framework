@@ -2,7 +2,7 @@ import ReportRow from "./ReportRow";
 import useFetch from "react-fetch-hook";
 
 const ReportTypeDetails = (props) => {
-    const { isLoading, data, error } = useFetch("http://localhost/api/v1/report/get-all-filtered?url=" + props.reports_url + "&type=" + props.reports_type);
+    const { isLoading, data, error } = useFetch("http://backend/api/v1/report/get-all-filtered?url=" + props.reports_url + "&type=" + props.reports_type);
  
     if (error) {
         console.log(error)
