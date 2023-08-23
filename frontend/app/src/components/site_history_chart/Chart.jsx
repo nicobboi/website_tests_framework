@@ -13,7 +13,7 @@ import {
 import 'chartjs-adapter-date-fns';
 import { Scatter, getElementAtEvent } from 'react-chartjs-2';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import {useSearchParams, createSearchParams} from 'react-router-dom';
 
 import DateTimePicker from 'react-datetime-picker';
@@ -151,7 +151,7 @@ const Chart = (props) => {
     }
 
     // return the dataset for the given type (timestamp - score)
-    const fetchChartData = (type, start_time = null, end_time = null) => {
+    const fetchChartData = ((type, start_time = null, end_time = null) => {
         // Reports filtered by type
         const reports = props.reports_scores.filter(report_score => report_score.tool.type === type)
             .filter((report_score) => (start_time ? dayjs(report_score.timestamp) > start_time : report_score))
@@ -176,7 +176,7 @@ const Chart = (props) => {
         }
 
         return dataset;
-    }
+    })
 
     // datasets of the chart
     const initialData = {
@@ -215,7 +215,7 @@ const Chart = (props) => {
     };
 
     const [data, setData] = useState(initialData);
-    const updateDataRender = (start, end) => {
+    const updateDataRender = useCallback((start, end) => {
         const updatedData = {
             datasets: [
                 {
@@ -242,7 +242,8 @@ const Chart = (props) => {
         }
 
         setData(updatedData);
-    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
     
     // chart options
     const initialOptions = {
@@ -361,7 +362,7 @@ const Chart = (props) => {
     // update data render filtering by start/end dates
     useMemo(() => {
         updateDataRender(startDate, endDate)
-    }, [startDate, endDate])
+    }, [startDate, endDate, updateDataRender])
 
     // set filter category by search params
     useEffect(() => {
@@ -374,6 +375,7 @@ const Chart = (props) => {
                 }
             }
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     return (
