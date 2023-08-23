@@ -197,11 +197,9 @@ services:
     build:
       context: ./frontend
       dockerfile: frontend.dockerfile
-      target: ${ENVIRONMENT}
     environment:
       - SERVER_NAME=${DOMAIN?Variable not set}
       - SERVER_HOST=https://${DOMAIN?Variable not set}
-      - API_URL=${API_URL}
     labels:
       - traefik.enable=true
       - traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}

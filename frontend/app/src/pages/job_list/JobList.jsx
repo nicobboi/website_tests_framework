@@ -56,6 +56,7 @@ const JobList = () => {
 
         setDataFetched(listByUrl);
       }
+    // eslint-disable-next-line
     }, [isLoading, data])
   
     if (error && jobType) {
