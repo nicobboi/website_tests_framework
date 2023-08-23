@@ -48,7 +48,7 @@ const RunTest = () => {
         var request_url = ""
 
         if (testMode === "task") {
-          request_url = "http://backend/api/v1/website/run"
+          request_url = "/api/v1/website/run"
         } else if (testMode === "schedule") {
           payload = {
             time_info: scheduleTime.utcOffset(0).format('HH:mm:ssZ'),
@@ -56,7 +56,7 @@ const RunTest = () => {
             ...payload
           }
         
-          request_url = "http://backend/api/v1/schedule/add"
+          request_url = "/api/v1/schedule/add"
         }
 
         // API call to start a run/add a schedule

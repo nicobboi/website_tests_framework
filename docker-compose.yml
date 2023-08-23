@@ -190,15 +190,17 @@ services:
     image: "${DOCKER_IMAGE_FRONTEND?Variable not set}:${TAG-latest}"
     env_file:
       - .env
+    volumes: 
+      - ./frontend/app/src:/app/src
     ports:
       - "3000:3000"
-    networks:
-      - ${TRAEFIK_PUBLIC_NETWORK?Variable not set}
-      - default
     build:
       context: ./frontend
       dockerfile: frontend.dockerfile
+      target: development
     environment:
+      - SERVER_NAME=${DOMAIN?Variable not set}
+      - SERVER_HOST=https://${DOMAIN?Variable not set}
       - API_URL=${API_URL}
     labels:
       - traefik.enable=true
