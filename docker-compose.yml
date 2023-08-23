@@ -108,8 +108,6 @@ services:
     hostname: redis
     volumes:
       - redis-data:/data
-    # ports:
-    #   - "6379:6379"
 
   flower:
     image: mher/flower:0.9.7
@@ -190,10 +188,10 @@ services:
     image: "${DOCKER_IMAGE_FRONTEND?Variable not set}:${TAG-latest}"
     env_file:
       - .env
+    depends_on:
+      - backend
     volumes: 
       - ./frontend/app/src:/app/src
-    ports:
-      - "3000:3000"
     build:
       context: ./frontend
       dockerfile: frontend.dockerfile

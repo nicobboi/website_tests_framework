@@ -12,7 +12,8 @@
 
   - Clone this repository (or download the source code);
   - Copy .env file from .env.template and change the project configuration;
-  - Launch `docker compose up`: this will create all the images and containers.
+  - Launch `docker compose build`: this will create all the images and containers.
+  - Launch `docker compose up`: this will start the containers.
 
 * Now you can open your browser and interact with these URLs:
 
