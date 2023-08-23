@@ -3,15 +3,20 @@ import json
 from datetime import datetime
 from zoneinfo import ZoneInfo
 import os
-
-# import here the output handlers
 from ..toolmockup import output_handler as mockup
 
+# import here the output handlers
+
+
 def run_test(url):
-    output = {
-        "validation-mockup": None,
-        # "pa-website-validator": None
-    }
+    output = {}
+
+    # if the env var is set, start only the mockup test
+    if os.environ.get("MOCKUP_TESTS"):
+        print("'Mockup' test started.")
+        output["validation-mockup"] = mockup.get_output(url, min_score=67, max_score=100)
+        print("Test ended.\n")
+        return output    
 
     # script_dir = os.path.dirname(__file__) 
 
@@ -49,14 +54,5 @@ def run_test(url):
 
     # print("Test ended.\n")
 
-    # MOCKUP --------------------------------------------------------------------- #
-
-    print("\'Mockup\' test started.")
-
-    output["validation-mockup"] = mockup.get_output(url, min_score=35, max_score=90)
-
-    print("Test ended.\n")
-
-    # ---------------------------------------------------------------------------- #
 
     return output
