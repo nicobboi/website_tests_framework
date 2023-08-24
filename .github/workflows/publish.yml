@@ -4,6 +4,7 @@ on:
         paths:
             - './backend/**'
             - './frontend/**'
+permissions: write-all
 jobs:
     publish-docker-images:
         runs-on: ubuntu-latest
