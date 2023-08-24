@@ -14,6 +14,7 @@
   - Copy .env file from .env.template and change the project configuration;
   - Launch `docker compose build`: this will create all the images and containers.
   - Launch `docker compose up`: this will start the containers.
+  - To use dev configurations, launch `sh docker-compose-dev.sh` instead.
 
 * Now you can open your browser and interact with these URLs:
 
@@ -25,9 +26,9 @@ Automatic interactive documentation with Swagger UI (from the OpenAPI backend): 
 
 Alternative automatic documentation with ReDoc (from the OpenAPI backend): http://localhost/redoc
 
-PGAdmin, PostgreSQL web administration: http://localhost:5050
+PGAdmin, PostgreSQL web administration: http://localhost:5050 (development)
 
-Flower, administration of Celery tasks: http://localhost:5555
+Flower, administration of Celery tasks: http://localhost:5555 (development)
 
 Traefik UI, to see how the routes are being handled by the proxy: http://localhost:8090
 
@@ -52,14 +53,6 @@ Change `traefik-public` to the name of the used Traefik network. And then update
 ```bash
 TRAEFIK_PUBLIC_NETWORK=traefik-public
 ```
-
-### Persisting Docker named volumes
-
-You need to make sure that each service (Docker container) that uses a volume is always deployed to the same Docker "node" in the cluster, that way it will preserve the data. Otherwise, it could be deployed to a different node each time, and each time the volume would be created in that new node before starting the service. As a result, it would look like your service was starting from scratch every time, losing all the previous data.
-
-That's specially important for a service running a database. But the same problem would apply if you were saving files in your main backend service (for example, if those files were uploaded by your users, or if they were created by your system).
-
-To solve that, you can put constraints in the services that use one or more data volumes (like databases) to make them be deployed to a Docker node with a specific label. And of course, you need to have that label assigned to one (only one) of your nodes.
 
 #### Adding services with volumes
 
@@ -127,6 +120,13 @@ docker-auto-labels docker-stack.yml
 
 You can run that command every time you deploy, right before deploying, as it doesn't modify anything if the required labels already exist.
 
+### Persisting Docker named volumes
+
+You need to make sure that each service (Docker container) that uses a volume is always deployed to the same Docker "node" in the cluster, that way it will preserve the data. Otherwise, it could be deployed to a different node each time, and each time the volume would be created in that new node before starting the service. As a result, it would look like your service was starting from scratch every time, losing all the previous data.
+
+That's specially important for a service running a database. But the same problem would apply if you were saving files in your main backend service (for example, if those files were uploaded by your users, or if they were created by your system).
+
+To solve that, you can put constraints in the services that use one or more data volumes (like databases) to make them be deployed to a Docker node with a specific label. And of course, you need to have that label assigned to one (only one) of your nodes.
 
 
 ### Continuous Integration / Continuous Delivery
@@ -146,11 +146,11 @@ If you need to add more environments, for example, you could imagine using a cli
 
 There is a main `docker-compose.yml` file with all the configurations that apply to the whole stack, it is used automatically by `docker-compose`.
 
-And there's also a `docker-compose.override.yml` with overrides for development, for example to mount the source code as a volume. It is used automatically by `docker-compose` to apply overrides on top of `docker-compose.yml`.
+And there's also a `docker-compose.dev.yml` with overrides for development, for example to mount the source code as a volume. It is used by running the shell script `docker-run-dev.sh`.
 
 These Docker Compose files use the `.env` file containing configurations to be injected as environment variables in the containers.
 
-They also use some additional configurations taken from environment variables set in the scripts before calling the `docker-compose` command.
+They also use some additional configurations taken from environment variables set in the scripts before calling the `docker compose` command.
 
 It is all designed to support several "stages", like development, building, testing, and deployment. Also, allowing the deployment to different environments like staging and production (and you can add more environments very easily).
 

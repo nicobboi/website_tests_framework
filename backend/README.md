@@ -68,4 +68,4 @@ If you don't want to start with the default models and want to remove them / mod
 
 ## Test Tools
 
-If you want to add new testing tools for monitoring websites, go to `./app/tools`.
+If you want to add new testing tools for monitoring websites, go to `./app/app/tools`.

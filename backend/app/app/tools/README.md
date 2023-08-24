@@ -29,4 +29,4 @@ To implement a tool for a category you have to follow this steps:
     }
     ```
   - Open the category output handler inside the folder (*categoryname*test.py);
-  - Import the *output_handler* created and add in the output dict variable your tool, then assign it the return value of the *get_output* function.
+  - Import the *output_handler* created, then assign to *output*['*toolname*'] the return value of the *get_output* function.
