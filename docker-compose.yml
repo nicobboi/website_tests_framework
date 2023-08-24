@@ -135,7 +135,7 @@ services:
         - traefik.http.services.${STACK_NAME?Variable not set}-flower.loadbalancer.server.port=5555
 
   backend:
-    image: "${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}"
+    image: ghcr.io/nicobboi/website-tests-backend:latest
     depends_on:
       - db
     logging:
@@ -148,15 +148,15 @@ services:
     environment:
       - SERVER_NAME=${DOMAIN?Variable not set}
       - SERVER_HOST=https://${DOMAIN?Variable not set}
-    build:
-      context: ./backend
-      dockerfile: backend.dockerfile
-      args:
-        BACKEND_APP_MODULE: ${BACKEND_APP_MODULE-app.main:app}
-        BACKEND_PRE_START_PATH: ${BACKEND_PRE_START_PATH-/app/prestart.sh}
-        BACKEND_PROCESS_MANAGER: ${BACKEND_PROCESS_MANAGER-gunicorn}
-        BACKEND_WITH_RELOAD: ${BACKEND_WITH_RELOAD-false}
-        INSTALL_DEV: ${INSTALL_DEV-false}
+    # build:
+    #   context: ./backend
+    #   dockerfile: backend.dockerfile
+    #   args:
+    #     BACKEND_APP_MODULE: ${BACKEND_APP_MODULE-app.main:app}
+    #     BACKEND_PRE_START_PATH: ${BACKEND_PRE_START_PATH-/app/prestart.sh}
+    #     BACKEND_PROCESS_MANAGER: ${BACKEND_PROCESS_MANAGER-gunicorn}
+    #     BACKEND_WITH_RELOAD: ${BACKEND_WITH_RELOAD-false}
+    #     INSTALL_DEV: ${INSTALL_DEV-false}
     labels:
        - traefik.enable=true
        - traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}
@@ -164,7 +164,7 @@ services:
        - traefik.http.services.${STACK_NAME?Variable not set}-backend.loadbalancer.server.port=80
 
   celeryworker:
-    image: "${DOCKER_IMAGE_CELERYWORKER?Variable not set}:${TAG-latest}"
+    image: ghcr.io/nicobboi/website-tests-celeryworker:latest
     depends_on:
       - db
       - redis
@@ -180,23 +180,23 @@ services:
     environment:
       - SERVER_NAME=${DOMAIN?Variable not set}
       - SERVER_HOST=http://${DOMAIN?Variable not set}
-    build:
-      context: ./backend
-      dockerfile: celeryworker.dockerfile
-      args:
-        INSTALL_DEV: ${INSTALL_DEV-false}
+    # build:
+    #   context: ./backend
+    #   dockerfile: celeryworker.dockerfile
+    #   args:
+    #     INSTALL_DEV: ${INSTALL_DEV-false}
 
   frontend:
-    image: "${DOCKER_IMAGE_FRONTEND?Variable not set}:${TAG-latest}"
+    image: ghcr.io/nicobboi/website-tests-frontend:latest
     env_file:
       - .env
     depends_on:
       - backend
     volumes: 
       - ./frontend/app/src:/app/src
-    build:
-      context: ./frontend
-      dockerfile: frontend.dockerfile
+    # build:
+    #   context: ./frontend
+    #   dockerfile: frontend.dockerfile
     environment:
       - SERVER_NAME=${DOMAIN?Variable not set}
       - SERVER_HOST=https://${DOMAIN?Variable not set}
