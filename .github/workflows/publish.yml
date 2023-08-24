@@ -1,5 +1,6 @@
 name: publish
 on: [push]
+permissions: write-all
 jobs:
     publish-docker-images:
         runs-on: ubuntu-latest
