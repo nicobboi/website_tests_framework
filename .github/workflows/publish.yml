@@ -17,18 +17,15 @@ jobs:
             name: Build backend image
             run: |
                 docker build -f ./backend/backend.dockerfile ./backend --tag ghcr.io/nicobboi/website-tests-backend:latest
-                docker run ghcr.io/nicobboi/website-tests-backend:latest
                 docker push ghcr.io/nicobboi/website-tests-backend:latest
         - 
             name: Build celery image
             run: |
                 docker build -f ./backend/celeryworker.dockerfile ./backend --tag ghcr.io/nicobboi/website-tests-celeryworker:latest
-                docker run ghcr.io/nicobboi/website-tests-celeryworker:latest
                 docker push ghcr.io/nicobboi/website-tests-celeryworker:latest
         - 
             name: Build frontend image
             run: |
                 docker build -f ./frontend/frontend.dockerfile ./frontend --tag ghcr.io/nicobboi/website-tests-frontend:latest
-                docker run ghcr.io/nicobboi/website-tests-frontend:latest
                 docker push ghcr.io/nicobboi/website-tests-frontend:latest
             
