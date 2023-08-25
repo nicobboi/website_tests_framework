@@ -1,9 +1,5 @@
 name: test images
-on: 
-    push:
-        paths:
-            - './backend/**'
-            - './frontend/**'
+on: [push]
 jobs:
     test-docker-images:
         runs-on: ubuntu-latest
