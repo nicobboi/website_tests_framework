@@ -1,0 +1,26 @@
+name: test images
+on: 
+    push:
+        paths:
+            - './backend/**'
+            - './frontend/**'
+jobs:
+    test-docker-images:
+        runs-on: ubuntu-latest
+        steps:
+        - 
+            uses: actions/checkout@v2
+        -
+            name: Prepare Environment Variables
+            run: cp .env.template .env
+        -   
+            name: Setup docker compose
+            uses: KengoTODA/actions-setup-docker-compose@main
+            env:
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        - 
+            name: Test docker images
+            run: docker compose -f "docker-compose.yml" up
+        -
+            name: Stop docker containers
+            run: docker compose -f "docker-compose.yml" down
