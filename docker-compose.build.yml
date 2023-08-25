@@ -1,0 +1,19 @@
+version: "3.3"
+services:
+  backend:
+    image: backend:latest 
+    build:
+      context: ./backend
+      dockerfile: backend.dockerfile
+
+  celeryworker:
+    image: celeryworker:latest 
+    build:
+      context: ./backend
+      dockerfile: celeryworker.dockerfile
+
+  frontend:
+    image: frontend:latest 
+    build:
+      context: ./frontend
+      dockerfile: frontend.dockerfile
