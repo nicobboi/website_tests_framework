@@ -5,7 +5,7 @@ const Home = () => {
     const { isLoading, data, error } = useFetch("/api/v1/website/latest-scores");
  
     if (error) {
-        console.log(error)
+        // console.log(error)
         return (
         <div>
             <p>Code: {error.status}</p>
