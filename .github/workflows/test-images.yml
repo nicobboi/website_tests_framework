@@ -16,7 +16,7 @@ jobs:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         - 
             name: Test docker images
-            run: docker compose -f "docker-compose.yml" up
+            run: docker compose -f "docker-compose.yml" up -d
         -
             name: Stop docker containers
             run: docker compose -f "docker-compose.yml" down
