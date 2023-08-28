@@ -56,7 +56,7 @@ services:
         INSTALL_JUPYTER: ${INSTALL_JUPYTER-true}
 
   celeryworker:
-    image: celeryworkers:latest 
+    image: celeryworker:latest 
     environment:
       - SERVER_HOST=http://${DOMAIN?Variable not set}
     build:

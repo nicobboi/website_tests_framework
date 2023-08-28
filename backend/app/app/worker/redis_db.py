@@ -16,10 +16,15 @@ def get_all_tasks(status_filter: Union[TaskStatus, None] = None):
     """
     Return all the task in Redis DB (optional: filtered by status)
     """
-    # TODO: modifica come prendere le task (guarda https://docs.celeryq.dev/en/stable/reference/celery.app.control.html#celery.app.control.Inspect)
     task_results: List[AsyncResult] = []
+    # Finished tasks
     for key in celery_app.backend.client.scan_iter("celery-task-meta-*"):
         task_id = str(key).split("celery-task-meta-", 1)[1].replace("'", "")
+        task_results.append(AsyncResult(id=task_id, backend=celery_app.backend))
+    # Pending tasks
+    for key in [task for task in celery_app.control.inspect().active().values()]:
+        if not key: break
+        task_id = key[0]["id"]
         task_results.append(AsyncResult(id=task_id, backend=celery_app.backend))
 
     output = [{
