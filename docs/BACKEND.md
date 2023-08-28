@@ -2,6 +2,8 @@
 
 ## General workflow
 
+All backend files are in `backend/`.
+
 By default, the dependencies are managed with [Poetry](https://python-poetry.org/), go there and install it.
 
 From `./app/` you can install all the dependencies with:
@@ -18,11 +20,20 @@ $ poetry shell
 
 Next, open your editor at `./app/` (instead of the project root: `./`), so that you see an `./app/` directory with your code inside. That way, your editor will be able to find all the imports, etc. Make sure your editor uses the environment you just created with Poetry.
 
-Modify or add SQLAlchemy models in `./app/app/models/`, Pydantic schemas in `./app/app/schemas/`, API endpoints in `./app/app/api/`, CRUD (Create, Read, Update, Delete) utils in `./app/app/crud/`. The easiest might be to copy the ones for Items (models, endpoints, and CRUD utils) and update them to your needs.
+Modify or add SQLAlchemy models in `./app/app/models/`, Pydantic schemas in `./app/app/schemas/`, API endpoints in `./app/app/api/`, CRUD (Create, Read, Update, Delete) utils in `./app/app/crud/`.
 
-Add and modify tasks to the Celery worker in `./app/app/worker/tasks.py`.
 
-If you need to install any additional package to the worker, add it to the file `./app/celeryworker.dockerfile`.
+## Celery
+
+Celery app configurations are in `./app/app/core/celery_app.py`.
+
+All Celery files are in `./app/app/worker`: 
+ * Add and modify tasks to the Celery worker in `tasks.py`;
+ * Celery scheduler is handled by `scheduler.py`; 
+ * Redis database handler (used to retrieve task informations) is `redis_db.py`.
+
+If you need to install any additional package to the worker, add it to the file `backend/app/celeryworker.dockerfile`.
+
 
 ## Migrations
 
@@ -33,7 +44,7 @@ Make sure you create a "revision" of your models and that you "upgrade" your dat
 * Start an interactive session in the backend container:
 
 ```console
-$ docker-compose exec backend bash
+$ docker compose exec backend bash
 ```
 
 * If you created a new model in `./app/app/models/`, make sure to import it in `./app/app/db/base.py`, that Python module (`base.py`) that imports all the models will be used by Alembic.
@@ -64,6 +75,5 @@ and comment the line in the file `prestart.sh` that contains:
 $ alembic upgrade head
 ```
 
-If you don't want to start with the default models and want to remove them / modify them, from the beginning, without having any previous revision, you can remove the revision files (`.py` Python files) under `./app/alembic/versions/`. And then create a first migration as described above.
 
 ## [Tools implementation guide](TOOLS.md)

@@ -28,9 +28,9 @@ Alternative automatic documentation with **ReDoc** (from the OpenAPI backend): h
 
 **Note**: The first time you start your stack, it might take a minute for it to be ready. While the backend waits for the database to be ready and configures everything, you can check the logs to monitor it.
 
-Now you can start developing: check **[BACKEND](docs/BACKEND.md)** and **[FRONTEND](docs/FRONTEND.md)** for the corresponding framework guide.
+Now you can start developing: check **[BACKEND](BACKEND.md)** and **[FRONTEND](FRONTEND.md)** for the corresponding framework guide.
 
-Known problems/updates to fix/add are in the [TODO file](TODO.md).
+Known problems/updates to fix/add are in the [TODO file](../TODO.md).
 
 
 ### Traefik network
