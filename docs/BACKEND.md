@@ -22,6 +22,8 @@ Next, open your editor at `./app/` (instead of the project root: `./`), so that 
 
 Modify or add SQLAlchemy models in `./app/app/models/`, Pydantic schemas in `./app/app/schemas/`, API endpoints in `./app/app/api/`, CRUD (Create, Read, Update, Delete) utils in `./app/app/crud/`.
 
+If you want to use mockup tools instead of the real ones, uncomment the *MOCKUP_TESTS* variable in `.env`.
+
 
 ## Celery
 

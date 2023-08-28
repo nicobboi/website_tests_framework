@@ -18,7 +18,8 @@ if (!fs.existsSync(downloadPath)) {
     defaultViewport: false,
     userDataDir: (__dirname + "/user_data"),
     args:[
-      '--start-maximized' // you can also use '--start-fullscreen'
+      '--start-maximized', // you can also use '--start-fullscreen'
+      '--no-sandbox'
    ],
   });
 

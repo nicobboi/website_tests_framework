@@ -168,8 +168,8 @@ services:
     depends_on:
       - db
       - redis
-    volumes:
-      - ./backend/app:/app
+    # volumes:
+    #   - ./backend/app:/app
     logging:
       driver: "json-file"
       options:

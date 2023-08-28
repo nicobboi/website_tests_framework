@@ -36,6 +36,7 @@ services:
       - "5555:5555"
 
   backend:
+    image: backend:latest 
     ports:
       - "8888:8888"
     volumes:
@@ -55,6 +56,7 @@ services:
         INSTALL_JUPYTER: ${INSTALL_JUPYTER-true}
 
   celeryworker:
+    image: celeryworkers:latest 
     environment:
       - SERVER_HOST=http://${DOMAIN?Variable not set}
     build:
@@ -63,6 +65,12 @@ services:
       args:
         INSTALL_DEV: ${INSTALL_DEV-true}
         INSTALL_JUPYTER: ${INSTALL_JUPYTER-true}
+    
+  frontend:
+    image: frontend:latest 
+    build:
+      context: ./frontend
+      dockerfile: frontend.dockerfile
 
 networks:
   traefik-public:

@@ -1,9 +1,10 @@
 from subprocess import Popen, PIPE
 from datetime import datetime, timezone
 import json
+import os
 
 def get_output(url: str):
-    ssllabs_path = "./ssllabs-scan"
+    ssllabs_path = os.path.dirname(__file__) + "/ssllabs-scan"
 
     start_test_timestamp = str(datetime.now(tz=timezone.utc))
 

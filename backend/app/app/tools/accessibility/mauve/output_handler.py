@@ -2,12 +2,17 @@ from subprocess import Popen
 from datetime import datetime, timezone
 import json
 import os
+import glob
 
 def get_output(url: str):
+    script_dir = os.path.dirname(__file__) 
     # tool's script path
-    mauve_path = "./index.js"
+    mauve_path = script_dir + "/index.js"
     # report download path
-    output_path = "./reports"
+    output_path = script_dir + "/reports"
+    # if the url has '/' as last char, it will be removed
+    if url[-1] == '/':
+        url = url[0:-1]
 
     start_test_timestamp = str(datetime.now(tz=timezone.utc))
 
@@ -16,11 +21,10 @@ def get_output(url: str):
 
     end_test_timestamp = str(datetime.now(tz=timezone.utc))
 
-    # if the url has '/' as last char, it will be removed
-    if url[-1] == '/':
-        url = url[0:-1]
     # example: mauve-earl-reporthttps___www.comune.novellara.re.it
-    report_path = output_path + "/mauve-earl-report" + url.replace("/","_").replace(":","_") + ".json"
+    report_path = glob.glob(output_path + "/*.json")
+    if not report_path: exit(1)
+    else: report_path = report_path[0]
 
     # there's an error in the json (",]"), so I manually removed it
     replace_string = ""

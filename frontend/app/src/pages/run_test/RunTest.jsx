@@ -258,7 +258,6 @@ const RunTest = () => {
                       type="checkbox"
                       value=""
                       id="accessibility-check"
-                      disabled
                       {...register("accessibility-check")}
                     />
                     <label
@@ -320,7 +319,6 @@ const RunTest = () => {
                       type="checkbox"
                       value=""
                       id="validation-check"
-                      disabled
                       {...register("validation-check")}
                     />
                     <label

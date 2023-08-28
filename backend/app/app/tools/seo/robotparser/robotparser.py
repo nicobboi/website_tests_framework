@@ -29,7 +29,7 @@ def test(uri):
         output += "Url not crawlable!\n\n"
 
 
-    sitemaps = rp.site_maps
+    sitemaps = rp.site_maps()
     if sitemaps:
         output += "Sitemap parameter is present in the robots.txt.\n"
         output += "Sitemaps are present!\n\n"
