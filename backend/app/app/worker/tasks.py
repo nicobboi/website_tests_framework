@@ -2,7 +2,6 @@ import requests
 from datetime import datetime, timezone
 
 from app.core.celery_app import celery_app
-from app.core.config import settings
 from app.tools import use_tool
 
 

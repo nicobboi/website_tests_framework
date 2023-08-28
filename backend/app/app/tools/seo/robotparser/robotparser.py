@@ -28,12 +28,14 @@ def test(uri):
     else:
         output += "Url not crawlable!\n\n"
 
-    if rp.site_maps() != None:
-        output += "Sitemap is present!\n"
-        output += "Sitemap parameter is present in the robots.txt.\n\n"
+
+    sitemaps = rp.site_maps
+    if sitemaps:
+        output += "Sitemap parameter is present in the robots.txt.\n"
+        output += "Sitemaps are present!\n\n"
     else:
         # list of commons sitemap files
-        sitemap = [
+        sitemaps = [
             "sitemap.xml",
             "sitemap_index.xml",
             "sitemap-index.xml",
@@ -45,18 +47,26 @@ def test(uri):
             "sitemapindex.xml",
             "sitemap/index.xml",
             "sitemap1.xml",
-            "rss/,"
+            "rss/",
             "rss.xml",
             "atom.xml"
         ]
 
-        for s in sitemap:
-            res = requests.get(uri + s)
-            if res.status_code == 200:
-                output += "Sitemap is present!\n"
+        output += "Sitemap parameter is not present in the robots.txt!\n"
+
+    output += "List of working sitemaps:\n"
+    working_sitemaps = []
+    for s in sitemaps:
+        res = requests.get(uri + s)
+        if res.status_code == 200:
+            working_sitemaps.append(s)
+    
+    if len(working_sitemaps) == 0: output += "none\n\n"
+    else: 
+        for ws in working_sitemaps: output += ws + "\n"
             
-        output += "Sitemap parameter is not present in the robots.txt!\n\n"
-        
+    
+    
     # TODO: controllare se i siti presenti nella sitemap non sono rotti
 
     return output    
