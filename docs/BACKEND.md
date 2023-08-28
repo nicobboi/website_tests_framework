@@ -66,6 +66,4 @@ $ alembic upgrade head
 
 If you don't want to start with the default models and want to remove them / modify them, from the beginning, without having any previous revision, you can remove the revision files (`.py` Python files) under `./app/alembic/versions/`. And then create a first migration as described above.
 
-## Test Tools
-
-If you want to add new testing tools for monitoring websites, go to `./app/app/tools`.
+## [Tools implementation guide](TOOLS.md)

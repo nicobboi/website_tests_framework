@@ -1,40 +1,37 @@
 # DEVELOPMENT GUIDE
 
-## Installation requirements
+## Local development requirements
 
-* [Docker](https://www.docker.com/) v24.0.4.
-* [Docker Compose](https://docs.docker.com/compose/install/) v2.20.0.
 * [Poetry](https://python-poetry.org/) v1.5.1.
 * [NodeJS](https://nodejs.org/) v19.6.0.
 * [npm](https://docs.npmjs.com/) v9.8.0.
 
-## Framework installation guide
+## Dev guide
 
-  - Clone this repository (or download the source code);
-  - Copy .env file from .env.template and change the project configurations;
-  - Launch `docker compose build`: this will create all the images and containers;
-  - Launch `docker compose up`: this will start the containers;
-  - To use dev configurations, launch `sh docker-compose-dev.sh` instead.
+To use dev configurations, launch `sh docker-compose-dev.sh`: this will launch `docker compose` with `docker-compose.yml` and `docker-compose.dev.yml` as override.
 
 * Now you can open your browser and interact with these URLs:
 
-Frontend, React app: http://localhost/
+**Frontend**, React app: http://localhost/
 
-Backend, JSON based web API based on OpenAPI: http://localhost/api/
+**Backend**, JSON based web API based on OpenAPI: http://localhost/api/
 
-Automatic interactive documentation with Swagger UI (from the OpenAPI backend): http://localhost/docs
+Automatic interactive documentation with **Swagger UI** (from the OpenAPI backend): http://localhost/docs
 
-Alternative automatic documentation with ReDoc (from the OpenAPI backend): http://localhost/redoc
+Alternative automatic documentation with **ReDoc** (from the OpenAPI backend): http://localhost/redoc
 
-PGAdmin, PostgreSQL web administration: http://localhost:5050 (development)
+**PGAdmin**, PostgreSQL web administration: http://localhost:5050 (development)
 
-Flower, administration of Celery tasks: http://localhost:5555 (development)
+**Flower**, administration of Celery tasks: http://localhost:5555 (development)
 
-Traefik UI, to see how the routes are being handled by the proxy: http://localhost:8090
+**Traefik UI**, to see how the routes are being handled by the proxy: http://localhost:8090
 
-**Note**: The first time you start your stack, it might take a minute for it to be ready. While the backend waits for the database to be ready and configures everything. You can check the logs to monitor it.
+**Note**: The first time you start your stack, it might take a minute for it to be ready. While the backend waits for the database to be ready and configures everything, you can check the logs to monitor it.
 
-Now you can start developing: check `./backend` and `./frontend` folders for the corresponding frameworks.
+Now you can start developing: check **[BACKEND](docs/BACKEND.md)** and **[FRONTEND](docs/FRONTEND.md)** for the corresponding framework guide.
+
+Known problems/updates to fix/add are in the [TODO file](TODO.md).
+
 
 ### Traefik network
 
@@ -131,9 +128,11 @@ To solve that, you can put constraints in the services that use one or more data
 
 ### Docker Compose files and env vars
 
-There is a main `docker-compose.yml` file with all the configurations that apply to the whole stack, it is used automatically by `docker-compose`.
+There is a main `docker-compose.yml` file with all the configurations that apply to the whole stack, it is used automatically by `docker compose`.
 
-And there's also a `docker-compose.dev.yml` with overrides for development, for example to mount the source code as a volume. It is used by running the shell script `docker-run-dev.sh`.
+There's a `docker-compose.dev.yml` with overrides for development. It is used by running the shell script `docker-run-dev.sh`.
+
+`docker-compose.build.yml` is used to build and publish the custom images to the repository by github workflows.
 
 These Docker Compose files use the `.env` file containing configurations to be injected as environment variables in the containers.
 
@@ -141,7 +140,7 @@ They also use some additional configurations taken from environment variables se
 
 It is all designed to support several "stages", like development, building, testing, and deployment. Also, allowing the deployment to different environments like staging and production (and you can add more environments very easily).
 
-They are designed to have the minimum repetition of code and configurations, so that if you need to change something, you have to change it in the minimum amount of places. That's why files use environment variables that get auto-expanded. That way, if for example, you want to use a different domain, you can call the `docker-compose` command with a different `DOMAIN` environment variable instead of having to change the domain in several places inside the Docker Compose files.
+They are designed to have the minimum repetition of code and configurations, so that if you need to change something, you have to change it in the minimum amount of places. That's why files use environment variables that get auto-expanded. That way, if for example, you want to use a different domain, you can call the `docker compose` command with a different `DOMAIN` environment variable instead of having to change the domain in several places inside the Docker Compose files.
 
 Also, if you want to have another deployment environment, say `preprod`, you just have to change environment variables, but you can keep using the same Docker Compose files.
 
@@ -149,6 +148,7 @@ Also, if you want to have another deployment environment, say `preprod`, you jus
 
 The `.env` file is the one that contains all your configurations, generated keys and passwords, etc.
 
-Depending on your workflow, you could want to exclude it from Git, for example if your project is public. In that case, you would have to make sure to set up a way for your CI tools to obtain it while building or deploying your project.
+This file is excluded by Git. To create it you have to copy the `.env.template` file and change the configurations.
 
-One way to do it could be to add each environment variable to your CI/CD system, and updating the `docker-compose.yml` file to read that specific env var instead of reading the `.env` file.
+All the existing default variables are already working, but is suggested to modify them even during development.
+
